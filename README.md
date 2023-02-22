@@ -36,7 +36,7 @@ The following resources will be used to accomplish this:
 - [FastAPI](https://fastapi.tiangolo.com): developing an API to serve the model with
 - [Locust](https://github.com/locustio/locust): API load balance testing
 
-Care was taken to select open source projects that may help reduce vendor lock and enable easier implementation of on-prem solutions.
+Care was taken to select open source projects that may help reduce vendor lock and enable easier implementation of secure, on-prem solutions.
 
 Changes can be tracked on [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) until that branch is merged.
 
