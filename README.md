@@ -30,11 +30,11 @@ The following resources will be used to accomplish this:
 - [Lightning](Lightning.ai): developing and serving the model
 - [Optuna](https://optuna.readthedocs.io/en/stable/): hyperparameter optimization trials
 - [Aim](https://aimstack.io): experiment management
+- [FastAPI](https://fastapi.tiangolo.com): developing an API to serve the model with
+- [Locust](https://github.com/locustio/locust): API load balance testing
 - [PyneCone](https://pynecone.io): data app as a front end
 - [Vercel](https://vercel.com): deploying an [exported, static PyneCone app](https://pynecone.io/docs/hosting/self-hosting)
 - [Supabase](https://supabase.com): user management
-- [FastAPI](https://fastapi.tiangolo.com): developing an API to serve the model with
-- [Locust](https://github.com/locustio/locust): API load balance testing
 
 Care was taken to select open source projects that may help reduce vendor lock and enable easier implementation of secure, on-prem solutions.
 
