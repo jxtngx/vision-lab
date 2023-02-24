@@ -25,7 +25,7 @@
 
 ## Overview
 
-The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts
+The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts.
 
 There is a particular focus on designing a novel (new) machine learning algorithm (in concept only) that will allow for the creation of pre-trained models. The project will culminate with displaying training results via a React UI similar to the one shown below.
 
