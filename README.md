@@ -23,7 +23,7 @@ href="https://lightning.ai" ><img src ="https://img.shields.io/badge/-Lightning-
 
 ## Overview
 
-The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. Is is an end-to-end project using LightningAI, ReactJS + the Vercel ecosystem, and Supabase; built from Lightning Pod's structural concepts.
+The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts
 
 _As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task. All code was removed from the default branch; see [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) for changes until that branch is merged onto the default branch.
 
