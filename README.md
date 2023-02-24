@@ -23,6 +23,8 @@ href="https://lightning.ai" ><img src ="https://img.shields.io/badge/-Lightning-
 
 ## Overview
 
+_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task. All code was removed from the default branch; see [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) for changes until that branch is merged onto the default branch.
+
 The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem.
 
 There is a particular focus on designing a novel (new) deep learning algorithm for image classification (in concept only) that will allow for the creation of pre-trained models.
@@ -48,13 +50,17 @@ There is a particular focus on designing a novel (new) deep learning algorithm f
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
 - [Vercel](https://vercel.com): hosting the front end, and monitoring and analytics
 
+**Secrets Management**
+
+- [Hashicorp Vault](https://developer.hashicorp.com/vault): secret and encryption management system
+
 ## Notes
 
-_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task.
+- Changes can be tracked on [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) until that branch is merged.
 
-Changes can be tracked on [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) until that branch is merged.
+- Vault and Terraform will only be used if needed.
 
-A clean template for research projects is found at [lightning-pod](https://github.com/JustinGoheen/lightning-pod).
+- A clean template for research projects is found at [lightning-pod](https://github.com/JustinGoheen/lightning-pod).
 
 ## Comments
 
