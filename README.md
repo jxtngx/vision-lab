@@ -23,16 +23,19 @@ href="https://lightning.ai" ><img src ="https://img.shields.io/badge/-Lightning-
 
 ## Overview
 
-_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task. The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with a foundational template to upskill from, or use to familiarize with the Lightning ecosystem.
+The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem.
+
+There is a particular focus on designing a novel (new) deep learning algorithm for image classification (in concept only) that will allow for the creation of pre-trained models.
 
 **Languages**
 
 - [Python](https://www.python.org): data engineering, and machine learning
-- [TypeScript](https://www.typescriptlang.org) and [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript): frontend design and visualization, and select backend services
+- [TypeScript](https://www.typescriptlang.org) and [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript): front-end design and visualization, and select backend services
 - [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build))
 
 **Data Engineering and Machine Learning**
 
+- [Supabase-Py](https://supabase.com/docs/reference/python/initializing) + Python: data acquisition and pushing to Supabase-Postgres
 - [Lightning](Lightning.ai): developing and serving the model
 - [Optuna](https://optuna.readthedocs.io/en/stable/): hyperparameter optimization trials
 - [Aim](https://aimstack.io): experiment management
@@ -43,9 +46,11 @@ _As of 22 February 2023:_ this project will reduce vendor examples in favor of a
 
 - [Supabase](https://supabase.com) + [Postgres](https://supabase.com/docs/guides/database/overview) + [Prisma](https://supabase.com/docs/guides/integrations/prisma): database, storage, and user auth management
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
-- [Vercel](https://vercel.com): deploying the front end, monitoring and analytics
+- [Vercel](https://vercel.com): hosting the front end, and monitoring and analytics
 
 ## Notes
+
+_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task.
 
 Changes can be tracked on [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) until that branch is merged.
 
@@ -55,11 +60,11 @@ A clean template for research projects is found at [lightning-pod](https://githu
 
 _Why use React and TypeScript instead of Plotly Dash, Streamlit, or Pynecone?_
 
-Simply put, Dash and Streamlit seem more focused on enterprise clients - making use difficult for lone engineers trying to go from -1 to 0 with regard to conveying technology via a visual interface.
+Dash and Streamlit seem more focused on enterprise clients with regard to design, hosting, and user management.
 
-Pynecone is promising given it compiles to NextJS - making project deployable to Vercel; however, it is simply too new to adopt.
+Pynecone is promising given it compiles to NextJS - making projects deployable to Vercel; however, it is simply too new to adopt.
 
-Learning and using TypeScript with React enables creating better frontends with tools like [material-ui](https://mui.com), MUI's [figma design kit](https://mui.com/store/items/figma-react/), and [d3js](https://d3js.org). We can learn from an applied approach, developing a single page web app as an [mvp](https://en.wikipedia.org/wiki/Minimum_viable_product)/[pre-alpha](https://en.wikipedia.org/wiki/Software_release_life_cycle).
+Learning and using TypeScript with React enables creating better frontends with tools like [material-ui](https://mui.com), MUI's [figma design kit](https://mui.com/store/items/figma-react/), and [d3js](https://d3js.org). We can learn from an applied approach - staying somewhat high-level - by developing a single page web app as an [mvp](https://en.wikipedia.org/wiki/Minimum_viable_product)/[pre-alpha](https://en.wikipedia.org/wiki/Software_release_life_cycle), and using the learning resources mentioned in the next section.
 
 _Why NextJS and Supabase?_
 
