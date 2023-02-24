@@ -18,8 +18,8 @@
 
 <a href="https://lightning.ai" ><img src ="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white" height="28"/> </a>
 
-<!-- [![codecov](https://codecov.io/gh/JustinGoheen/lightning-pod/branch/main/graph/badge.svg)](https://codecov.io/gh/JustinGoheen/lightning-pod)
-![CircleCI](https://circleci.com/gh/JustinGoheen/lightning-pod.svg?style=shield) -->
+<!-- [![codecov](https://codecov.io/gh/JustinGoheen/lightning-pod-example/branch/main/graph/badge.svg)](https://codecov.io/gh/JustinGoheen/lightning-pod-example)
+![CircleCI](https://circleci.com/gh/JustinGoheen/lightning-pod-example.svg?style=shield) -->
 
 </div>
 
@@ -60,6 +60,23 @@ There is a particular focus on designing a novel (new) machine learning algorith
 **Secrets Management**
 
 - [Hashicorp Vault](https://developer.hashicorp.com/vault): secret and encryption management system
+
+## Setup
+
+You must have Python and NPM installed.
+
+To setup a virtual development environment, in terminal, do:
+
+```sh
+python3 -m venv .venv/
+source .venv/bin/activate
+pip install -e ".[full]"
+pre-commit install
+deactivate
+cd lpx-ui
+yarn install
+cd ..
+```
 
 ## AI/ML and Software Engineering Learning Resources
 

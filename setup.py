@@ -20,9 +20,9 @@ rootdir = Path(__file__).parent
 long_description = (rootdir / "README.md").read_text()
 
 setup(
-    name="lightning-pod",
-    version="0.0.5",
-    description="A Research Template for the Lightning.ai Ecosystem",
+    name="lightning-podex",
+    version="0.0.1",
+    description="An End to End ML Product Example",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Justin Goheen",

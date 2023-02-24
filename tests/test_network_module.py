@@ -14,7 +14,7 @@
 
 import torch
 
-from lightning_pod.core.module import Decoder, Encoder, PodModule
+from lightning_podex.core.module import Decoder, Encoder, PodModule
 
 
 def test_module_not_abstract():

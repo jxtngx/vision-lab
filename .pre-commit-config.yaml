@@ -39,3 +39,9 @@ repos:
       - id: flake8
         args: [--max-line-length=120]
         name: Check PEP8
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.237'
+    hooks:
+      - id: ruff
+        args: ["--fix"]
