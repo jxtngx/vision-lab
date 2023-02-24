@@ -22,7 +22,6 @@ from lightning.pytorch import LightningDataModule
 from lightning.pytorch.loggers import Logger
 from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from torch.utils.data import DataLoader, random_split
-from torchvision import transforms
 
 from lightning_podex import conf
 from lightning_podex.pipeline.dataset import PodDataset
@@ -40,8 +39,8 @@ class PodDataModule(LightningDataModule):
         split: bool = True,
         train_size: float = 0.8,
         num_workers: int = NUMWORKERS,
-        transforms: Callable = transforms.ToTensor(),
         batch_size: int = 64,
+        transforms: Optional[Callable] = None,
     ):
         super().__init__()
         self.data_dir = os.path.join(PROJECTPATH, data_dir, "cache")

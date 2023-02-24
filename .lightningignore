@@ -10,7 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+dist/lightning*
 downloads/
 eggs/
 .eggs/
@@ -26,6 +26,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.yarn*
+.pnp*
+node_modules
+.storage
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -133,33 +137,57 @@ dmypy.json
 
 # VS Code
 *.code-workspace
-.vscode/
+.vscode
 
 # PyCharm
-.idea/
+.idea
 
-# profiler, logger logs, model checkpoints, production models
+# TypeScript and JavaScript
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+.next/
+out/
+
+# production
+build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# turbo
+.turbo
+
+# PROJECT
+# profiler, logger logs, model checkpoints, production models, data
+.ruff_cache
 outputs/
 models/checkpoints/model-*
 logs/tensorboard/version*
 logs/torch_profiler/fit*
 logs/torch_profiler/predict*
 logs/torch_profiler/test*
-logs/wandb_logs/wandb
-
-# tests
-tests/
-
-# research notebooks
-notebooks/
-
-# CICD
-.circleci/
-.devcontainer/
-.github/
-.deepsource/
-.git/
-
-# docs and examples
-docs/
-examples/
+data/cache/PodDataset
