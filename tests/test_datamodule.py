@@ -17,7 +17,7 @@ from pathlib import Path
 
 import torch
 
-from lightning_podex.pipeline.datamodule import PodDataModule
+from vision_pod.pipeline.datamodule import PodDataModule
 
 
 def test_module_not_abstract():

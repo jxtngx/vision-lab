@@ -17,12 +17,12 @@ from pathlib import Path
 
 import click
 
-from lightning_podex.cli.utils import build, common_destructive_flow, make_bug_trainer, teardown
-from lightning_podex.components import sweeps
-from lightning_podex.core.module import PodModule
-from lightning_podex.core.trainer import PodTrainer
-from lightning_podex.fabric.bugreport import bugreport
-from lightning_podex.pipeline.datamodule import PodDataModule
+from vision_pod.cli.utils import build, common_destructive_flow, make_bug_trainer, teardown
+from vision_pod.components import sweeps
+from vision_pod.core.module import PodModule
+from vision_pod.core.trainer import PodTrainer
+from vision_pod.fabric.bugreport import bugreport
+from vision_pod.pipeline.datamodule import PodDataModule
 
 FILEPATH = Path(__file__)
 PKGPATH = FILEPATH.parents[1]
@@ -70,7 +70,6 @@ def help() -> None:
 
 @trainer.command("run-example")
 def run_example() -> None:
-
     model = PodModule()
     dm = PodDataModule()
     trainer = PodTrainer(fast_dev_run=True)

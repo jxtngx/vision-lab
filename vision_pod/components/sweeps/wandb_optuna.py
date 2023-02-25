@@ -27,10 +27,10 @@ from rich.console import Console
 from rich.table import Table
 from torch import optim
 
-from lightning_podex import conf
-from lightning_podex.core.module import PodModule
-from lightning_podex.core.trainer import PodTrainer
-from lightning_podex.pipeline.datamodule import PodDataModule
+from vision_pod import conf
+from vision_pod.core.module import PodModule
+from vision_pod.core.trainer import PodTrainer
+from vision_pod.pipeline.datamodule import PodDataModule
 
 
 class ObjectiveWork:
@@ -84,7 +84,6 @@ class ObjectiveWork:
         self.trainer.datamodule.persist_splits()
 
     def _objective(self, trial: Trial) -> float:
-
         lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
         optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
         optimizer = getattr(optim, optimizer_name)
@@ -135,7 +134,6 @@ class ObjectiveWork:
         return self.trainer.callback_metrics["val_acc"].item()
 
     def run(self, trial: Trial) -> float:
-
         if trial.number == 0:
             self.datamodule.prepare_data()
 
@@ -158,7 +156,7 @@ class SweepFlow:
         self,
         project_name: Optional[str] = None,
         wandb_dir: Optional[str] = conf.WANDBPATH,
-        study_name: Optional[str] = "lightning-podex",
+        study_name: Optional[str] = "vision-pod",
         log_preprocessing: bool = False,
     ) -> None:
         # settings
@@ -189,7 +187,6 @@ class SweepFlow:
 
     @staticmethod
     def _display_report(trial_metric_names: List[str], trial_info: List[str]) -> None:
-
         table = Table(title="Study Statistics")
 
         for col in trial_metric_names:

@@ -59,7 +59,6 @@ def build() -> None:
 
 
 def teardown() -> None:
-
     do_not_delete = "README.md"
 
     target_dirs = [
@@ -87,8 +86,8 @@ def teardown() -> None:
 
 
 def make_bug_trainer():
-    source = os.path.join(PROJECTPATH, "lightning_podex", "cli", "bugreport", "trainer.py")
-    destination = os.path.join(PROJECTPATH, "lightning_podex", "core", "bug_trainer.py")
+    source = os.path.join(PROJECTPATH, "vision_pod", "cli", "bugreport", "trainer.py")
+    destination = os.path.join(PROJECTPATH, "vision_pod", "core", "bug_trainer.py")
     shutil.copyfile(source, destination)
 
 

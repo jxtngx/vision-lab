@@ -14,7 +14,7 @@
 
 <div align="center">
 
-# Lightning Pod Example
+# Lightning Pod Vision
 
 <a href="https://lightning.ai" ><img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white" height="29"/></a> <img src ="https://img.shields.io/badge/Python-3776AB.svg?style=for-the-badge&logo=Python&logoColor=white" height="29"/> <img src ="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" height="29"/>
 
@@ -28,9 +28,9 @@
 
 ## Overview
 
-The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces lightning_pod.pages with a ReactUI.
+The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning. The _product_ is an intelligent agent behind a visual interface.
 
-_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task.
+It uses [Lightning](https://lightning.ai), [FastAPI](https://fastapi.tiangolo.com), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces lightning_pod.pages with a React UI.
 
 ## Programming Languages and Concepts
 
@@ -58,24 +58,30 @@ _As of 22 February 2023:_ this project will reduce vendor examples in favor of a
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
 - [Vercel](https://vercel.com): hosting the front end, and monitoring and analytics
 
-**Secrets Management**
-
-- [Hashicorp Vault](https://developer.hashicorp.com/vault): secret and encryption management system
-
 **Domain**
 
 - Topics:
-  - Financial Trading
-  - Market microstructure
-  - Time Series Momentum
-  - Time Series Analysis
-  - Optimization Methods in Finance
-  - Multi-agent Systems
-  - Intelligent Agents
-  - Recurrent and Temporal Convolutional Networks
-  - Reinforcement Learning
-- Data Source: [AlpacaHQ](https://alpaca.markets)
-- Domain Libraries: [Nixtla](https://www.nixtla.io)
+  - Computer Vision
+  - Image Classification
+- Data Source: torchvision, CIFAR
+- Domain Libraries: torchvision
+
+## Roadmap
+
+The general outline for building this project is:
+
+- data acquistion and preprocessing
+- data storage
+- model selection
+- determine evaluation criteria
+- determine hyperparameter optimization plan
+- do HPO trials
+- train from best HPO config
+- persist model
+- build Model serving API with FastAPI
+- determine feedback criteria for front end users
+- design and build front end
+- improve on feedback
 
 ## Setup
 

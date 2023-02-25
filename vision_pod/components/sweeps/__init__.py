@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from lightning_podex.components.sweeps.wandb_optuna import SweepFlow as WandbOptunaSweepFlow  # noqa: F401
+from vision_pod.components.sweeps.wandb_optuna import SweepFlow as WandbOptunaSweepFlow  # noqa: F401
