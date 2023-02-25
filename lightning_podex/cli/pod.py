@@ -17,11 +17,11 @@ from pathlib import Path
 
 import click
 
-from lightning_podex.cli.bugreport import bugreport
 from lightning_podex.cli.utils import build, common_destructive_flow, make_bug_trainer, teardown
 from lightning_podex.components import sweeps
 from lightning_podex.core.module import PodModule
 from lightning_podex.core.trainer import PodTrainer
+from lightning_podex.fabric.bugreport import bugreport
 from lightning_podex.pipeline.datamodule import PodDataModule
 
 FILEPATH = Path(__file__)
