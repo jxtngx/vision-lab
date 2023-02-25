@@ -185,7 +185,7 @@ next-env.d.ts
 # profiler, logger logs, model checkpoints, production models, data
 .ruff_cache/
 outputs/
-models/checkpoints/model-*
+models/checkpoints/model*
 logs/tensorboard/version*
 logs/torch_profiler/fit*
 logs/torch_profiler/predict*
