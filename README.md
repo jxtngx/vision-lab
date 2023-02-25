@@ -16,7 +16,7 @@
 
 # Lightning Pod Example
 
-<a href="https://lightning.ai" ><img src ="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white" height="28"/> </a>
+<a href="https://lightning.ai" ><img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white" height="28"/></a> <img src ="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white" height="30"/>
 
 <!-- [![codecov](https://codecov.io/gh/JustinGoheen/lightning-pod-example/branch/main/graph/badge.svg)](https://codecov.io/gh/JustinGoheen/lightning-pod-example)
 ![CircleCI](https://circleci.com/gh/JustinGoheen/lightning-pod-example.svg?style=shield) -->
@@ -25,11 +25,9 @@
 
 ## Overview
 
-The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts.
+The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces lightning_pod.pages data apps with a ReactUI.
 
-There is a particular focus on designing a novel (new) machine learning algorithm (in concept only) that will allow for the creation of pre-trained models. The project will culminate with displaying training results via a React UI similar to the one shown below.
-
-![](assets/dash_ui.png)
+_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task.
 
 ## Programming Languages and Concepts
 
@@ -37,7 +35,7 @@ There is a particular focus on designing a novel (new) machine learning algorith
 
 - [Python](https://www.python.org): data engineering, and machine learning
 - [TypeScript](https://www.typescriptlang.org) and [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript): front-end design and visualization, and select back-end services
-- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build))
+- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build)) may require troubleshooting errors
 
 **Data Engineering and Database Management**
 
@@ -53,13 +51,28 @@ There is a particular focus on designing a novel (new) machine learning algorith
 
 **User Interfaces**
 
-- [Supabase](https://supabase.com): database, storage, and user auth management
+- [Supabase](https://supabase.com): database, storage, and user management
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
 - [Vercel](https://vercel.com): hosting the front end, and monitoring and analytics
 
 **Secrets Management**
 
 - [Hashicorp Vault](https://developer.hashicorp.com/vault): secret and encryption management system
+
+**Domain**
+
+- Topics:
+  - Financial Trading
+  - Market microstructure
+  - Time Series Momentum
+  - Time Series Analysis
+  - Optimization Methods in Finance
+  - Multi-agent Systems
+  - Intelligent Agents
+  - Recurrent and Temporal Convolutional Networks
+  - Reinforcement Learning
+- Data Source: [AlpacaHQ](https://alpaca.markets)
+- Domain Libraries: [Nixtla](https://www.nixtla.io)
 
 ## Setup
 
