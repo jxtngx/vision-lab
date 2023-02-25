@@ -16,16 +16,21 @@
 
 # Lightning Pod Example
 
-<a 
-href="https://lightning.ai" ><img src ="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white" height="28"/> </a>
+<a href="https://lightning.ai" ><img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white" height="29"/></a> <img src ="https://img.shields.io/badge/Python-3776AB.svg?style=for-the-badge&logo=Python&logoColor=white" height="29"/> <img src ="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" height="29"/>
+
+<img src ="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white" height="31"/> <img src ="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" height="31"/> <img src ="https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white" height="30"/>
+<img src ="https://img.shields.io/badge/FastAPI-009688.svg?style=for-the-badge&logo=FastAPI&logoColor=white" height="29"/>
+
+<!-- [![codecov](https://codecov.io/gh/JustinGoheen/lightning-pod-example/branch/main/graph/badge.svg)](https://codecov.io/gh/JustinGoheen/lightning-pod-example)
+![CircleCI](https://circleci.com/gh/JustinGoheen/lightning-pod-example.svg?style=shield) -->
 
 </div>
 
 ## Overview
 
-The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts.
+The core purpose of this repo is to provide [Lightning.ai](https://lightning.ai) users with an end-to-end template to upskill from, or use to familiarize with the Lightning ecosystem. It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces lightning_pod.pages with a ReactUI.
 
-_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task. All code was removed from the default branch; see [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) for changes until that branch is merged onto the default branch.
+_As of 22 February 2023:_ this project will reduce vendor examples in favor of a more efficient end-to-end flow that focuses on concepts and methodologies instead of multiple examples for the same task.
 
 ## Programming Languages and Concepts
 
@@ -33,7 +38,7 @@ _As of 22 February 2023:_ this project will reduce vendor examples in favor of a
 
 - [Python](https://www.python.org): data engineering, and machine learning
 - [TypeScript](https://www.typescriptlang.org) and [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript): front-end design and visualization, and select back-end services
-- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build))
+- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build)) may require troubleshooting errors
 
 **Data Engineering and Database Management**
 
@@ -49,7 +54,7 @@ _As of 22 February 2023:_ this project will reduce vendor examples in favor of a
 
 **User Interfaces**
 
-- [Supabase](https://supabase.com): database, storage, and user auth management
+- [Supabase](https://supabase.com): database, storage, and user management
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
 - [Vercel](https://vercel.com): hosting the front end, and monitoring and analytics
 
@@ -57,33 +62,37 @@ _As of 22 February 2023:_ this project will reduce vendor examples in favor of a
 
 - [Hashicorp Vault](https://developer.hashicorp.com/vault): secret and encryption management system
 
-## Notes
+**Domain**
 
-- Changes can be tracked on [enhancement/clean-example](https://github.com/JustinGoheen/lightning-pod-example/tree/enhancement/clean-example) until that branch is merged.
+- Topics:
+  - Financial Trading
+  - Market microstructure
+  - Time Series Momentum
+  - Time Series Analysis
+  - Optimization Methods in Finance
+  - Multi-agent Systems
+  - Intelligent Agents
+  - Recurrent and Temporal Convolutional Networks
+  - Reinforcement Learning
+- Data Source: [AlpacaHQ](https://alpaca.markets)
+- Domain Libraries: [Nixtla](https://www.nixtla.io)
 
-- Vault and Terraform will only be used if needed.
+## Setup
 
-- A clean template for research projects is found at [lightning-pod](https://github.com/JustinGoheen/lightning-pod).
+You must have Python and NPM installed.
 
-## Comments
+To setup a virtual development environment, in terminal, do:
 
-_Why use React and TypeScript instead of Plotly Dash, Streamlit, or Pynecone?_
-
-Dash and Streamlit seem more focused on enterprise clients with regard to design, hosting, and user management.
-
-Pynecone is promising given it compiles to NextJS - making projects deployable to Vercel; however, it is simply too new to adopt.
-
-Learning and using TypeScript with React enables creating better frontends with tools like [material-ui](https://mui.com), MUI's [figma design kit](https://mui.com/store/items/figma-react/), and [d3js](https://d3js.org). We can learn from an applied approach - staying somewhat high-level - by developing a single page web app as an [mvp](https://en.wikipedia.org/wiki/Minimum_viable_product)/[pre-alpha](https://en.wikipedia.org/wiki/Software_release_life_cycle), and using the learning resources mentioned in the next section.
-
-_Why NextJS and Supabase?_
-
-NextJS has an easy to use [developer onboarding resource](https://nextjs.org/learn/foundations/about-nextjs?utm_source=next-site&utm_medium=nav-cta&utm_campaign=next-website).
-
-Supabase has an integration with [Vercel.](https://supabase.com/docs/guides/integrations/vercel), the creators of NextJS. Making it an easy choice.
-
-_Why an end-to-end example?_
-
-Going through end-to-end example will increase our value-add to cross-functional teams, as we will be more literate of concepts across the [product development](https://asana.com/resources/product-development-process), and [Dev](https://resources.github.com/devops/) + [ML Ops](https://blogs.nvidia.com/blog/2020/09/03/what-is-mlops/) life cycles.
+```sh
+python3 -m venv .venv/
+source .venv/bin/activate
+pip install -e ".[full]"
+pre-commit install
+deactivate
+cd lpx-ui
+yarn install
+cd ..
+```
 
 ## AI/ML and Software Engineering Learning Resources
 
