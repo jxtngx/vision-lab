@@ -17,8 +17,7 @@ from pathlib import Path
 
 import click
 
-from vision_pod.cli.utils import build, common_destructive_flow, make_bug_trainer, teardown
-from vision_pod.components import sweeps
+from vision_pod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
 from vision_pod.core.module import PodModule
 from vision_pod.core.trainer import PodTrainer
 from vision_pod.fabric.bugreport import bugreport
@@ -37,12 +36,6 @@ def main() -> None:
 @main.command("teardown")
 def _teardown() -> None:
     common_destructive_flow([teardown], command_name="teardown")
-
-
-# TODO add help description
-@main.command("init")
-def init() -> None:
-    common_destructive_flow([teardown, build], command_name="init")
 
 
 @main.command("bug-report")
@@ -68,52 +61,37 @@ def help() -> None:
     os.system(f"python {trainer} --help")
 
 
-@trainer.command("run-example")
-def run_example() -> None:
+@trainer.command("fast-dev-run")
+def fast_dev_run() -> None:
     model = PodModule()
     dm = PodDataModule()
     trainer = PodTrainer(fast_dev_run=True)
     trainer.fit(model=model, datamodule=dm)
 
 
-@trainer.command("run")
+@trainer.command("sweep-and-train")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "aim"]))
 @click.option("--project-name", default="lightningpod-train")
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-def run_trainer(em, project_name, trial_count, persist_model, persist_predictions, persist_splits) -> None:
+def sweep_and_train(em, project_name, trial_count, persist_model, persist_predictions, persist_splits) -> None:
     project_name = "-".join([project_name, em])
-    if em == "wandb":
-        trainer = sweeps.WandbTrainFlow(project_name=project_name, trial_count=trial_count)
-        sweeps
-        trainer.run(persist_model=persist_model, persist_predictions=persist_predictions, persist_splits=persist_splits)
-    if em == "aim":
-        raise NotImplementedError("Aim experiment manager is not implemented")
 
 
-@main.group("sweep")
-def sweep() -> None:
-    pass
-
-
-@sweep.command("wandb")
-@click.option("--project-name", default="lightningpod-sweep-wandb")
+@trainer.command("train-only")
+@click.option("--em", default="wandb", type=click.Choice(["wandb", "aim"]))
+@click.option("--project-name", default="lightningpod-train")
 @click.option("--trial-count", default=10)
-def run_wandb_sweep(project_name, trial_count) -> None:
-    sweep = sweeps.WandbSweepFlow(project_name=project_name, trial_count=trial_count)
-    sweep.run()
+@click.option("--persist_model", is_flag=True)
+@click.option("--persist_predictions", is_flag=True)
+@click.option("--persist_splits", is_flag=True)
+def train_only(em, project_name, trial_count, persist_model, persist_predictions, persist_splits) -> None:
+    project_name = "-".join([project_name, em])
 
 
-@sweep.command("wandb-optuna")
-@click.option("--project-name", default="lightningpod-sweep-optuna")
-def run_wandb_optuna_sweep(project_name) -> None:
-    sweep = sweeps.WandbOptunaSweepFlow(project_name=project_name)
-    sweep.run()
-
-
-@sweep.command("aim")
+@trainer.command("sweep-only")
 @click.option("--project-name", default="lightningpod-sweep-aim")
-def run_aim_sweep(project_name) -> None:
+def sweep_only(project_name) -> None:
     pass
