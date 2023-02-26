@@ -34,11 +34,21 @@ from vision_pod.pipeline.datamodule import PodDataModule
 
 
 class ObjectiveWork:
-    def __init__(self, sweep_config: Dict[str, Any], project_name: str, wandb_save_dir: str):
+    def __init__(
+        self,
+        sweep_config: Dict[str, Any],
+        project_name: str,
+        wandb_save_dir: str,
+        experiment_manager: str = "wandb",
+    ):
+        self.experiment_manager = experiment_manager
         self.project_name = project_name
         self.wandb_save_dir = wandb_save_dir
         self.sweep_config = sweep_config
-        self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=project_name)
+        if self.experiment_manager == "wandb":
+            self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=project_name)
+        if self.experiment_manager == "optuna":
+            self.sweep_id = wandb.util.generate_id()
         self.sweep_name = "-".join(["Sweep", self.sweep_id])
         self.sweep_config.update({"name": self.sweep_name})
         self.datamodule = PodDataModule()
@@ -137,9 +147,6 @@ class ObjectiveWork:
             ],
         }
 
-        if trial.number == 0:
-            self.trial_group = wandb.util.generate_id()
-
         if hasattr(self, "trainer"):
             # stops previous wandb run so that a new run can be initialized on new trial
             # also helps to avoid hanging process in wandb sdk
@@ -151,8 +158,8 @@ class ObjectiveWork:
         self.trainer = PodTrainer(
             logger=WandbLogger(
                 project=self.project_name,
-                name="-".join(["trial", str(trial.number)]),
-                group=self.trial_group,
+                name="-".join(["sweep", self.sweep_id, "trial", str(trial.number)]),
+                group=self.sweep_config["name"],
                 save_dir=self.wandb_save_dir,
                 config=config,
             ),
@@ -208,18 +215,20 @@ class ObjectiveWork:
 
     def run(
         self,
-        experiment_manager: str = "wandb",
-        trial_count: int = 5,
+        trial_count: int = 10,
         optuna_study_name: Optional[str] = None,
     ) -> float:
-        if experiment_manager == "optuna":
+        if self.experiment_manager == "optuna":
             self._study = optuna.create_study(direction="maximize", study_name=optuna_study_name)
             self._study.optimize(self._optuna_objective, n_trials=trial_count, timeout=600)
-        if experiment_manager == "wandb":
+        if self.experiment_manager == "wandb":
             wandb.agent(self.sweep_id, function=self._wandb_objective, count=trial_count)
 
     def stop(self) -> None:
-        os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
+        if self.experiment_manager == "wandb":
+            os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
+        if self.experiment_manager == "optuna":
+            self.trainer.logger.experiment.finish()
 
 
 class SweepFlow:
@@ -228,12 +237,14 @@ class SweepFlow:
         project_name: Optional[str] = None,
         trial_count: int = 10,
         wandb_dir: Optional[str] = conf.WANDBPATH,
+        experiment_manager: str = "wandb",
     ) -> None:
         """
         Notes:
             see: https://community.wandb.ai/t/run-best-model-off-sweep/2423
         """
         # settings
+        self.experiment_manager = experiment_manager
         self.project_name = project_name
         self.wandb_dir = wandb_dir
         self.trial_count = trial_count
@@ -247,12 +258,17 @@ class SweepFlow:
                 "dropout": {"min": 0.2, "max": 0.5},
             },
         )
-        self._objective_work = ObjectiveWork(self._sweep_config, self.project_name, self.wandb_dir)
+        self._objective_work = ObjectiveWork(
+            self._sweep_config, self.project_name, self.wandb_dir, experiment_manager=self.experiment_manager
+        )
         self._wandb_api = wandb.Api()
 
     @property
-    def best_run(self):
-        return self._wandb_api.sweep(self._objective_work.sweep_url).best_run()
+    def best_params(self):
+        if self.experiment_manager == "wandb":
+            return self._wandb_api.sweep(self._objective_work.sweep_url).best_run().config
+        if self.experiment_manager == "optuna":
+            return self._objective_work._study.best_params
 
     @staticmethod
     def _display_report(trial_metric_names: List[str], trial_info: List[str]) -> None:
@@ -275,25 +291,15 @@ class SweepFlow:
         display_report: bool = False,
     ) -> None:
         # this is blocking
-        self._objective_work.run(experiment_manager=experiment_manager, trial_count=self.trial_count)
+        self._objective_work.run(trial_count=self.trial_count)
         # will only run after objective is complete
         self._objective_work.stop()
 
         if display_report:
-            if experiment_manager == "wandb":
-                self._display_report(
-                    trial_metric_names=list(self.best_run.config.keys()), trial_info=list(self.best_run.config.values())
-                )
-            if experiment_manager == "optuna":
-                trial_metric_names = ["Finished Trials", "Pruned Trials", "Completed Trials", "Best Trial"]
-                trial_info = [
-                    len(self.trials),
-                    len(self.pruned_trial),
-                    len(self.complete_trials),
-                    self.best_trial.value,
-                ]
-                trial_info = [str(i) for i in trial_info]
-                self._display_report(trial_metric_names=trial_metric_names, trial_info=trial_info)
+            self._display_report(
+                trial_metric_names=list(self.best_params.keys()),
+                trial_info=list(self.best_params.values()),
+            )
         if persist_model:
             self._objective_work.persist_model()
         if persist_predictions:
@@ -356,16 +362,20 @@ class TrainFlow:
         self._train_work = TrainWork()
 
     @property
+    def best_params(self) -> Dict[str, Any]:
+        return self._sweep_flow.best_params
+
+    @property
     def lr(self) -> float:
-        return self._sweep_flow.best_run.config["lr"]
+        return self._sweep_flow.best_params["lr"]
 
     @property
     def dropout(self) -> float:
-        return self._sweep_flow.best_run.config["dropout"]
+        return self._sweep_flow.best_params["dropout"]
 
     @property
     def optimizer(self) -> str:
-        return self._sweep_flow.best_run.config["optimizer"]
+        return self._sweep_flow.best_params["optimizer"]
 
     @property
     def sweep_group(self) -> str:
