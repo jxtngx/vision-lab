@@ -12,18 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import lightning as L
+from pathlib import Path
+
+from lightning import LightningApp, LightningFlow
+from lightning.app.frontend import StaticWebFrontend
 
 
-class RootFlow(L.LightningFlow):
+class ReactUI(LightningFlow):
     def __init__(self):
         super().__init__()
 
+    def configure_layout(self):
+        return StaticWebFrontend(Path(__file__).parent / "pod_ui/src")
+
+
+class RootFlow(LightningFlow):
+    def __init__(self):
+        super().__init__()
+        self.react_ui = ReactUI()
+
     def run(self):
-        ...
+        self.react_ui.run()
 
     def configure_layout(self):
-        ...
+        return [{"name": "ReactUI", "content": self.react_ui}]
 
 
-app = L.LightningApp(RootFlow())
+app = LightningApp(RootFlow())
