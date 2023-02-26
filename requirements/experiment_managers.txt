@@ -1,5 +1,4 @@
-aim
+wandb
 optuna
 torch-tb-profiler
 # lightning_training_studio @ git+https://github.com/Lightning-AI/lightning-hpo.git
-# wandb

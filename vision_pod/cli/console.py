@@ -18,6 +18,7 @@ from pathlib import Path
 import click
 
 from vision_pod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
+from vision_pod.components.hpo import sweep
 from vision_pod.core.module import PodModule
 from vision_pod.core.trainer import PodTrainer
 from vision_pod.fabric.bugreport import bugreport
@@ -70,28 +71,30 @@ def fast_dev_run() -> None:
 
 
 @trainer.command("sweep-and-train")
-@click.option("--em", default="wandb", type=click.Choice(["wandb", "aim"]))
-@click.option("--project-name", default="lightningpod-train")
+@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
+@click.option("--project-name", default="visionpod")
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
 def sweep_and_train(em, project_name, trial_count, persist_model, persist_predictions, persist_splits) -> None:
     project_name = "-".join([project_name, em])
+    trainer = sweep.TrainFlow(experiment_manager=em, project_name=project_name, trial_count=trial_count)
+    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions, persist_splits=persist_splits)
 
 
 @trainer.command("train-only")
-@click.option("--em", default="wandb", type=click.Choice(["wandb", "aim"]))
-@click.option("--project-name", default="lightningpod-train")
+@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
+@click.option("--project-name", default="visionpod")
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
 def train_only(em, project_name, trial_count, persist_model, persist_predictions, persist_splits) -> None:
-    project_name = "-".join([project_name, em])
+    pass
 
 
 @trainer.command("sweep-only")
-@click.option("--project-name", default="lightningpod-sweep-aim")
+@click.option("--project-name", default="visionpod")
 def sweep_only(project_name) -> None:
     pass
