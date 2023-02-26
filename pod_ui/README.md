@@ -1,5 +1,13 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+The intent is to learn NextJS and ReactJS well enough to recreate the Dash app shown below:
+
+![](../assets/dash_ui.png)
+
+The current state is shown below:
+
+![](../assets/current_state.png)
+
 ## Getting Started
 
 First build the app and then run the development server:
