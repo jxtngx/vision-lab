@@ -23,7 +23,7 @@ class ReactUI(LightningFlow):
         super().__init__()
 
     def configure_layout(self):
-        return StaticWebFrontend(Path(__file__).parent / "pod_ui/src")
+        return StaticWebFrontend(Path(__file__).parent / "pod_ui/dist")
 
 
 class RootFlow(LightningFlow):
