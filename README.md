@@ -35,7 +35,7 @@
 
 The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning. The _product_ is an intelligent agent behind a visual interface.
 
-It uses [Lightning](https://lightning.ai), [FastAPI](https://fastapi.tiangolo.com), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, and [Supabase](https://supabase.com); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces lightning_pod.pages with a React UI.
+It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, [FastAPI](https://fastapi.tiangolo.com), [Supabase](https://supabase.com), and [Zuplo](https://zuplo.com); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces lightning_pod.pages with a React UI.
 
 ## Programming Languages and Concepts
 
@@ -68,15 +68,18 @@ It uses [Lightning](https://lightning.ai), [FastAPI](https://fastapi.tiangolo.co
 - Topics:
   - Computer Vision
   - Image Classification
-- Data Source: torchvision, CIFAR
+- Data Source: torchvision CIFAR10
 - Domain Libraries: torchvision
+- Model: VisionTransformer
+  - [torchvision code](https://github.com/pytorch/vision/blob/cd3324639372c6a10b50703dc8262418f8a83144/torchvision/models/vision_transformer.py#LL621)
+  - [VisionTransformer Paper](https://paperswithcode.com/paper/an-image-is-worth-16x16-words-transformers-1)
 
 ## Roadmap
 
 The general outline for building this project is:
 
 - data acquistion and storage
-- do HPO trials and train from best HPO config
+- do HPO trials and train from best trial config
 - persist model
 - build Model serving API with FastAPI
 - determine feedback criteria for front end users
@@ -95,7 +98,7 @@ source .venv/bin/activate
 pip install -e ".[full]"
 pre-commit install
 deactivate
-cd lpx-ui
+cd pod_ui
 yarn install
 cd ..
 ```
