@@ -68,11 +68,9 @@ It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the 
 - Topics:
   - Computer Vision
   - Image Classification
-- Data Source: torchvision CIFAR10
+- Data Source: torchvision MNIST
 - Domain Libraries: torchvision
-- Model: VisionTransformer
-  - [torchvision code](https://github.com/pytorch/vision/blob/cd3324639372c6a10b50703dc8262418f8a83144/torchvision/models/vision_transformer.py#LL621)
-  - [VisionTransformer Paper](https://paperswithcode.com/paper/an-image-is-worth-16x16-words-transformers-1)
+- Model: Linear Encoder Decoder
 
 ## Roadmap
 
