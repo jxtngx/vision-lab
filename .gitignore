@@ -194,3 +194,6 @@ data/cache/PodDataset
 /wandb/
 /logs/wandb/wandb
 pod_ui/dist
+
+# docs
+/docs/docs/tutorial*
