@@ -18,13 +18,13 @@
 
 <!-- <img src ="https://img.shields.io/badge/Python-000000.svg?style=for-the-badge&logo=Python&logoColor=white" height="29"/> <img src ="https://img.shields.io/badge/TypeScript-000000.svg?style=for-the-badge&logo=TypeScript&logoColor=white" height="29"/> -->
 
-<a href="https://lightning.ai" ><img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white" height="29"/></a>
+<img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white"/>
 
 <img src ="https://img.shields.io/badge/FastAPI-000000.svg?style=for-the-badge&logo=FastAPI&logoColor=white" height="30"/>
 <img src ="https://img.shields.io/badge/W&B-000000.svg?style=for-the-badge&logo=weightsandbiases&logoColor=white" height="30"/>
 <img src ="https://img.shields.io/badge/Optuna-000000.svg?style=for-the-badge&logo=target&logoColor=white" height="30"/>
 
-<img src ="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Supabase-000000?style=for-the-badge&logo=supabase&logoColor=white" height="30"/>
+<img src ="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Supabase-000000?style=for-the-badge&logo=supabase&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Prisma-000000?style=for-the-badge&logo=prisma&logoColor=white" height="30"/>
 
 <!-- [![codecov](https://codecov.io/gh/JustinGoheen/lightning-pod-example/branch/main/graph/badge.svg)](https://codecov.io/gh/JustinGoheen/lightning-pod-example)
 ![CircleCI](https://circleci.com/gh/JustinGoheen/lightning-pod-example.svg?style=shield) -->
@@ -35,7 +35,9 @@
 
 The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning. The _product_ is an intelligent agent behind a visual interface.
 
-It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, [FastAPI](https://fastapi.tiangolo.com), [Supabase](https://supabase.com), and [Zuplo](https://zuplo.com); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces lightning_pod.pages with a React UI.
+It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, [FastAPI](https://fastapi.tiangolo.com), [Supabase](https://supabase.com), [Zuplo](https://zuplo.com), and [Prisma](https://www.prisma.io); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces _lightning_pod.pages_ with a NextJS app in _pod_ui_.
+
+This is a work in progress, especially the front end.
 
 ## Programming Languages and Concepts
 
@@ -60,8 +62,9 @@ It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the 
 **User Interfaces**
 
 - [Supabase](https://supabase.com): database, storage, and user management
+- [Prisma](https://www.prisma.io): Next-generation Node.js and TypeScript ORM
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
-- [Vercel](https://vercel.com): hosting the front end, and monitoring and analytics
+- [Vercel](https://vercel.com): hosting the front end, and monitoring + analytics
 
 **Domain**
 
