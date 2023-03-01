@@ -21,8 +21,7 @@ from lightning.pytorch import seed_everything
 from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers import Logger, TensorBoardLogger
 from lightning.pytorch.profilers import Profiler, PyTorchProfiler
-
-from vision_pod import conf
+from visionpod import conf
 
 
 class PodTrainer(L.Trainer):

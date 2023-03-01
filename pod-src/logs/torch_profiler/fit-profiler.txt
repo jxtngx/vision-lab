@@ -1,0 +1,27 @@
+FIT Profiler Report
+Profile stats for: records
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+                                          ProfilerStep*        34.39%     981.067ms       100.00%        2.853s        1.426s             2
+[pl][profile][EvaluationEpochLoop].val_dataloader_id...         0.00%     108.000us        65.27%        1.862s        1.862s             1
+enumerate(DataLoader)#_MultiProcessingDataLoaderIter...        65.27%        1.862s        65.27%        1.862s        1.862s             1
+[pl][profile][Strategy]SingleDeviceStrategy.validati...         0.09%       2.599ms         0.15%       4.205ms       4.205ms             1
+[pl][profile][Strategy]SingleDeviceStrategy.backward...         0.01%     397.000us         0.05%       1.336ms       1.336ms             1
+[pl][profile][Callback]TQDMProgressBar.on_train_batc...         0.03%     771.000us         0.03%     863.000us     863.000us             1
+[pl][profile][Callback]TQDMProgressBar.on_validation...         0.02%     440.000us         0.02%     440.000us     440.000us             1
+     [pl][module]visionpod.core.module.Encoder: encoder         0.00%      33.000us         0.02%     436.000us     436.000us             1
+                                           aten::linear         0.00%      21.000us         0.01%     409.000us      81.800us             5
+[pl][module]torch.nn.modules.container.Sequential: e...         0.00%      69.000us         0.01%     402.000us     402.000us             1
+                                            aten::addmm         0.01%     272.000us         0.01%     369.000us      73.800us             5
+    autograd::engine::evaluate_function: AddmmBackward0         0.00%      69.000us         0.01%     366.000us      91.500us             4
+[pl][profile][Callback]TQDMProgressBar.on_validation...         0.01%     297.000us         0.01%     297.000us     297.000us             1
+     [pl][module]visionpod.core.module.Decoder: decoder         0.00%      17.000us         0.01%     281.000us     281.000us             1
+autograd::engine::evaluate_function: MseLossBackward...         0.00%      88.000us         0.01%     280.000us     280.000us             1
+                                             aten::sqrt         0.01%     272.000us         0.01%     272.000us      27.200us            10
+[pl][profile][Callback]TQDMProgressBar.on_validation...         0.01%     248.000us         0.01%     269.000us     269.000us             1
+[pl][module]torch.nn.modules.container.Sequential: d...         0.00%      38.000us         0.01%     263.000us     263.000us             1
+                                              aten::sum         0.01%     198.000us         0.01%     224.000us      12.444us            18
+                                aten::mse_loss_backward         0.00%      85.000us         0.01%     223.000us     111.500us             2
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+Self CPU time total: 2.853s

@@ -16,13 +16,12 @@ import os
 from pathlib import Path
 
 import click
-
-from vision_pod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
-from vision_pod.components.hpo import sweep
-from vision_pod.core.module import PodModule
-from vision_pod.core.trainer import PodTrainer
-from vision_pod.fabric.bugreport import bugreport
-from vision_pod.pipeline.datamodule import PodDataModule
+from visionpod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
+from visionpod.components.hpo import sweep
+from visionpod.core.module import PodModule
+from visionpod.core.trainer import PodTrainer
+from visionpod.fabric.bugreport import bugreport
+from visionpod.pipeline.datamodule import PodDataModule
 
 FILEPATH = Path(__file__)
 PKGPATH = FILEPATH.parents[1]

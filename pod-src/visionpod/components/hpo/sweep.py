@@ -25,12 +25,12 @@ from optuna.trial import FrozenTrial, Trial, TrialState
 from rich.console import Console
 from rich.table import Table
 from torch import optim
+from visionpod import conf
+from visionpod.core.module import PodModule
+from visionpod.core.trainer import PodTrainer
+from visionpod.pipeline.datamodule import PodDataModule
 
 import wandb
-from vision_pod import conf
-from vision_pod.core.module import PodModule
-from vision_pod.core.trainer import PodTrainer
-from vision_pod.pipeline.datamodule import PodDataModule
 
 
 class ObjectiveWork:

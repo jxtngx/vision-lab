@@ -23,9 +23,8 @@ from lightning.pytorch.loggers import Logger
 from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
-
-from vision_pod import conf
-from vision_pod.pipeline.dataset import PodDataset
+from visionpod import conf
+from visionpod.pipeline.dataset import PodDataset
 
 filepath = Path(__file__)
 PROJECTPATH = os.getcwd()

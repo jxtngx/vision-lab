@@ -20,7 +20,9 @@ rootdir = Path(__file__).parent
 long_description = (rootdir / "README.md").read_text()
 
 setup(
-    name="vision-pod",
+    name="visionpod",
+    package_dir={"": "pod-src"},
+    packages=["visionpod"],
     version="0.0.1",
     description="An End to End ML Product Example",
     long_description=long_description,

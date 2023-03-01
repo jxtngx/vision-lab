@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import torch
-
-from vision_pod.core.module import Decoder, Encoder, PodModule
+from visionpod.core.module import Decoder, Encoder, PodModule
 
 
 def test_module_not_abstract():
