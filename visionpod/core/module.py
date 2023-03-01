@@ -15,97 +15,36 @@
 from typing import Optional
 
 import lightning as L
+import torch
 import torch.nn.functional as F
 from torch import nn, optim
 from torchmetrics.functional import accuracy
 
 
-class Encoder(nn.Module):
-    """an encoder layer
-
-    Args:
-        dropout: float = probability of an element to be zeroed. Default: 0.5
-
-    Returns:
-        an encoded image.
-
+class VisionNet(nn.Module):
+    """
     Note:
-        PodModule was initially based on examples found in Lightning docs, and was adapted to account for
-        the Optuna Trial.
-        The encoder flow is as follows: Sequential(Linear, PReLU, Dropout, Linear).
-
-        - for Sequential containers see
-        https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html#torch.nn.Sequential
-        - for Linear see
-        https://pytorch.org/docs/stable/generated/torch.nn.Linear.html?highlight=linear#torch.nn.Linear
-        - for PReLU see
-        https://pytorch.org/docs/stable/generated/torch.nn.PReLU.html?highlight=prelu#torch.nn.PReLU
-        - for Dropout see
-        https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html
+        see below for example
+        https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#define-a-loss-function-and-optimizer
     """
 
-    def __init__(self, dropout: float = 0.5):
+    def __init__(self):
         super().__init__()
-        self.encoder = nn.Sequential(
-            nn.Linear(
-                in_features=28 * 28,
-                out_features=64,
-                bias=True,
-            ),
-            nn.PReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(
-                in_features=64,
-                out_features=3,
-                bias=True,
-            ),
-        )
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
-        return self.encoder(x)
-
-
-class Decoder(nn.Module):
-    """a decoder layer
-
-    Args:
-        dropout: float = probability of an element to be zeroed. Default: 0.5
-
-    Returns:
-        a decoded image.
-
-    Note:
-        PodModule was initially based on examples found in Lightning docs, and was adapted to
-        account for the Optuna Trial.
-        The decoder flow is as follows: Sequential(Linear, PReLU, Linear).
-
-        - for Sequential containers see
-        https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html#torch.nn.Sequential
-        - for Linear see
-        https://pytorch.org/docs/stable/generated/torch.nn.Linear.html?highlight=linear#torch.nn.Linear
-        - for PReLU see
-        https://pytorch.org/docs/stable/generated/torch.nn.PReLU.html?highlight=prelu#torch.nn.PReLU
-    """
-
-    def __init__(self, dropout: float = 0.5):
-        super().__init__()
-        self.decoder = nn.Sequential(
-            nn.Linear(
-                in_features=3,
-                out_features=64,
-                bias=True,
-            ),
-            nn.PReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(
-                in_features=64,
-                out_features=28 * 28,
-                bias=True,
-            ),
-        )
-
-    def forward(self, x):
-        return self.decoder(x)
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = torch.flatten(x, 1)  # flatten all dimensions except batch
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
 
 
 class PodModule(L.LightningModule):
@@ -133,8 +72,7 @@ class PodModule(L.LightningModule):
         num_classes: int = 10,
     ):
         super().__init__()
-        self.encoder = Encoder(dropout)
-        self.decoder = Decoder(dropout)
+        self.vision_net = VisionNet()
         self.optimizer = optimizer
         self.lr = lr
         self.accuracy_task = accuracy_task
@@ -142,12 +80,8 @@ class PodModule(L.LightningModule):
         self.save_hyperparameters()
 
     def forward(self, x):
-        x = x.view(x.size(0), -1)
-        z = self.encoder(x)
-        x_hat = self.decoder(z)
-        y_hat = nn.Linear(28 * 28, self.num_classes)(x_hat)
-        y_hat = F.log_softmax(x_hat, dim=1).argmax(dim=1)
-        return x_hat, y_hat
+        y_hat = self.vision_net(x)
+        return y_hat
 
     def training_step(self, batch):
         return self._common_step(batch, "training")
@@ -160,14 +94,11 @@ class PodModule(L.LightningModule):
 
     def _common_step(self, batch, stage):
         x, y = batch
-        x = x.view(x.size(0), -1)
-        z = self.encoder(x)
-        x_hat = self.decoder(z)
-        loss = F.mse_loss(x_hat, x)
+        print(stage, x.shape)
+        y_hat = self.vision_net(x)
+        loss = F.cross_entropy(y_hat, y)
 
         if stage in ["val", "test"]:
-            y_hat = nn.Linear(28 * 28, self.num_classes)(x_hat)
-            y_hat = F.log_softmax(y_hat, dim=1).argmax(dim=1)
             acc = accuracy(y_hat, y, task=self.accuracy_task, num_classes=self.num_classes)
             self.log(f"{stage}_acc", acc)
             self.log(f"{stage}_loss", loss)

@@ -20,7 +20,7 @@ GLOBALSEED = 42
 
 # SET PATHS
 filepath = Path(__file__)
-PROJECTPATH = filepath.parents[2]
+PROJECTPATH = filepath.parents[1]
 
 # research paths
 _researchpath = os.path.join(PROJECTPATH, "research")

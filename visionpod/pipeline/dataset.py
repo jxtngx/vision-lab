@@ -14,7 +14,7 @@
 
 from typing import Any
 
-from torchvision.datasets import MNIST as Dataset
+from torchvision.datasets import CIFAR10 as Dataset
 
 
 class PodDataset(Dataset):

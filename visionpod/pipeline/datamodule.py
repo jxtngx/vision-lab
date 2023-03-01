@@ -36,15 +36,20 @@ class PodDataModule(LightningDataModule):
     def __init__(
         self,
         dataset: Any = PodDataset,
-        data_dir: str = "data",
+        data_dir: str = os.path.join(conf.DATASETPATH, "cache"),
         split: bool = True,
         train_size: float = 0.8,
         num_workers: int = NUMWORKERS,
-        transforms: Callable = transforms.ToTensor(),
+        transforms: Callable = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ]
+        ),
         batch_size: int = 64,
     ):
         super().__init__()
-        self.data_dir = os.path.join(conf.DATASETPATH, "cache")
+        self.data_dir = data_dir
         self.dataset = dataset
         self.split = split
         self.train_size = train_size
