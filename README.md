@@ -40,6 +40,10 @@ It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the 
 
 This is a work in progress, especially the front end.
 
+The docs can be viewed at [visionpod-docs.vercel.app](https://visionpod-docs.vercel.app/)
+
+The NextJS app can be viewed at [visionpod.vercel.app](https://visionpod.vercel.app/)
+
 ## Programming Languages and Concepts
 
 **Languages**
