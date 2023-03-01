@@ -18,8 +18,8 @@
 
 <!-- <img src ="https://img.shields.io/badge/Python-000000.svg?style=for-the-badge&logo=Python&logoColor=white" height="29"/> <img src ="https://img.shields.io/badge/TypeScript-000000.svg?style=for-the-badge&logo=TypeScript&logoColor=white" height="29"/> -->
 
-<img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white"/>
-<br> 
+<img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white" height="30"/>
+<br>
 
 <img src ="https://img.shields.io/badge/FastAPI-000000.svg?style=for-the-badge&logo=FastAPI&logoColor=white" height="30"/>
 <img src ="https://img.shields.io/badge/W&B-000000.svg?style=for-the-badge&logo=weightsandbiases&logoColor=white" height="30"/>
@@ -72,7 +72,7 @@ This is a work in progress, especially the front end.
 - Topics:
   - Computer Vision
   - Image Classification
-- Data Source: torchvision MNIST
+- Data Source: torchvision CIFAR10
 - Domain Libraries: torchvision
 - Model: Linear Encoder Decoder
 
@@ -88,7 +88,30 @@ The general outline for building this project is:
 - design and build front end
 - improve on feedback
 
-## Setup
+## Structure
+
+The structure of the project is:
+
+- `docs-src` is the docusaurus project
+- `lightning-app` is the root Lightning Flow and App that will be deployed to Lightning
+- `next-app` is the Next + React frontend deployed to Vercel
+- `pipeline` handles data engineering for Supabase and Prisma
+- `requirements` + `requirements.txt` helps Python related CI/CD jobs
+- `research` handles HPO and training
+- `tests` are tests for visionpod
+- `visionpod` is the python package and deep learning network
+
+visionpod is the primary source code for the default branch. the following modules will be handled on separate production branches:
+
+| Module        | Branch   |
+| ------------- | -------- |
+| docs-src      | DOCS     |
+| lightning-app | LAPP     |
+| next-app      | NAPP     |
+| pipeline      | PIPELINE |
+| research      | RESEARCH |
+
+<!-- ## Setup
 
 You must have Python and NPM installed.
 
@@ -103,4 +126,4 @@ deactivate
 cd pod_ui
 yarn install
 cd ..
-```
+``` -->
