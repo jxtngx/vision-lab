@@ -1,4 +1,0 @@
-# pytorch lightning, lightning app, torchmetrics, pytorch core
-lightning
-torch
-torchvision
