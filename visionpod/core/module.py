@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 import lightning as L
 import torch
@@ -65,7 +64,7 @@ class PodModule(L.LightningModule):
 
     def __init__(
         self,
-        optimizer: Optional[optim.Optimizer] = optim.Adam,
+        optimizer: str = "adam",
         lr: float = 1e-3,
         dropout: float = 0.5,
         accuracy_task: str = "multiclass",
@@ -73,7 +72,7 @@ class PodModule(L.LightningModule):
     ):
         super().__init__()
         self.vision_net = VisionNet()
-        self.optimizer = optimizer
+        self.optimizer = getattr(optim, optimizer)
         self.lr = lr
         self.accuracy_task = accuracy_task
         self.num_classes = num_classes
