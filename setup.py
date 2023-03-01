@@ -21,7 +21,7 @@ long_description = (rootdir / "README.md").read_text()
 
 setup(
     name="visionpod",
-    package_dir={"": "pod-src"},
+    package_dir={"": "src"},
     packages=["visionpod"],
     version="0.0.1",
     description="An End to End ML Product Example",

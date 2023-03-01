@@ -185,15 +185,15 @@ next-env.d.ts
 # profiler, logger logs, model checkpoints, production models, data
 .ruff_cache/
 outputs/
-models/checkpoints/model*
-logs/tensorboard/version*
-logs/torch_profiler/fit*
-logs/torch_profiler/predict*
-logs/torch_profiler/test*
-data/cache/PodDataset
+/research/models/checkpoints/model*
+/research/logs/tensorboard/version*
+/research/logs/torch_profiler/fit*
+/research/logs/torch_profiler/predict*
+/research/logs/torch_profiler/test*
+/research/data/cache/PodDataset
 /wandb/
-/logs/wandb/wandb
+research/logs/wandb/wandb
 pod_ui/dist
 
 # docs
-/docs/docs/tutorial*
+docs/docs/tutorial*
