@@ -47,26 +47,19 @@ class VisionNet(nn.Module):
 
 
 class PodModule(L.LightningModule):
-    """a custom PyTorch Lightning LightningModule
+    """A custom PyTorch Lightning LightningModule.
 
-    Note:
-        PodModule was initially based on examples found in Lightning docs, and was adapted to account
-        for the Optuna Trial.
-        The flow is as follows:
-        [encoder: Sequential(Linear, PReLU, Dropout, Linear), decoder: Sequential(Linear, PReLU, Linear)].
-
-        - for Sequential containers see
-        https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html#torch.nn.Sequential
-        - for Linear see https://pytorch.org/docs/stable/generated/torch.nn.Linear.html?highlight=linear#torch.nn.Linear
-        - for PReLU see https://pytorch.org/docs/stable/generated/torch.nn.PReLU.html?highlight=prelu#torch.nn.PReLU
-        - for Dropout see https://pytorch.org/docs/stable/generated/torch.nn.Dropout.html
+    # Arguments
+        optimizer: a PyTorch Optimizer.
+        lr: the learning rate.
+        accuracy_task: task for torchmetrics.accuracy.
+        num_classes: number of classes.
     """
 
     def __init__(
         self,
         optimizer: str = "adam",
         lr: float = 1e-3,
-        dropout: float = 0.5,
         accuracy_task: str = "multiclass",
         num_classes: int = 10,
     ):

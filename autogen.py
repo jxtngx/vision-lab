@@ -2,7 +2,7 @@
 
 from keras_autodoc import DocumentationGenerator
 
-pages = {"core.md": ["visionpod.core.module.PodModule"]}
+pages = {"core.PodModule.md": ["visionpod.core.module.PodModule"]}
 
 doc_generator = DocumentationGenerator(pages)
-doc_generator.generate("./docs-src/docs/")
+doc_generator.generate("./docs-src/docs/visionpod")
