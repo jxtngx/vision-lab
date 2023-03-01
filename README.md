@@ -36,7 +36,7 @@
 
 The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning. The _product_ is an intelligent agent behind a visual interface.
 
-It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, [FastAPI](https://fastapi.tiangolo.com), [Supabase](https://supabase.com), [Zuplo](https://zuplo.com), and [Prisma](https://www.prisma.io); and is built from [Lightning Pod](https://github.com/JustinGoheen/lightning-pod)'s structural concepts, with the exception that this project replaces _lightning_pod.pages_ with a NextJS app in _pod_ui_.
+It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, [FastAPI](https://fastapi.tiangolo.com), [Supabase](https://supabase.com), [Zuplo](https://zuplo.com), and [Prisma](https://www.prisma.io).
 
 This is a work in progress, especially the front end.
 
