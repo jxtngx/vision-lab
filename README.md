@@ -1,3 +1,9 @@
+---
+sidebar_position: 1
+---
+
+# Lightning-Pod Vision
+
 <!-- # Copyright Justin R. Goheen.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +20,12 @@
 
 <div align="center">
 
-# Lightning Pod Vision
-
 <!-- <img src ="https://img.shields.io/badge/Python-000000.svg?style=for-the-badge&logo=Python&logoColor=white" height="29"/> <img src ="https://img.shields.io/badge/TypeScript-000000.svg?style=for-the-badge&logo=TypeScript&logoColor=white" height="29"/> -->
 
 <img src ="https://img.shields.io/badge/Lightning-792DE4?style=for-the-badge&logo=pytorch-lightning&logoColor=white" height="30"/>
-<br>
-
-<img src ="https://img.shields.io/badge/FastAPI-000000.svg?style=for-the-badge&logo=FastAPI&logoColor=white" height="30"/>
-<img src ="https://img.shields.io/badge/W&B-000000.svg?style=for-the-badge&logo=weightsandbiases&logoColor=white" height="30"/>
-<img src ="https://img.shields.io/badge/Optuna-000000.svg?style=for-the-badge&logo=target&logoColor=white" height="30"/>
-
+<br/>
+<img src ="https://img.shields.io/badge/FastAPI-000000.svg?style=for-the-badge&logo=FastAPI&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/W&B-000000.svg?style=for-the-badge&logo=weightsandbiases&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Optuna-000000.svg?style=for-the-badge&logo=target&logoColor=white" height="30"/>
+<br/>
 <img src ="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Supabase-000000?style=for-the-badge&logo=supabase&logoColor=white" height="30"/> <img src ="https://img.shields.io/badge/Prisma-000000?style=for-the-badge&logo=prisma&logoColor=white" height="30"/>
 
 <!-- [![codecov](https://codecov.io/gh/JustinGoheen/lightning-pod-example/branch/main/graph/badge.svg)](https://codecov.io/gh/JustinGoheen/lightning-pod-example)
@@ -100,24 +101,57 @@ The structure of the project is:
 - `lightning-app` is the root Lightning Flow and App that will be deployed to Lightning
 - `next-app` is the Next + React frontend deployed to Vercel
 - `pipeline` handles data engineering for Supabase and Prisma
-- `requirements` + `requirements.txt` helps Python related CI/CD jobs
+- `requirements` + `requirements.txt` helps CI/CD jobs install Python requirements
 - `research` handles HPO and training
 - `tests` are tests for visionpod
 - `visionpod` is the python package and deep learning network
 
 visionpod is the primary source code for the default branch. the following modules will be handled on separate production branches:
 
-| Module        | Branch   |
-| ------------- | -------- |
-| docs-src      | DOCS     |
-| lightning-app | LAPP     |
-| next-app      | NAPP     |
-| pipeline      | PIPELINE |
-| research      | RESEARCH |
+| Module        | Branch |
+| ------------- | ------ |
+| docs-src      | docs   |
+| lightning-app | l-app  |
+| next-app      | n-app  |
 
-<!-- ## Setup
+## Setup
 
-You must have Python and NPM installed.
+You must have [Python](https://www.python.org/downloads/) and [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) installed.
+
+<details>
+    <summary> Installing NVM on macOS </summary>
+
+```bash
+brew install nvm
+# update .zshrc or .bashrc
+vim .zshrc
+```
+
+add the following to your profile:
+
+> to insert snippet, hit: `shift` + `i`
+
+```zsh
+export NVM_DIR=~/.nvm
+source $(brew --prefix nvm)/nvm.sh
+```
+
+> to exit insert mode, hit: `esc` + `shift` + `:wq!`
+
+then restart your terminal, and check the nvm version with:
+
+```zsh
+nvm -v
+```
+
+proceed to installing node, enabling yarn, and creating a quickstart project with vite
+
+```bash
+nvm install lts
+corepack enable
+```
+
+</details>
 
 To setup a virtual development environment, in terminal, do:
 
@@ -127,7 +161,8 @@ source .venv/bin/activate
 pip install -e ".[full]"
 pre-commit install
 deactivate
-cd pod_ui
+cd next-app
+yarn config set nodeLinker node-module
 yarn install
 cd ..
-``` -->
+```
