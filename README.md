@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 # Lightning-Pod Vision
 
 <!-- # Copyright Justin R. Goheen.
