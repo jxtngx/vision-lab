@@ -77,7 +77,7 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
   - Image Classification
 - Data Source: [torchgeo UC Merced](https://torchgeo.readthedocs.io/en/stable/api/datasets.html#uc-merced)
 - Domain Libraries: torchvision, torchgeo
-- Model: A simple CNN based on [torchvision example](https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#define-a-loss-function-and-optimizer), modified for HPO.
+- Model: torchvision [VisionTransformer](https://github.com/pytorch/vision/blob/main/torchvision/models/vision_transformer.py)
 
 ## Structure
 
