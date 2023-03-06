@@ -35,9 +35,11 @@ sidebar_position: 1
 
 ## Overview
 
-The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning. The _product_ is an intelligent agent behind a visual interface.
+The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning. The _product_ is a model served via API.
 
-It uses [Lightning](https://lightning.ai), [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem, [FastAPI](https://fastapi.tiangolo.com), [Supabase](https://supabase.com), [Zuplo](https://zuplo.com), and [Prisma](https://www.prisma.io).
+Another purpose of this project is to create a visual interface with [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem.
+
+Core services and dependencies are: [Supabase](https://supabase.com), [Prisma](https://www.prisma.io), [FastAPI](https://fastapi.tiangolo.com), and [Zuplo](https://zuplo.com).
 
 This is a work in progress, especially the front end.
 
@@ -51,11 +53,12 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
 
 - [Python](https://www.python.org): data engineering, and machine learning
 - [TypeScript](https://www.typescriptlang.org) and [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript): front-end design and visualization, and select back-end services
-- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build)) may require troubleshooting errors
+- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build), [prisma-client-py](https://github.com/RobertCraigie/prisma-client-py)) may require troubleshooting errors
 
 **Data Engineering and Database Management**
 
-- Python + [Supabase-Py](https://supabase.com/docs/reference/python/initializing) + [Postgres](https://supabase.com/docs/guides/database/overview): data acquisition and pushing to Supabase-Postgres
+- [Supabase](https://supabase.com): Postgres database, and bucket storage
+- [Prisma](https://www.prisma.io): Next-generation Node.js and TypeScript ORM (with community Python client)
 
 **Model Development and Serving**
 
@@ -67,8 +70,7 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
 
 **User Interfaces**
 
-- [Supabase](https://supabase.com): database, storage, and user management
-- [Prisma](https://www.prisma.io): Next-generation Node.js and TypeScript ORM
+- [Supabase](https://supabase.com): user management
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
 - [Vercel](https://vercel.com): hosting the front end, and monitoring + analytics
 
@@ -79,19 +81,7 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
   - Image Classification
 - Data Source: torchvision CIFAR10
 - Domain Libraries: torchvision
-- Model: Linear Encoder Decoder
-
-## Roadmap
-
-The general outline for building this project is:
-
-- data acquistion and storage
-- do HPO trials and train from best trial config
-- persist model
-- build Model serving API with FastAPI
-- determine feedback criteria for front end users
-- design and build front end
-- improve on feedback
+- Model: A simple CNN based on [torchvision example](https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#define-a-loss-function-and-optimizer), modified for HPO.
 
 ## Structure
 
@@ -167,6 +157,18 @@ yarn install
 cd ..
 ```
 
+## Roadmap
+
+The general outline for building this project is:
+
+- data acquistion and storage
+- do HPO trials and train from best trial config
+- persist model
+- build Model serving API with FastAPI
+- determine feedback criteria for front end users
+- design and build front end
+- improve on feedback
+
 ## Learning Resources
 
 ### JavaScript, TypeScript, and React
@@ -185,9 +187,9 @@ The following three videos were created by Lightning's Thomas Chaton; the videos
 
 > these videos were created before PyTorch Lightning was moved into the Lightning Framework mono repo
 
-[Lightning Codebase Deep Dive 1](https://youtu.be/aEeh9ucKUkU) <br>
-[Lightning Codebase Deep Dive 2](https://youtu.be/NEpRYqdsm54) <br>
-[Lightning Codebase Deep Dive 3](https://youtu.be/x4d4RDNJaZk)
+- [Lightning Codebase Deep Dive 1](https://youtu.be/aEeh9ucKUkU)
+- [Lightning Codebase Deep Dive 2](https://youtu.be/NEpRYqdsm54)
+- [Lightning Codebase Deep Dive 3](https://youtu.be/x4d4RDNJaZk)
 
 #### General Engineering and Tools
 
