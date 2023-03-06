@@ -22,6 +22,7 @@ from visionpod.components.hpo import sweep
 from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
 from visionpod.fabric.bugreport import bugreport
+from visionpod.fabric.docs.autogen import PodDocsGenerator
 from visionpod.pipeline.datamodule import PodDataModule
 
 FILEPATH = Path(__file__)
@@ -37,6 +38,16 @@ def main() -> None:
 @main.command("teardown")
 def _teardown() -> None:
     common_destructive_flow([teardown], command_name="teardown")
+
+
+@main.group("docs")
+def docs() -> None:
+    pass
+
+
+@docs.command("build")
+def build_docs() -> None:
+    PodDocsGenerator.build()
 
 
 @main.command("bug-report")
