@@ -91,7 +91,6 @@ class PodModule(L.LightningModule):
 
     def _common_step(self, batch, stage):
         x, y = batch
-        print(stage, x.shape)
         y_hat = self.model(x)
         loss = F.cross_entropy(y_hat, y)
 
