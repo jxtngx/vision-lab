@@ -15,8 +15,8 @@ class PodDocsGenerator:
 
         pages = {
             "core.PodModule.md": [
-                "visionpod.core.module.ViT_B_16_Parameters",
-                "visionpod.core.module.ViT_B_16_HyperParameters",
+                # "visionpod.core.module.ViT_B_16_Parameters",
+                # "visionpod.core.module.ViT_B_16_HyperParameters",
                 "visionpod.core.module.PodModule",
             ]
         }
