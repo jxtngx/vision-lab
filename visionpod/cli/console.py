@@ -50,6 +50,16 @@ def build_docs() -> None:
     PodDocsGenerator.build()
 
 
+@docs.command("start")
+def start_docs() -> None:
+    _cwd = os.getcwd()
+    try:
+        os.chdir(os.path.join(PROJECTPATH, "docs-src"))
+        os.system("yarn start")
+    except KeyboardInterrupt:
+        os.chdir(_cwd)
+
+
 @main.command("bug-report")
 def bug_report() -> None:
     bugreport.main()
@@ -74,11 +84,13 @@ def help() -> None:
 
 
 @trainer.command("fast-dev-run")
-def fast_dev_run() -> None:
-    model = PodModule()
-    dm = PodDataModule()
+@click.option("--image_size", default=32)
+@click.option("--num_classes", default=10)
+def fast_dev_run(image_size, num_classes) -> None:
+    model = PodModule(vit_req_image_size=image_size, vit_req_num_classes=num_classes)
+    datamodule = PodDataModule()
     trainer = PodTrainer(fast_dev_run=True)
-    trainer.fit(model=model, datamodule=dm)
+    trainer.fit(model=model, datamodule=datamodule)
 
 
 @trainer.command("sweep-and-train")
