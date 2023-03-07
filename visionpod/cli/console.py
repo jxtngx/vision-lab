@@ -100,21 +100,31 @@ def fast_dev_run(image_size, num_classes) -> None:
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-def sweep_and_train(em, project_name, trial_count, persist_model, persist_predictions, persist_splits) -> None:
+@click.option("--image_size", default=32)
+@click.option("--num_classes", default=10)
+def sweep_and_train(
+    em, project_name, trial_count, persist_model, persist_predictions, persist_splits, image_size, num_classes
+) -> None:
     project_name = "-".join([project_name, em])
     trainer = sweep.TrainFlow(experiment_manager=em, project_name=project_name, trial_count=trial_count)
-    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions, persist_splits=persist_splits)
+    trainer.run(
+        project_name,
+        persist_model=persist_model,
+        persist_predictions=persist_predictions,
+        persist_splits=persist_splits,
+    )
 
 
 @trainer.command("train-only")
-@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
-@click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-def train_only(em, project_name, trial_count, persist_model, persist_predictions, persist_splits) -> None:
-    pass
+@click.option("--image_size", default=32)
+@click.option("--num_classes", default=10)
+def train_only(project_name, persist_model, persist_predictions, persist_splits, image_size, num_classes) -> None:
+    trainer = sweep.TrainWork()
+    trainer.run(project_name)
 
 
 @trainer.command("sweep-only")

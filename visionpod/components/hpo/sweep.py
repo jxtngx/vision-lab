@@ -25,7 +25,6 @@ from lightning.pytorch.loggers import WandbLogger
 from optuna.trial import FrozenTrial, Trial, TrialState
 from rich.console import Console
 from rich.table import Table
-from torch import optim
 
 from visionpod import conf
 from visionpod.core.module import PodModule
@@ -131,11 +130,9 @@ class ObjectiveWork:
             - PyTorch with Optuna (by PyTorch) https://youtu.be/P6NwZVl8ttc
         """
         lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
-        optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
-        optimizer = getattr(optim, optimizer_name)
-        dropout = trial.suggest_float("dropout", 0.2, 0.5)
+        optimizer = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
 
-        model = PodModule(dropout=dropout, optimizer=optimizer, lr=lr)
+        model = PodModule(optimizer=optimizer, lr=lr)
 
         config = dict(trial.params)
         config["trial.number"] = trial.number
@@ -169,7 +166,7 @@ class ObjectiveWork:
         # set optuna logs dir
         self._set_artifact_dir()
         # logs hyperparameters to logs/wandb_logs/wandb/{run_name}/files/config.yaml
-        hyperparameters = dict(optimizer=optimizer_name, lr=lr, dropout=dropout)
+        hyperparameters = dict(optimizer=optimizer, lr=lr)
         self.trainer.logger.log_hyperparams(hyperparameters)
 
         self.trainer.fit(model=model, datamodule=self.datamodule)
@@ -185,11 +182,9 @@ class ObjectiveWork:
         )
 
         lr = wandb.config.lr
-        optimizer_name = wandb.config.optimizer
-        optimizer = getattr(optim, optimizer_name)
-        dropout = wandb.config.dropout
+        optimizer = wandb.config.optimizer
 
-        model = PodModule(dropout=dropout, optimizer=optimizer, lr=lr)
+        model = PodModule(optimizer=optimizer, lr=lr)
 
         trainer_init_kwargs = {
             "max_epochs": 10,
@@ -204,7 +199,7 @@ class ObjectiveWork:
         )
 
         # logs hyperparameters to logs/wandb_logs/wandb/{run_name}/files/config.yaml
-        hyperparameters = dict(optimizer=optimizer_name, lr=lr, dropout=dropout)
+        hyperparameters = dict(optimizer=optimizer, lr=lr)
         self.trainer.logger.log_hyperparams(hyperparameters)
 
         self.trainer.fit(model=model, datamodule=self.datamodule)
@@ -255,7 +250,7 @@ class SweepFlow:
             parameters={
                 "lr": {"min": 0.0001, "max": 0.1},
                 "optimizer": {"distribution": "categorical", "values": ["Adam", "RMSprop", "SGD"]},
-                "dropout": {"min": 0.2, "max": 0.5},
+                # "dropout": {"min": 0.2, "max": 0.5},
             },
         )
         self._objective_work = ObjectiveWork(
@@ -323,19 +318,25 @@ class TrainWork:
 
     def run(
         self,
-        lr: float,
-        dropout: float,
-        optimizer: str,
         project_name: str,
-        training_run_name: str,
+        training_run_name: Optional[str] = None,
+        optimizer: str = "Adam",
+        lr: float = 1e-3,
         wandb_dir: Optional[str] = conf.WANDBPATH,
     ) -> None:
-        self.model = PodModule(lr=lr, dropout=dropout, optimizer=getattr(optim, optimizer))
+
+        self.model = PodModule(lr=lr, optimizer=optimizer)
         self.datamodule = PodDataModule()
+
+        group_name = "Solo Training Runs" if not training_run_name else "Sweep Training Runs"
+
+        if not training_run_name:
+            training_run_name = wandb.util.generate_id()
+
         logger = WandbLogger(
             project=project_name,
             name=training_run_name,
-            group="Training Runs",
+            group=group_name,
             save_dir=wandb_dir,
         )
         trainer_init_kwargs = {
@@ -390,11 +391,14 @@ class TrainFlow:
         persist_model: bool = False,
         persist_predictions: bool = False,
         persist_splits: bool = False,
+        sweep: bool = False,
     ) -> None:
-        self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
+
+        if sweep:
+            self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
+
         self._train_work.run(
             lr=self.lr,
-            dropout=self.dropout,
             optimizer=self.optimizer,
             project_name=self.project_name,
             training_run_name=self.run_name,
