@@ -15,12 +15,11 @@
 import os
 from pathlib import Path
 
-# GLOBAL SEED
-GLOBALSEED = 42
-
 # SET PATHS
 filepath = Path(__file__)
 PROJECTPATH = filepath.parents[1]
+
+GLOBALSEED = 42
 
 # research paths
 _researchpath = os.path.join(PROJECTPATH, "research")
