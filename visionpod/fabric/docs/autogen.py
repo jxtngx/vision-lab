@@ -13,7 +13,13 @@ DOCSDIR = os.path.join(PROJECTPATH, "docs-src", "docs")
 class PodDocsGenerator:
     def build():
 
-        pages = {"core.PodModule.md": ["visionpod.core.module.PodModule"]}
+        pages = {
+            "core.PodModule.md": [
+                "visionpod.core.module.ViT_B_16_Parameters",
+                "visionpod.core.module.ViT_B_16_HyperParameters",
+                "visionpod.core.module.PodModule",
+            ]
+        }
 
         doc_generator = DocumentationGenerator(pages)
         doc_generator.generate(f"{PROJECTPATH}/docs-src/docs/visionpod")
