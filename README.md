@@ -78,6 +78,7 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
 - Data Source: [torchgeo UC Merced](https://torchgeo.readthedocs.io/en/stable/api/datasets.html#uc-merced)
 - Domain Libraries: torchvision, torchgeo
 - Model: torchvision [VisionTransformer](https://github.com/pytorch/vision/blob/main/torchvision/models/vision_transformer.py)
+- Paper: [An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
 
 ## Structure
 
