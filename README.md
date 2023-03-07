@@ -43,7 +43,17 @@ The docs can be viewed at [visionpod-docs.vercel.app](https://visionpod-docs.ver
 
 The NextJS app's progress can be viewed at [visionpod.vercel.app](https://visionpod.vercel.app/)
 
-## Programming Languages and Concepts
+## Tools and Topics
+
+**Domain**
+
+- Topics:
+  - Computer Vision
+  - Image Classification
+- Data Source: [torchgeo UC Merced](https://torchgeo.readthedocs.io/en/stable/api/datasets.html#uc-merced)
+- Domain Libraries: torchvision, torchgeo
+- Model: torchvision [VisionTransformer](https://github.com/pytorch/vision/blob/main/torchvision/models/vision_transformer.py)
+- Paper: [An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
 
 **Languages**
 
@@ -70,16 +80,6 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
 - [TurboRepo](https://turbo.build) + [NextJS](https://nextjs.org) + [React](https://reactjs.org): front end
 - [Vercel](https://vercel.com): hosting the front end, and monitoring + analytics
 
-**Domain**
-
-- Topics:
-  - Computer Vision
-  - Image Classification
-- Data Source: [torchgeo UC Merced](https://torchgeo.readthedocs.io/en/stable/api/datasets.html#uc-merced)
-- Domain Libraries: torchvision, torchgeo
-- Model: torchvision [VisionTransformer](https://github.com/pytorch/vision/blob/main/torchvision/models/vision_transformer.py)
-- Paper: [An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
-
 ## Structure
 
 The structure of the project is:
@@ -87,58 +87,14 @@ The structure of the project is:
 - `docs-src` is the docusaurus project
 - `lightning-app` is the root Lightning Flow and App that will be deployed to Lightning
 - `next-app` is the Next + React frontend deployed to Vercel
-- `pipeline` handles data engineering for Supabase and Prisma
 - `requirements` + `requirements.txt` helps CI/CD jobs install Python requirements
-- `research` handles HPO and training
+- `research` location of data cache, experiment logs, companion notebooks, checkpoints, and pre-trained model
 - `tests` are tests for visionpod
-- `visionpod` is the python package and deep learning network
-
-visionpod is the primary source code for the default branch. the following modules will be handled on separate production branches:
-
-| Module        | Branch |
-| ------------- | ------ |
-| docs-src      | docs   |
-| lightning-app | l-app  |
-| next-app      | n-app  |
+- `visionpod` is the python package. it contains the deep learning network in _visionpod.core.module_.
 
 ## Setup
 
-You must have [Python](https://www.python.org/downloads/) and [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) installed.
-
-<details>
-    <summary> Installing NVM on macOS </summary>
-
-```bash
-brew install nvm
-# update .zshrc or .bashrc
-vim .zshrc
-```
-
-add the following to your profile:
-
-> to insert snippet, hit: `shift` + `i`
-
-```zsh
-export NVM_DIR=~/.nvm
-source $(brew --prefix nvm)/nvm.sh
-```
-
-> to exit insert mode, hit: `esc` + `shift` + `:wq!`
-
-then restart your terminal, and check the nvm version with:
-
-```zsh
-nvm -v
-```
-
-proceed to installing node, enabling yarn, and creating a quickstart project with vite
-
-```bash
-nvm install lts
-corepack enable
-```
-
-</details>
+You must have [Python](https://www.python.org/downloads/) and [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) installed. See [Installing NVM, Node, and TypeScript](https://visionpod-docs.vercel.app/blog/Installing-NVM-Node-and-TypeScript) for help.
 
 To setup a virtual development environment, in terminal, do:
 

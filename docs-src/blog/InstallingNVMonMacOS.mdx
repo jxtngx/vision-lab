@@ -1,0 +1,68 @@
+---
+slug: Installing-NVM-Node-and-TypeScript
+title: Installing NVM, Node, and TypeScript
+authors: [goheen]
+tags: [TypeScript, Setup]
+---
+
+The following is a simple flow for installing [NVM](https://github.com/nvm-sh/nvm), [NodeJS](https://nodejs.dev/en/), and [TypeScript](https://www.typescriptlang.org) on macOS.
+
+## Step Zero
+
+You will need [homebrew](https://brew.sh) installed. If you do not have homebrew installed, you can do so with the following:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+## First Step
+
+install NVM with homebrew.
+
+```bash
+brew install nvm
+# update .zshrc or .bashrc
+vim .zshrc
+```
+
+## Second Step
+
+add the following to your .zshrc or .bashrc profile:
+
+```bash
+export NVM_DIR=~/.nvm
+source $(brew --prefix nvm)/nvm.sh
+```
+
+:::tip
+to insert snippet, hit: `shift` + `i`
+:::
+
+## Third Step
+
+restart your terminal, and check the nvm version with:
+
+```bash
+nvm -v
+```
+
+:::tip
+to exit insert mode, hit: `esc` + `shift` + `:wq!`
+:::
+
+## Fourth Step
+
+install node, and enable yarn
+
+```bash
+nvm install lts
+corepack enable
+```
+
+## Fifth Step
+
+install TypeScript globally for user
+
+```bash
+npm install -g typescript
+```

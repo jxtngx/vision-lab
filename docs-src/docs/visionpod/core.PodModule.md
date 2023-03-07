@@ -13,7 +13,7 @@ visionpod.core.module.PodModule(
     vit_hp_norm_layer=None,
     vit_opt_conv_stem_configs=None,
     vit_init_opt_progress=False,
-    vit_init_opt_weights=None,
+    vit_init_opt_weights=False,
 )
 ```
 
@@ -32,7 +32,7 @@ __Arguments__
 - __vit_hp_norm_layer__ `torch.nn.modules.module.Module | None`: Optional[nn.Module] = None,
 - __vit_opt_conv_stem_configs__ `List[torchvision.models.vision_transformer.ConvStemConfig] | None`: Optional[List[ConvStemConfig]] = None,
 - __vit_init_opt_progress__ `bool`: bool = False,
-- __vit_init_opt_weights__ `torchvision.models.vision_transformer.ViT_B_16_Weights | None`: Optional["ViT_B_16_Weights"] = None,
+- __vit_init_opt_weights__ `bool`: bool = False,
 
 
 ----
