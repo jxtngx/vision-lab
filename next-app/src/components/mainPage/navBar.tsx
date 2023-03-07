@@ -10,7 +10,7 @@ export default function NavBar() {
       <AppBar position="static" color="primary">
         <Toolbar>
           <Typography component="div" sx={{ flexGrow: 1 }}>
-            Linear Encoder-Decoder
+            VisionTransformer: Base, 16x16
           </Typography>
         </Toolbar>
       </AppBar>
