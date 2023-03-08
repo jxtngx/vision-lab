@@ -11,109 +11,37 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 
 import dash
 import dash_bootstrap_components as dbc
-import pandas as pd
-import plotly.express as px
 import torch
-from dash import dash_table, dcc, html
-from lightning.pytorch.utilities.model_summary import ModelSummary
+from dash import dcc, html
 
 from visionpod import conf
 from visionpod.core.module import PodModule
 
+from .utilities import create_figure, find_index, make_model_summary
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-
-def metrics_collection(y_true, y_predict):
-    pass
-
-
-def create_figure(image, title_text):
-    fig = px.imshow(image.view(conf.IMAGESIZE, conf.IMAGESIZE))
-    fig.update_layout(
-        title=dict(
-            text=title_text,
-            font_family="Ucityweb, sans-serif",
-            font=dict(size=24),
-            y=0.05,
-            yanchor="bottom",
-            x=0.5,
-        ),
-        height=300,
-    )
-    return fig
+PREDS = torch.load(conf.PREDSPATH)
+TRUTHS = torch.load(conf.VALPATH)
+LABELS = list(set(i[1] for i in TRUTHS))
 
 
-def make_model_layer_table(model_summary: list):
-    model_layers = model_summary[:-4]
-    model_layers = [i for i in model_layers if not all(j == "-" for j in i)]
-    model_layers = [i.split("|") for i in model_layers]
-    model_layers = [[j.strip() for j in i] for i in model_layers]
-    model_layers[0][0] = "Layer"
-    header = model_layers[0]
-    body = model_layers[1:]
-    table = pd.DataFrame(body, columns=header)
-    table = dash_table.DataTable(
-        data=table.to_dict("records"),
-        columns=[{"name": i, "id": i} for i in table.columns],
-        style_cell={
-            "textAlign": "left",
-            "font-family": "FreightSans, Helvetica Neue, Helvetica, Arial, sans-serif",
-        },
-        style_as_list_view=True,
-        style_table={
-            "overflow-x": "auto",
-        },
-        style_header={"border": "0px solid black"},
-    )
-    return table
-
-
-def make_model_param_text(model_summary: list):
-    model_params = model_summary[-4:]
-    model_params = [i.split("  ") for i in model_params]
-    model_params = [[i[0]] + [i[-1]] for i in model_params]
-    model_params = [[j.strip() for j in i] for i in model_params]
-    model_params = [i[::-1] for i in model_params]
-    model_params[-1][0] = "Est. params size (MB)"
-    model_params = ["".join([i[0], ": ", i[-1]]) for i in model_params]
-    return model_params
-
-
-def make_model_summary(model_summary: ModelSummary):
-    model_summary = model_summary.__str__().split("\n")
-    model_layers = make_model_layer_table(model_summary)
-    model_params = make_model_param_text(model_summary)
-    return model_layers, model_params
-
-
-def find_index(dataset, label=0, label_idx=1):
-    for i in range(len(dataset)):
-        if dataset[i][label_idx] == label:
-            return i
-
-
-# DATA
-predictions = torch.load(conf.PREDSPATH)
-ground_truths = torch.load(conf.VALPATH)
-ground_truth_labels = list(set(i[1] for i in ground_truths))
-# find first zero
-zero_idx = find_index(ground_truths, label=0, label_idx=1)
+zero_idx = find_index(TRUTHS, label=LABELS[0], label_idx=1)
 
 
 # model summary
-chkptdir = os.path.join("models", "checkpoints")
-available_checkpoints = os.listdir(chkptdir)
+available_checkpoints = os.listdir(conf.CHKPTSPATH)
 available_checkpoints.remove("README.md")
 latest_checkpoint = available_checkpoints[0]
-chkpt_fname = os.path.join("models", "checkpoints", latest_checkpoint)
-model = PodModule.load_from_checkpoint(chkpt_fname)
-summary = ModelSummary(model)
-model_layers, model_params = make_model_summary(summary)
+chkpt_filename = os.path.join(conf.CHKPTSPATH, latest_checkpoint)
+model = PodModule.load_from_checkpoint(chkpt_filename)
+model_layers, model_params = make_model_summary(model)
 
 # APP LAYOUT
 NavBar = dbc.NavbarSimple(
@@ -129,7 +57,7 @@ Control = dbc.Card(
         [
             html.H1("Label", className="card-title"),
             dcc.Dropdown(
-                options=ground_truth_labels,
+                options=LABELS,
                 value=0,
                 multi=False,
                 id="dropdown",
@@ -187,7 +115,7 @@ SideBar = dbc.Col(
 
 GroundTruth = dcc.Graph(
     id="left-fig",
-    figure=create_figure(ground_truths[zero_idx][0], "Ground Truth"),
+    figure=create_figure(TRUTHS[zero_idx][0], "Ground Truth"),
     config={
         "responsive": True,
         "displayModeBar": True,
@@ -197,7 +125,7 @@ GroundTruth = dcc.Graph(
 
 Predictions = dcc.Graph(
     id="right-fig",
-    figure=create_figure(predictions[zero_idx][0], "Decoded"),
+    figure=create_figure(PREDS[zero_idx][0], "Decoded"),
     config={
         "responsive": True,
         "displayModeBar": True,
