@@ -26,6 +26,17 @@ from visionpod import conf
 
 
 class PodTrainer(L.Trainer):
+    """A custom Lightning.LightningTrainer
+
+    # Arguments
+        logger: None
+        profiler: None
+        callbacks: []
+        plugins: []
+        set_seed: True
+        trainer_init_kwargs:
+    """
+
     def __init__(
         self,
         logger: Optional[Logger] = None,
@@ -35,9 +46,10 @@ class PodTrainer(L.Trainer):
         set_seed: bool = True,
         **trainer_init_kwargs: Dict[str, Any]
     ) -> None:
-        # SET SEED
+
         if set_seed:
             seed_everything(conf.GLOBALSEED, workers=True)
+
         super().__init__(
             logger=logger or TensorBoardLogger(conf.TENSORBOARDPATH, name="logs"),
             profiler=profiler or PyTorchProfiler(dirpath=conf.TORCHPROFILERPATH, filename="profiler"),
@@ -46,7 +58,12 @@ class PodTrainer(L.Trainer):
             **trainer_init_kwargs
         )
 
-    def persist_predictions(self, predictions_dir: Optional[Union[str, Path]] = conf.PREDSPATH) -> None:
+    def persist_predictions(self, predictions_dir: Optional[Union[str, Path]] = None) -> None:
+        """helper method to persist predictions on completion of a training run
+
+        # Arguments
+            predictions_dir: the directory path where predictions should be saved to
+        """
         self.test(ckpt_path="best", datamodule=self.datamodule)
         predictions = self.predict(self.model, self.datamodule.val_dataloader())
         torch.save(predictions, predictions_dir)

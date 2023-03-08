@@ -17,6 +17,7 @@ from pathlib import Path
 
 import click
 
+from visionpod import conf
 from visionpod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
 from visionpod.components.hpo import sweep
 from visionpod.core.module import PodModule
@@ -76,7 +77,6 @@ def trainer() -> None:
     pass
 
 
-# TODO add help description
 @trainer.command("help")
 def help() -> None:
     trainer = os.path.join(PKGPATH, "core", "trainer.py")
@@ -84,8 +84,8 @@ def help() -> None:
 
 
 @trainer.command("fast-dev-run")
-@click.option("--image_size", default=32)
-@click.option("--num_classes", default=10)
+@click.option("--image_size", default=conf.IMAGESIZE)
+@click.option("--num_classes", default=conf.NUMCLASSES)
 def fast_dev_run(image_size, num_classes) -> None:
     model = PodModule(vit_req_image_size=image_size, vit_req_num_classes=num_classes)
     datamodule = PodDataModule()
@@ -100,8 +100,8 @@ def fast_dev_run(image_size, num_classes) -> None:
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-@click.option("--image_size", default=32)
-@click.option("--num_classes", default=10)
+@click.option("--image_size", default=conf.IMAGESIZE)
+@click.option("--num_classes", default=conf.NUMCLASSES)
 def sweep_and_train(
     em, project_name, trial_count, persist_model, persist_predictions, persist_splits, image_size, num_classes
 ) -> None:
@@ -120,8 +120,8 @@ def sweep_and_train(
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-@click.option("--image_size", default=32)
-@click.option("--num_classes", default=10)
+@click.option("--image_size", default=conf.IMAGESIZE)
+@click.option("--num_classes", default=conf.NUMCLASSES)
 def train_only(project_name, persist_model, persist_predictions, persist_splits, image_size, num_classes) -> None:
     trainer = sweep.TrainWork()
     trainer.run(project_name)

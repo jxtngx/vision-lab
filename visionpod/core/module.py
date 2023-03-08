@@ -20,26 +20,26 @@ import lightning as L
 import torch.nn.functional as F
 from torch import nn, optim
 from torchmetrics.functional import accuracy
-from torchvision.models import vit_b_16 as VisionTransformer
-from torchvision.models import ViT_B_16_Weights
+from torchvision.models import vit_b_32 as VisionTransformer
+from torchvision.models import ViT_B_32_Weights as Weights
 from torchvision.models.vision_transformer import ConvStemConfig
 
 
 class PodModule(L.LightningModule):
     """A custom PyTorch Lightning LightningModule for torchvision.VisionTransformer.
 
-    # Arguments
-        optimizer: str = "Adam",
-        lr: float = 1e-3,
-        accuracy_task: str = "multiclass",
-        vit_req_image_size: int = 32,
-        vit_req_num_classes: int = 10,
-        vit_hp_dropout: float = 0.0,
-        vit_hp_attention_dropout: float = 0.0,
-        vit_hp_norm_layer: Optional[nn.Module] = None,
-        vit_opt_conv_stem_configs: Optional[List[ConvStemConfig]] = None,
-        vit_init_opt_progress: bool = False,
-        vit_init_opt_weights: bool = False,
+    # Args
+        optimizer: "Adam". A valid [torch.optim](https://pytorch.org/docs/stable/optim.html) name.
+        lr: 1e-3
+        accuracy_task: "multiclass". One of (binary, multiclass, multilabel).
+        vit_req_image_size: 32
+        vit_req_num_classes: 10
+        vit_hp_dropout: 0.0
+        vit_hp_attention_dropout: 0.0
+        vit_hp_norm_layer: None
+        vit_opt_conv_stem_configs: None
+        vit_init_opt_progress: False
+        vit_init_opt_weights: False
     """
 
     def __init__(
@@ -61,7 +61,7 @@ class PodModule(L.LightningModule):
         if not vit_hp_norm_layer:
             vit_hp_norm_layer = partial(nn.LayerNorm, eps=1e-6)
 
-        vit_weights = ViT_B_16_Weights if vit_init_opt_weights else None
+        vit_weights = Weights if vit_init_opt_weights else None
 
         vit_kwargs = dict(
             image_size=vit_req_image_size,
@@ -80,26 +80,33 @@ class PodModule(L.LightningModule):
         self.save_hyperparameters()
 
     def forward(self, x):
+        """calls .forward of a given model flow"""
         return self.model(x)
 
     def training_step(self, batch):
-        return self._common_step(batch, "training")
+        """runs a training step sequence in ``.common_step``"""
+        return self.common_step(batch, "training")
 
     def test_step(self, batch, *args):
-        self._common_step(batch, "test")
+        """runs a test step sequence in ``.common_step``"""
+        self.common_step(batch, "test")
 
     def validation_step(self, batch, *args):
-        self._common_step(batch, "val")
+        """runs a validation step sequence in ``.common_step``"""
+        self.common_step(batch, "val")
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
+        """returns a prediction from the trained model"""
         x, y = batch
         return self(x)
 
     def configure_optimizers(self):
+        """configures the ``torch.optim`` used in training loop"""
         optimizer = self.optimizer(self.parameters(), lr=self.lr)
         return optimizer
 
-    def _common_step(self, batch, stage):
+    def common_step(self, batch, stage):
+        """consolidates common code for train, test, and validation steps"""
         x, y = batch
         y_hat = self.model(x)
         loss = F.cross_entropy(y_hat, y)

@@ -15,13 +15,14 @@
 import os
 from pathlib import Path
 
+GLOBALSEED = 42
+
+IMAGESIZE = 32
+NUMCLASSES = 10
+
 # SET PATHS
 filepath = Path(__file__)
 PROJECTPATH = filepath.parents[1]
-
-GLOBALSEED = 42
-
-# research paths
 _researchpath = os.path.join(PROJECTPATH, "research")
 _logspath = os.path.join(_researchpath, "logs")
 TORCHPROFILERPATH = os.path.join(_logspath, "torch_profiler")

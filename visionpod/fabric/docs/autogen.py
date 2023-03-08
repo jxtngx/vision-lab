@@ -15,14 +15,23 @@ class PodDocsGenerator:
 
         pages = {
             "core.PodModule.md": [
-                # "visionpod.core.module.ViT_B_16_Parameters",
-                # "visionpod.core.module.ViT_B_16_HyperParameters",
                 "visionpod.core.module.PodModule",
-            ]
+                "visionpod.core.module.PodModule.forward",
+                "visionpod.core.module.PodModule.training_step",
+                "visionpod.core.module.PodModule.test_step",
+                "visionpod.core.module.PodModule.validation_step",
+                "visionpod.core.module.PodModule.predict_step",
+                "visionpod.core.module.PodModule.configure_optimizers",
+                "visionpod.core.module.PodModule.common_step",
+            ],
+            "core.PodTrainer.md": [
+                "visionpod.core.trainer.PodTrainer",
+                "visionpod.core.trainer.PodTrainer.persist_predictions",
+            ],
         }
 
         doc_generator = DocumentationGenerator(pages)
-        doc_generator.generate(f"{PROJECTPATH}/docs-src/docs/visionpod")
+        doc_generator.generate(f"{PROJECTPATH}/docs-src/docs/VisionPod")
 
         root_readme = os.path.join(PROJECTPATH, "README.md")
         docs_intro = os.path.join(DOCSDIR, "intro.md")
