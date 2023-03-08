@@ -20,19 +20,19 @@ visionpod.core.module.PodModule(
 
 A custom PyTorch Lightning LightningModule for torchvision.VisionTransformer.
 
-__Args__
+__Arguments__
 
-optimizer: "Adam". A valid [torch.optim](https://pytorch.org/docs/stable/optim.html) name.
-lr: 1e-3
-accuracy_task: "multiclass". One of (binary, multiclass, multilabel).
-vit_req_image_size: 32
-vit_req_num_classes: 10
-vit_hp_dropout: 0.0
-vit_hp_attention_dropout: 0.0
-vit_hp_norm_layer: None
-vit_opt_conv_stem_configs: None
-vit_init_opt_progress: False
-vit_init_opt_weights: False
+- __optimizer__ `str`: "Adam". A valid [torch.optim](https://pytorch.org/docs/stable/optim.html) name.
+- __lr__ `float`: 1e-3
+- __accuracy_task__ `str`: "multiclass". One of (binary, multiclass, multilabel).
+- __vit_req_image_size__ `int`: 32
+- __vit_req_num_classes__ `int`: 10
+- __vit_hp_dropout__ `float`: 0.0
+- __vit_hp_attention_dropout__ `float`: 0.0
+- __vit_hp_norm_layer__ `torch.nn.modules.module.Module | None`: None
+- __vit_opt_conv_stem_configs__ `List[torchvision.models.vision_transformer.ConvStemConfig] | None`: None
+- __vit_init_opt_progress__ `bool`: False
+- __vit_init_opt_weights__ `bool`: False
 
 
 ----

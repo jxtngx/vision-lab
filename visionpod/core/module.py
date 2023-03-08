@@ -28,7 +28,7 @@ from torchvision.models.vision_transformer import ConvStemConfig
 class PodModule(L.LightningModule):
     """A custom PyTorch Lightning LightningModule for torchvision.VisionTransformer.
 
-    # Args
+    # Arguments
         optimizer: "Adam". A valid [torch.optim](https://pytorch.org/docs/stable/optim.html) name.
         lr: 1e-3
         accuracy_task: "multiclass". One of (binary, multiclass, multilabel).
