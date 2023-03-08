@@ -41,6 +41,29 @@ def _teardown() -> None:
     common_destructive_flow([teardown], command_name="teardown")
 
 
+@main.group("run")
+def run() -> None:
+    pass
+
+
+@run.command("bug-report")
+def bug_report() -> None:
+    bugreport.main()
+    print("\n")
+    make_bug_trainer()
+    trainer = os.path.join(PKGPATH, "core", "bug_trainer.py")
+    run_command = " ".join(["python", trainer, " 2> boring_trainer_error.md"])
+    os.system(run_command)
+    os.remove(trainer)
+
+
+@run.command("dash-prototype")
+def dash_proto() -> None:
+    dashproto = os.path.join(PKGPATH, "dash_prototype", "app.py")
+    run_command = f"lightning run app {dashproto}"
+    os.system(run_command)
+
+
 @main.group("docs")
 def docs() -> None:
     pass
@@ -59,17 +82,6 @@ def start_docs() -> None:
         os.system("yarn start")
     except KeyboardInterrupt:
         os.chdir(_cwd)
-
-
-@main.command("bug-report")
-def bug_report() -> None:
-    bugreport.main()
-    print("\n")
-    make_bug_trainer()
-    trainer = os.path.join(PKGPATH, "core", "bug_trainer.py")
-    run_command = " ".join(["python", trainer, " 2> boring_trainer_error.md"])
-    os.system(run_command)
-    os.remove(trainer)
 
 
 @main.group("trainer")

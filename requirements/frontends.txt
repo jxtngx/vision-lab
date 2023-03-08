@@ -1,1 +1,4 @@
 plotly
+dash
+dash-bootstrap-components
+gunicorn
