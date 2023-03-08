@@ -32,7 +32,7 @@ class PodDocsGenerator:
         }
 
         doc_generator = DocumentationGenerator(pages)
-        doc_generator.generate(f"{PROJECTPATH}/docs-src/docs/VisionPod")
+        doc_generator.generate(f"{PROJECTPATH}/docs-src/docs/VisionPod Source")
 
         root_readme = os.path.join(PROJECTPATH, "README.md")
         docs_intro = os.path.join(DOCSDIR, "intro.md")
