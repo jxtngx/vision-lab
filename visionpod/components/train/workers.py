@@ -21,7 +21,7 @@ from lightning.pytorch.callbacks import EarlyStopping
 from lightning.pytorch.loggers import WandbLogger
 
 from visionpod import conf
-from visionpod.components.hpo import SweepFlow
+from visionpod.components.hpo import SweepWork
 from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
 from visionpod.pipeline.datamodule import PodDataModule
@@ -53,7 +53,7 @@ class TrainWork:
         group_name = "Solo Training Runs" if not training_run_name else "Sweep Training Runs"
 
         if not training_run_name:
-            training_run_name = wandb.util.generate_id()
+            training_run_name = "-".join(["SoloRun", wandb.util.generate_id()])
 
         logger = WandbLogger(
             project=project_name,
@@ -72,7 +72,7 @@ class TrainWork:
         self.trainer.fit(model=self.model, datamodule=self.datamodule)
 
 
-class TrainFlow:
+class TunedTrainWork:
     def __init__(
         self,
         experiment_manager: str = "wandb",
@@ -81,7 +81,7 @@ class TrainFlow:
     ) -> None:
         self.experiment_manager = experiment_manager
         self.project_name = project_name
-        self._sweep_flow = SweepFlow(project_name=project_name, trial_count=trial_count)
+        self._sweep_flow = SweepWork(project_name=project_name, trial_count=trial_count)
         self._train_work = TrainWork()
 
     @property
@@ -132,5 +132,5 @@ class TrainFlow:
             self._train_work.persist_predictions()
         if persist_splits:
             self._train_work.persist_splits()
-        if issubclass(TrainFlow, LightningFlow):
+        if issubclass(TunedTrainWork, LightningFlow):
             sys.exit()

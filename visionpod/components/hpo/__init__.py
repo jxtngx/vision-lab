@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from visionpod.components.hpo.flow import SweepFlow  # noqa: F401
+from visionpod.components.hpo.workers import SweepWork  # noqa: F401

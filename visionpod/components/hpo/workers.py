@@ -226,7 +226,7 @@ class ObjectiveWork:
             self.trainer.logger.experiment.finish()
 
 
-class SweepFlow:
+class SweepWork:
     def __init__(
         self,
         project_name: Optional[str] = None,
@@ -301,5 +301,5 @@ class SweepFlow:
             self._objective_work.persist_predictions()
         if persist_splits:
             self._objective_work.persist_splits()
-        if issubclass(SweepFlow, LightningFlow):
+        if issubclass(SweepWork, LightningFlow):
             sys.exit()
