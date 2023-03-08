@@ -5,30 +5,6 @@ authors: [goheen]
 tags: [Data]
 ---
 
-The [UC Merced dataset](https://torchgeo.readthedocs.io/en/stable/api/datasets.html#uc-merced) is a 21 class land use image dataset meant for research purposes.
+The [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images.
 
-There are 100 images for each of the following classes:
-
-- agricultural
-- airplane
-- baseballdiamond
-- beach
-- buildings
-- chaparral
-- denseresidential
-- forest
-- freeway
-- golfcourse
-- harbor
-- intersection
-- mediumresidential
-- mobilehomepark
-- overpass
-- parkinglot
-- river
-- runway
-- sparseresidential
-- storagetanks
-- tenniscourt
-
-Each image measures 256x256 pixels.
+The dataset is divided into five training batches and one test batch, each with 10000 images. The test batch contains exactly 1000 randomly-selected images from each class. The training batches contain the remaining images in random order, but some training batches may contain more images from one class than another. Between them, the training batches contain exactly 5000 images from each class.
