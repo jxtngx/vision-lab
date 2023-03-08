@@ -19,7 +19,7 @@ import click
 
 from visionpod import conf
 from visionpod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
-from visionpod.components.hpo import sweep
+from visionpod.components import train
 from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
 from visionpod.fabric.bugreport import bugreport
@@ -106,7 +106,7 @@ def sweep_and_train(
     em, project_name, trial_count, persist_model, persist_predictions, persist_splits, image_size, num_classes
 ) -> None:
     project_name = "-".join([project_name, em])
-    trainer = sweep.TrainFlow(experiment_manager=em, project_name=project_name, trial_count=trial_count)
+    trainer = train.TrainFlow(experiment_manager=em, project_name=project_name, trial_count=trial_count)
     trainer.run(
         project_name,
         persist_model=persist_model,
@@ -123,7 +123,7 @@ def sweep_and_train(
 @click.option("--image_size", default=conf.IMAGESIZE)
 @click.option("--num_classes", default=conf.NUMCLASSES)
 def train_only(project_name, persist_model, persist_predictions, persist_splits, image_size, num_classes) -> None:
-    trainer = sweep.TrainWork()
+    trainer = train.TrainWork()
     trainer.run(project_name)
 
 
