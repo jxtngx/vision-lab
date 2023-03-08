@@ -54,8 +54,8 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
 - Topics:
   - Computer Vision
   - Image Classification
-- Data Source: [torchgeo UC Merced](https://torchgeo.readthedocs.io/en/stable/api/datasets.html#uc-merced)
-- Domain Libraries: torchvision, torchgeo
+- Data Source: [torchvision CIFAR10](https://pytorch.org/vision/stable/generated/torchvision.datasets.CIFAR10.html#torchvision.datasets.CIFAR10)
+- Domain Libraries: torchvision
 - Model: torchvision [VisionTransformer](https://github.com/pytorch/vision/blob/main/torchvision/models/vision_transformer.py)
 - Paper: [An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale](https://arxiv.org/abs/2010.11929)
 
@@ -89,12 +89,11 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
 The structure of the project is:
 
 - `docs-src` is the docusaurus project
-- `lightning-app` is the root Lightning Flow and App that will be deployed to Lightning
 - `next-app` is the Next + React frontend deployed to Vercel
 - `requirements` + `requirements.txt` helps CI/CD jobs install Python requirements
 - `research` location of data cache, experiment logs, companion notebooks, checkpoints, and pre-trained model
 - `tests` are tests for visionpod
-- `visionpod` is the python package. it contains the deep learning network in _visionpod.core.module_.
+- `visionpod` is the python package, Lightning App, and VisionTransformer.
 
 ## Setup
 
