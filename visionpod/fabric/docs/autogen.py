@@ -28,6 +28,7 @@ class PodDocsGenerator:
                 "visionpod.core.trainer.PodTrainer",
                 "visionpod.core.trainer.PodTrainer.persist_predictions",
             ],
+            "app.AutoScaledFastAPI.md": ["visionpod.app.app.AutoScaledFastAPI"],
         }
 
         doc_generator = DocumentationGenerator(pages)

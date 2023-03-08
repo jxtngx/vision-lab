@@ -12,30 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pathlib import Path
 
-from lightning import LightningApp, LightningFlow
-from lightning.app.frontend import StaticWebFrontend
+from lightning import LightningApp, LightningWork
 
 
-class ReactUI(LightningFlow):
+class AutoScaledFastAPI(LightningWork):
+    """Runs an AutoScaled FastAPI Lightning App"""
+
     def __init__(self):
         super().__init__()
-
-    def configure_layout(self):
-        return StaticWebFrontend(Path(__file__).parents[1] / "next-app/.next/")
-
-
-class RootFlow(LightningFlow):
-    def __init__(self):
-        super().__init__()
-        self.react_ui = ReactUI()
 
     def run(self):
-        self.react_ui.run()
-
-    def configure_layout(self):
-        return [{"name": "ReactUI", "content": self.react_ui}]
+        ...
 
 
-app = LightningApp(RootFlow())
+app = LightningApp(AutoScaledFastAPI())
