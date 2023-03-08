@@ -87,7 +87,7 @@ The structure of the project is:
 - `docs-src` is the docusaurus project
 - `next-app` is the Next + React frontend deployed to Vercel
 - `requirements` + `requirements.txt` helps CI/CD jobs install Python requirements
-- `research` location of data cache, experiment logs, companion notebooks, checkpoints, and pre-trained model
+- `research` location of companion notebooks
 - `tests` are tests for visionpod
 - `visionpod` is the python package, Lightning App, and VisionTransformer.
 
