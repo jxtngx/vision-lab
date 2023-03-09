@@ -116,6 +116,7 @@ def fast_dev_run(image_size, num_classes) -> None:
 def train_only(em, project_name, persist_model, persist_predictions, persist_splits, image_size, num_classes) -> None:
     trainer = TrainerWork(experiment_manager=em, project_name=project_name)
     trainer.run(
+        conf.TRAINFLAGS,
         persist_model=persist_model,
         persist_predictions=persist_predictions,
         persist_splits=persist_splits,

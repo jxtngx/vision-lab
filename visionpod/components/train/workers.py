@@ -114,22 +114,23 @@ class TrainerWork:
             vit_hp_conv_stem_configs=self.conv_stem_configs,
             vit_hp_dropout=self.dropout,
             vit_hp_norm_layer=self.norm_layer,
-            **conf.MODELBASEKWARGS,
+            **self.module_kwargs,
         )
         self.datamodule = PodDataModule()
 
-        logger = WandbLogger(
+        self.logger = WandbLogger(
             project=self.project_name,
             name=self.run_name,
             group=self.group_name,
             save_dir=conf.WANDBPATH,
         )
 
-        self.trainer = PodTrainer(logger=logger, **conf.TRAINFLAGS)
+        self.trainer = PodTrainer(logger=self.logger, **self.trainer_flags)
         self.trainer.fit(model=self.model, datamodule=self.datamodule)
 
     def run(
         self,
+        trainer_flags: Dict[str, Any],
         persist_model: bool = False,
         persist_predictions: bool = False,
         persist_splits: bool = False,
@@ -137,6 +138,8 @@ class TrainerWork:
         trial_count: Optional[int] = None,
         module_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
+
+        self.trainer_flags = trainer_flags
 
         if not sweep and not module_kwargs:
             raise ValueError("either module_kwargs must be provided, or sweep must be true")
@@ -150,12 +153,8 @@ class TrainerWork:
         if sweep:
             self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=trial_count)
             self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
-            self._fit(
-                training_run_name=self.run_name,
-            )
 
-        if not sweep:
-            self._fit(project_name=self.project_name)
+        self._fit()
 
         if persist_model:
             self._train_work.persist_model()
