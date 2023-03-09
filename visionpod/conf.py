@@ -39,11 +39,11 @@ OPTUNAPATH = os.path.join(PROJECTPATH, "logs", "optuna")
 # MODULE AND MODEL KWARGS
 
 MODULEKWARGS = dict(
-    lr=1e3,
+    lr=1e-3,
     optimizer="Adam",
 )
 
-MODELBASEKWARGS = dict(
+MODELKWARGS = dict(
     image_size=32,
     num_classes=10,
     progress=False,
@@ -57,7 +57,6 @@ MODELHYPERS = dict(
     conv_stem_configs=None,
 )
 
-MODELKWARGS = {**MODELBASEKWARGS, **MODELHYPERS}
 
 IMAGESIZE = 32
 NUMCLASSES = 10
@@ -65,6 +64,6 @@ NUMCLASSES = 10
 # TRAINER FLAGS
 GLOBALSEED = 42
 
-TRAINFLAGS = dict(max_expochs=100, callbacks=EarlyStopping(monitor="training_loss", mode="min"))
+TRAINFLAGS = dict(max_epochs=100, callbacks=[EarlyStopping(monitor="training_loss", mode="min")])
 
 SWEEPFLAGS = dict()

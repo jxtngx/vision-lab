@@ -111,18 +111,18 @@ def fast_dev_run(image_size, num_classes) -> None:
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-@click.option("--image_size", default=conf.IMAGESIZE)
-@click.option("--num_classes", default=conf.NUMCLASSES)
-def train_only(em, project_name, persist_model, persist_predictions, persist_splits, image_size, num_classes) -> None:
-    trainer = TrainerWork(experiment_manager=em, project_name=project_name)
-    trainer.run(
+def train_only(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
+    trainer = TrainerWork(
         conf.TRAINFLAGS,
+        experiment_manager=em,
+        project_name=project_name,
+        sweep=False,
+        trial_count=None,
+    )
+    trainer.run(
         persist_model=persist_model,
         persist_predictions=persist_predictions,
         persist_splits=persist_splits,
-        sweep=False,
-        trial_count=None,
-        module_kwargs=conf.MODULEKWARGS,
     )
 
 

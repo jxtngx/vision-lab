@@ -32,14 +32,14 @@ class PodModule(L.LightningModule):
         optimizer: "Adam". A valid [torch.optim](https://pytorch.org/docs/stable/optim.html) name.
         lr: 1e-3
         accuracy_task: "multiclass". One of (binary, multiclass, multilabel).
-        vit_req_image_size: 32
-        vit_req_num_classes: 10
-        vit_hp_dropout: 0.0
-        vit_hp_attention_dropout: 0.0
-        vit_hp_norm_layer: None
-        vit_opt_conv_stem_configs: None
-        vit_init_opt_progress: False
-        vit_init_opt_weights: False
+        image_size: 32
+        num_classes: 10
+        dropout: 0.0
+        attention_dropout: 0.0
+        norm_layer: None
+        conv_stem_configs: None
+        opt_progress: False
+        opt_weights: False
     """
 
     def __init__(
@@ -47,38 +47,38 @@ class PodModule(L.LightningModule):
         optimizer: str = "Adam",
         lr: float = 1e-3,
         accuracy_task: str = "multiclass",
-        vit_req_image_size: int = 32,
-        vit_req_num_classes: int = 10,
-        vit_hp_dropout: float = 0.0,
-        vit_hp_attention_dropout: float = 0.0,
-        vit_hp_norm_layer: Optional[nn.Module] = None,
-        vit_hp_conv_stem_configs: Optional[List[ConvStemConfig]] = None,
-        vit_init_opt_progress: bool = False,
-        vit_init_opt_weights: bool = False,
+        image_size: int = 32,
+        num_classes: int = 10,
+        dropout: float = 0.0,
+        attention_dropout: float = 0.0,
+        norm_layer: Optional[nn.Module] = None,
+        conv_stem_configs: Optional[List[ConvStemConfig]] = None,
+        progress: bool = False,
+        weights: bool = False,
     ):
         super().__init__()
 
-        if not vit_hp_norm_layer:
-            vit_hp_norm_layer = partial(nn.LayerNorm, eps=1e-6)
+        if not norm_layer:
+            norm_layer = partial(nn.LayerNorm, eps=1e-6)
 
         vit_kwargs = dict(
-            image_size=vit_req_image_size,
-            num_classes=vit_req_num_classes,
-            dropout=vit_hp_dropout,
-            attention_dropout=vit_hp_attention_dropout,
-            norm_layer=vit_hp_norm_layer,
-            conv_stem_configs=vit_hp_conv_stem_configs,
+            image_size=image_size,
+            num_classes=num_classes,
+            dropout=dropout,
+            attention_dropout=attention_dropout,
+            norm_layer=norm_layer,
+            conv_stem_configs=conv_stem_configs,
         )
 
         self.model = VisionTransformer(
-            weights=Weights if vit_init_opt_weights else None,
-            progress=vit_init_opt_progress,
+            weights=Weights if weights else None,
+            progress=progress,
             **vit_kwargs,
         )
         self.optimizer = getattr(optim, optimizer)
         self.lr = lr
         self.accuracy_task = accuracy_task
-        self.num_classes = vit_req_num_classes
+        self.num_classes = num_classes
         self.save_hyperparameters()
 
     def forward(self, x):

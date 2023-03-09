@@ -29,11 +29,46 @@ from visionpod.pipeline.datamodule import PodDataModule
 class TrainerWork:
     def __init__(
         self,
+        trainer_flags: Dict[str, Any],
+        module_kwargs: Dict[str, Any] = conf.MODULEKWARGS,
+        model_kwargs: Dict[str, Any] = conf.MODELKWARGS,
+        model_hypers: Dict[str, Any] = conf.MODELHYPERS,
+        sweep: bool = False,
+        trial_count: Optional[int] = None,
         experiment_manager: str = "wandb",
         project_name: Optional[str] = None,
     ) -> None:
+
+        self._trainer_flags = trainer_flags
+        self._module_kwargs = module_kwargs
+        self._model_hypers = model_hypers
+        self._model_kwargs = model_kwargs
         self.experiment_manager = experiment_manager
         self.project_name = project_name
+        self.sweep = sweep
+        self.trial_count = trial_count
+
+        if not sweep and not module_kwargs:
+            raise ValueError("either module_kwargs must be provided, or sweep must be true")
+
+        if sweep and module_kwargs:
+            raise ValueError("set sweep cannot be true if providing module_kwargs")
+
+    @property
+    def module_kwargs(self) -> Dict[str, Any]:
+        return self._module_kwargs
+
+    @property
+    def model_kwargs(self) -> Dict[str, Any]:
+        return self._model_kwargs
+
+    @property
+    def model_hypers(self) -> Dict[str, Any]:
+        return self._model_hypers
+
+    @property
+    def trainer_flags(self) -> Dict[str, Any]:
+        return self._trainer_flags
 
     @property
     def best_params(self) -> Dict[str, Any]:
@@ -58,28 +93,28 @@ class TrainerWork:
         if hasattr(self, "_sweep_flow"):
             return self._sweep_flow.best_params["dropout"]
         else:
-            return self.module_kwargs["dropout"]
+            return self.model_hypers["dropout"]
 
     @property
     def attention_dropout(self) -> float:
         if hasattr(self, "_sweep_flow"):
             return self._sweep_flow.best_params["attention_dropout"]
         else:
-            return self.module_kwargs["attention_dropout"]
+            return self.model_hypers["attention_dropout"]
 
     @property
     def norm_layer(self) -> float:
         if hasattr(self, "_sweep_flow"):
             return self._sweep_flow.best_params["norm_layer"]
         else:
-            return self.module_kwargs["norm_layer"]
+            return self.model_hypers["norm_layer"]
 
     @property
     def conv_stem_configs(self) -> float:
         if hasattr(self, "_sweep_flow"):
             return self._sweep_flow.best_params["conv_stem_configs"]
         else:
-            return self.module_kwargs["conv_stem_configs"]
+            return self.model_hypers["conv_stem_configs"]
 
     @property
     def group_name(self) -> str:
@@ -110,11 +145,11 @@ class TrainerWork:
         self.model = PodModule(
             lr=self.lr,
             optimizer=self.optimizer,
-            vit_hp_attention_dropout=self.attention_dropout,
-            vit_hp_conv_stem_configs=self.conv_stem_configs,
-            vit_hp_dropout=self.dropout,
-            vit_hp_norm_layer=self.norm_layer,
-            **self.module_kwargs,
+            attention_dropout=self.attention_dropout,
+            conv_stem_configs=self.conv_stem_configs,
+            dropout=self.dropout,
+            norm_layer=self.norm_layer,
+            **self.model_kwargs,
         )
         self.datamodule = PodDataModule()
 
@@ -130,28 +165,13 @@ class TrainerWork:
 
     def run(
         self,
-        trainer_flags: Dict[str, Any],
         persist_model: bool = False,
         persist_predictions: bool = False,
         persist_splits: bool = False,
-        sweep: bool = False,
-        trial_count: Optional[int] = None,
-        module_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
 
-        self.trainer_flags = trainer_flags
-
-        if not sweep and not module_kwargs:
-            raise ValueError("either module_kwargs must be provided, or sweep must be true")
-
-        if sweep and module_kwargs:
-            raise ValueError("set sweep cannot be true if providing module_kwargs")
-
-        if module_kwargs:
-            self.module_kwargs = module_kwargs
-
-        if sweep:
-            self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=trial_count)
+        if self.sweep:
+            self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=self.trial_count)
             self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
 
         self._fit()
