@@ -39,6 +39,12 @@ class TrainerWork:
         project_name: Optional[str] = None,
     ) -> None:
 
+        if not sweep and not module_kwargs:
+            raise ValueError("either module_kwargs must be provided, or sweep must be true")
+
+        if sweep and module_kwargs:
+            raise ValueError("set sweep cannot be true if providing module_kwargs")
+
         self.trainer_flags = trainer_flags
         self.module_kwargs = module_kwargs
         self.model_hypers = model_hypers
@@ -47,12 +53,6 @@ class TrainerWork:
         self.project_name = project_name
         self.sweep = sweep
         self.trial_count = trial_count
-
-        if not sweep and not module_kwargs:
-            raise ValueError("either module_kwargs must be provided, or sweep must be true")
-
-        if sweep and module_kwargs:
-            raise ValueError("set sweep cannot be true if providing module_kwargs")
 
     @property
     def best_params(self) -> Dict[str, Any]:
