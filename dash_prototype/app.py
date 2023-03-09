@@ -22,9 +22,8 @@ import lightning as L
 import torch
 from dash import html
 from dash.dependencies import Input, Output
+from pages import Body, create_figure, find_index, NavBar
 from torch.utils.data import TensorDataset
-
-from .pages import Body, create_figure, find_index, NavBar
 
 
 @dataclass

@@ -18,24 +18,21 @@ import dash
 import dash_bootstrap_components as dbc
 import torch
 from dash import dcc, html
+from utilities import create_figure, find_index, make_model_summary
 
 from visionpod import conf
 from visionpod.core.module import PodModule
 
-from .utilities import create_figure, find_index, make_model_summary
+PREDS = torch.load(conf.PREDSPATH)
+TRUTHS = torch.load(conf.VALPATH)
+LABELS = list(set(i[1] for i in TRUTHS))
+LABELIDX = find_index(TRUTHS, label=LABELS[0], label_idx=1)
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-PREDS = torch.load(conf.PREDSPATH)
-TRUTHS = torch.load(conf.VALPATH)
-LABELS = list(set(i[1] for i in TRUTHS))
 
-
-zero_idx = find_index(TRUTHS, label=LABELS[0], label_idx=1)
-
-
-# model summary
+# MODEL SUMMARY
 available_checkpoints = os.listdir(conf.CHKPTSPATH)
 available_checkpoints.remove("README.md")
 latest_checkpoint = available_checkpoints[0]
@@ -58,7 +55,7 @@ Control = dbc.Card(
             html.H1("Label", className="card-title"),
             dcc.Dropdown(
                 options=LABELS,
-                value=0,
+                value=LABELS[0],
                 multi=False,
                 id="dropdown",
                 searchable=True,
@@ -115,7 +112,7 @@ SideBar = dbc.Col(
 
 GroundTruth = dcc.Graph(
     id="left-fig",
-    figure=create_figure(TRUTHS[zero_idx][0], "Ground Truth"),
+    figure=create_figure(TRUTHS[LABELIDX][0], "Ground Truth"),
     config={
         "responsive": True,
         "displayModeBar": True,
@@ -125,7 +122,7 @@ GroundTruth = dcc.Graph(
 
 Predictions = dcc.Graph(
     id="right-fig",
-    figure=create_figure(PREDS[zero_idx][0], "Decoded"),
+    figure=create_figure(PREDS[LABELIDX][0], "Decoded"),
     config={
         "responsive": True,
         "displayModeBar": True,
