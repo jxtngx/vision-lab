@@ -13,12 +13,11 @@
 # limitations under the License.
 
 import os
+from functools import partial
 from pathlib import Path
 
-GLOBALSEED = 42
-
-IMAGESIZE = 32
-NUMCLASSES = 10
+from lightning.pytorch.callbacks import EarlyStopping
+from torch import nn
 
 # SET PATHS
 filepath = Path(__file__)
@@ -35,3 +34,37 @@ DATASETPATH = os.path.join(PROJECTPATH, "data")
 SPLITSPATH = os.path.join(PROJECTPATH, "data", "training_split")
 WANDBPATH = os.path.join(PROJECTPATH, "logs", "wandb")
 OPTUNAPATH = os.path.join(PROJECTPATH, "logs", "optuna")
+
+
+# MODULE AND MODEL KWARGS
+
+MODULEKWARGS = dict(
+    lr=1e3,
+    optimizer="Adam",
+)
+
+MODELBASEKWARGS = dict(
+    image_size=32,
+    num_classes=10,
+    progress=False,
+    weights=False,
+)
+
+MODELHYPERS = dict(
+    dropout=0.0,
+    attention_dropout=0.0,
+    norm_layer=partial(nn.LayerNorm, eps=1e-6),
+    conv_stem_configs=None,
+)
+
+MODELKWARGS = {**MODELBASEKWARGS, **MODELHYPERS}
+
+IMAGESIZE = 32
+NUMCLASSES = 10
+
+# TRAINER FLAGS
+GLOBALSEED = 42
+
+TRAINFLAGS = dict(max_expochs=100, callbacks=EarlyStopping(monitor="training_loss", mode="min"))
+
+SWEEPFLAGS = dict()

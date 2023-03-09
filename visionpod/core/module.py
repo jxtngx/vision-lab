@@ -52,7 +52,7 @@ class PodModule(L.LightningModule):
         vit_hp_dropout: float = 0.0,
         vit_hp_attention_dropout: float = 0.0,
         vit_hp_norm_layer: Optional[nn.Module] = None,
-        vit_opt_conv_stem_configs: Optional[List[ConvStemConfig]] = None,
+        vit_hp_conv_stem_configs: Optional[List[ConvStemConfig]] = None,
         vit_init_opt_progress: bool = False,
         vit_init_opt_weights: bool = False,
     ):
@@ -61,18 +61,20 @@ class PodModule(L.LightningModule):
         if not vit_hp_norm_layer:
             vit_hp_norm_layer = partial(nn.LayerNorm, eps=1e-6)
 
-        vit_weights = Weights if vit_init_opt_weights else None
-
         vit_kwargs = dict(
             image_size=vit_req_image_size,
             num_classes=vit_req_num_classes,
             dropout=vit_hp_dropout,
             attention_dropout=vit_hp_attention_dropout,
             norm_layer=vit_hp_norm_layer,
-            conv_stem_configs=vit_opt_conv_stem_configs,
+            conv_stem_configs=vit_hp_conv_stem_configs,
         )
 
-        self.model = VisionTransformer(weights=vit_weights, progress=vit_init_opt_progress, **vit_kwargs)
+        self.model = VisionTransformer(
+            weights=Weights if vit_init_opt_weights else None,
+            progress=vit_init_opt_progress,
+            **vit_kwargs,
+        )
         self.optimizer = getattr(optim, optimizer)
         self.lr = lr
         self.accuracy_task = accuracy_task

@@ -16,8 +16,7 @@ import sys
 from typing import Any, Dict, Optional
 
 import wandb
-from lightning import LightningFlow
-from lightning.pytorch.callbacks import EarlyStopping
+from lightning import LightningWork
 from lightning.pytorch.loggers import WandbLogger
 
 from visionpod import conf
@@ -27,7 +26,75 @@ from visionpod.core.trainer import PodTrainer
 from visionpod.pipeline.datamodule import PodDataModule
 
 
-class TrainWork:
+class TrainerWork:
+    def __init__(
+        self,
+        experiment_manager: str = "wandb",
+        project_name: Optional[str] = None,
+    ) -> None:
+        self.experiment_manager = experiment_manager
+        self.project_name = project_name
+
+    @property
+    def best_params(self) -> Dict[str, Any]:
+        return self._sweep_flow.best_params
+
+    @property
+    def lr(self) -> float:
+        if hasattr(self, "_sweep_flow"):
+            return self._sweep_flow.best_params["lr"]
+        else:
+            return self.module_kwargs["lr"]
+
+    @property
+    def optimizer(self) -> str:
+        if hasattr(self, "_sweep_flow"):
+            return self._sweep_flow.best_params["optimizer"]
+        else:
+            return self.module_kwargs["optimizer"]
+
+    @property
+    def dropout(self) -> float:
+        if hasattr(self, "_sweep_flow"):
+            return self._sweep_flow.best_params["dropout"]
+        else:
+            return self.module_kwargs["dropout"]
+
+    @property
+    def attention_dropout(self) -> float:
+        if hasattr(self, "_sweep_flow"):
+            return self._sweep_flow.best_params["attention_dropout"]
+        else:
+            return self.module_kwargs["attention_dropout"]
+
+    @property
+    def norm_layer(self) -> float:
+        if hasattr(self, "_sweep_flow"):
+            return self._sweep_flow.best_params["norm_layer"]
+        else:
+            return self.module_kwargs["norm_layer"]
+
+    @property
+    def conv_stem_configs(self) -> float:
+        if hasattr(self, "_sweep_flow"):
+            return self._sweep_flow.best_params["conv_stem_configs"]
+        else:
+            return self.module_kwargs["conv_stem_configs"]
+
+    @property
+    def group_name(self) -> str:
+        if hasattr(self, "_sweep_flow"):
+            return self._sweep_flow._sweep_config["name"]
+        else:
+            return "Solo Training Runs"
+
+    @property
+    def run_name(self) -> str | None:
+        if hasattr(self, "_sweep_flow"):
+            return self.group_name.replace("Sweep", "train")
+        else:
+            return "-".join(["SoloRun", wandb.util.generate_id()])
+
     def persist_model(self) -> None:
         input_sample = self.trainer.datamodule.train_data.dataset[0][0]
         self.trainer.model.to_onnx(conf.MODELPATH, input_sample=input_sample, export_params=True)
@@ -38,75 +105,28 @@ class TrainWork:
     def persist_splits(self) -> None:
         self.trainer.datamodule.persist_splits()
 
-    def run(
-        self,
-        project_name: str,
-        training_run_name: Optional[str] = None,
-        optimizer: str = "Adam",
-        lr: float = 1e-3,
-        wandb_dir: Optional[str] = conf.WANDBPATH,
-    ) -> None:
+    def _fit(self) -> None:
 
-        self.model = PodModule(lr=lr, optimizer=optimizer)
+        self.model = PodModule(
+            lr=self.lr,
+            optimizer=self.optimizer,
+            vit_hp_attention_dropout=self.attention_dropout,
+            vit_hp_conv_stem_configs=self.conv_stem_configs,
+            vit_hp_dropout=self.dropout,
+            vit_hp_norm_layer=self.norm_layer,
+            **conf.MODELBASEKWARGS,
+        )
         self.datamodule = PodDataModule()
 
-        group_name = "Solo Training Runs" if not training_run_name else "Sweep Training Runs"
-
-        if not training_run_name:
-            training_run_name = "-".join(["SoloRun", wandb.util.generate_id()])
-
         logger = WandbLogger(
-            project=project_name,
-            name=training_run_name,
-            group=group_name,
-            save_dir=wandb_dir,
+            project=self.project_name,
+            name=self.run_name,
+            group=self.group_name,
+            save_dir=conf.WANDBPATH,
         )
-        trainer_init_kwargs = {
-            "max_epochs": 100,
-            "callbacks": [
-                EarlyStopping(monitor="training_loss", mode="min"),
-            ],
-        }
 
-        self.trainer = PodTrainer(logger=logger, **trainer_init_kwargs)
+        self.trainer = PodTrainer(logger=logger, **conf.TRAINFLAGS)
         self.trainer.fit(model=self.model, datamodule=self.datamodule)
-
-
-class TunedTrainWork:
-    def __init__(
-        self,
-        experiment_manager: str = "wandb",
-        project_name: Optional[str] = None,
-        trial_count: int = 10,
-    ) -> None:
-        self.experiment_manager = experiment_manager
-        self.project_name = project_name
-        self._sweep_flow = SweepWork(project_name=project_name, trial_count=trial_count)
-        self._train_work = TrainWork()
-
-    @property
-    def best_params(self) -> Dict[str, Any]:
-        return self._sweep_flow.best_params
-
-    @property
-    def lr(self) -> float:
-        return self._sweep_flow.best_params["lr"]
-
-    @property
-    def dropout(self) -> float:
-        return self._sweep_flow.best_params["dropout"]
-
-    @property
-    def optimizer(self) -> str:
-        return self._sweep_flow.best_params["optimizer"]
-
-    @property
-    def sweep_group(self) -> str:
-        return self._sweep_flow._sweep_config["name"]
-
-    @property
-    def run_name(self) -> str:
-        return self.sweep_group.replace("Sweep", "train")
 
     def run(
         self,
@@ -114,17 +134,28 @@ class TunedTrainWork:
         persist_predictions: bool = False,
         persist_splits: bool = False,
         sweep: bool = False,
+        trial_count: Optional[int] = None,
+        module_kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
 
-        if sweep:
-            self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
+        if not sweep and not module_kwargs:
+            raise ValueError("either module_kwargs must be provided, or sweep must be true")
 
-        self._train_work.run(
-            lr=self.lr,
-            optimizer=self.optimizer,
-            project_name=self.project_name,
-            training_run_name=self.run_name,
-        )
+        if sweep and module_kwargs:
+            raise ValueError("set sweep cannot be true if providing module_kwargs")
+
+        if module_kwargs:
+            self.module_kwargs = module_kwargs
+
+        if sweep:
+            self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=trial_count)
+            self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
+            self._fit(
+                training_run_name=self.run_name,
+            )
+
+        if not sweep:
+            self._fit(project_name=self.project_name)
 
         if persist_model:
             self._train_work.persist_model()
@@ -132,5 +163,5 @@ class TunedTrainWork:
             self._train_work.persist_predictions()
         if persist_splits:
             self._train_work.persist_splits()
-        if issubclass(TunedTrainWork, LightningFlow):
+        if issubclass(TrainerWork, LightningWork):
             sys.exit()
