@@ -39,10 +39,10 @@ class TrainerWork:
         project_name: Optional[str] = None,
     ) -> None:
 
-        self._trainer_flags = trainer_flags
-        self._module_kwargs = module_kwargs
-        self._model_hypers = model_hypers
-        self._model_kwargs = model_kwargs
+        self.trainer_flags = trainer_flags
+        self.module_kwargs = module_kwargs
+        self.model_hypers = model_hypers
+        self.model_kwargs = model_kwargs
         self.experiment_manager = experiment_manager
         self.project_name = project_name
         self.sweep = sweep
@@ -53,22 +53,6 @@ class TrainerWork:
 
         if sweep and module_kwargs:
             raise ValueError("set sweep cannot be true if providing module_kwargs")
-
-    @property
-    def module_kwargs(self) -> Dict[str, Any]:
-        return self._module_kwargs
-
-    @property
-    def model_kwargs(self) -> Dict[str, Any]:
-        return self._model_kwargs
-
-    @property
-    def model_hypers(self) -> Dict[str, Any]:
-        return self._model_hypers
-
-    @property
-    def trainer_flags(self) -> Dict[str, Any]:
-        return self._trainer_flags
 
     @property
     def best_params(self) -> Dict[str, Any]:
