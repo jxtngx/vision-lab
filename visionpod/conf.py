@@ -19,7 +19,7 @@ from pathlib import Path
 from lightning.pytorch.callbacks import EarlyStopping
 from torch import nn
 
-# SET PATHS
+# PATHS
 filepath = Path(__file__)
 PROJECTPATH = filepath.parents[1]
 _logspath = os.path.join(PROJECTPATH, "logs")
@@ -37,19 +37,18 @@ OPTUNAPATH = os.path.join(PROJECTPATH, "logs", "optuna")
 
 
 # MODULE AND MODEL KWARGS
-
+IMAGESIZE = 32
+NUMCLASSES = 10
 MODULEKWARGS = dict(
     lr=1e-3,
     optimizer="Adam",
 )
-
 MODELKWARGS = dict(
     image_size=32,
     num_classes=10,
     progress=False,
     weights=False,
 )
-
 MODELHYPERS = dict(
     dropout=0.0,
     attention_dropout=0.0,
@@ -58,12 +57,7 @@ MODELHYPERS = dict(
 )
 
 
-IMAGESIZE = 32
-NUMCLASSES = 10
-
 # TRAINER FLAGS
 GLOBALSEED = 42
-
 TRAINFLAGS = dict(max_epochs=100, callbacks=[EarlyStopping(monitor="training_loss", mode="min")])
-
 SWEEPFLAGS = dict()
