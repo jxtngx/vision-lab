@@ -29,7 +29,7 @@ from visionpod.pipeline.datamodule import PodDataModule
 class TrainerWork:
     def __init__(
         self,
-        trainer_flags: Dict[str, Any],
+        trainer_flags: Dict[str, Any] = conf.TRAINFLAGS,
         module_kwargs: Dict[str, Any] = conf.MODULEKWARGS,
         model_kwargs: Dict[str, Any] = conf.MODELKWARGS,
         model_hypers: Dict[str, Any] = conf.MODELHYPERS,

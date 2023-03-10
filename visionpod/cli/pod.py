@@ -96,24 +96,24 @@ def help() -> None:
 
 
 @trainer.command("fast-dev-run")
-@click.option("--image_size", default=conf.IMAGESIZE)
-@click.option("--num_classes", default=conf.NUMCLASSES)
+@click.option("--image_size", default=conf.MODELKWARGS["image_size"])
+@click.option("--num_classes", default=conf.MODELKWARGS["num_classes"])
 def fast_dev_run(image_size, num_classes) -> None:
-    model = PodModule(vit_req_image_size=image_size, vit_req_num_classes=num_classes)
+    model = PodModule(image_size=image_size, num_classes=num_classes)
     datamodule = PodDataModule()
-    trainer = PodTrainer(fast_dev_run=True)
+    trainer = PodTrainer(fast_dev_run=True, **conf.TRAINFLAGS)
     trainer.fit(model=model, datamodule=datamodule)
 
 
 @trainer.command("train-only")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
-@click.option("--persist_model", is_flag=True)
-@click.option("--persist_predictions", is_flag=True)
-@click.option("--persist_splits", is_flag=True)
+@click.option("--persist_model", default=True)
+@click.option("--persist_predictions", default=True)
+@click.option("--persist_splits", default=True)
 def train_only(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
     trainer = TrainerWork(
-        conf.TRAINFLAGS,
+        trainer_flags=conf.TRAINFLAGS,
         experiment_manager=em,
         project_name=project_name,
         sweep=False,

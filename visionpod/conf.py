@@ -16,12 +16,15 @@ import os
 from functools import partial
 from pathlib import Path
 
+import torch
+from lightning.pytorch.accelerators.mps import MPSAccelerator
 from lightning.pytorch.callbacks import EarlyStopping
-from torch import nn
+from torchvision import transforms
 
 # PATHS
 filepath = Path(__file__)
 PROJECTPATH = filepath.parents[1]
+PKGPATH = filepath.parent
 _logspath = os.path.join(PROJECTPATH, "logs")
 TORCHPROFILERPATH = os.path.join(_logspath, "torch_profiler")
 SIMPLEPROFILERPATH = os.path.join(_logspath, "simple_profiler")
@@ -52,12 +55,33 @@ MODELKWARGS = dict(
 MODELHYPERS = dict(
     dropout=0.0,
     attention_dropout=0.0,
-    norm_layer=partial(nn.LayerNorm, eps=1e-6),
+    norm_layer=partial(torch.nn.LayerNorm, eps=1e-6),
     conv_stem_configs=None,
 )
 
-
 # TRAINER FLAGS
+maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
 GLOBALSEED = 42
-TRAINFLAGS = dict(max_epochs=100, callbacks=[EarlyStopping(monitor="training_loss", mode="min")])
+TRAINFLAGS = dict(
+    max_epochs=100,
+    callbacks=[EarlyStopping(monitor="training_loss", mode="min")],
+    precision=16,
+    **maybe_use_mps,
+)
 SWEEPFLAGS = dict()
+
+# PIPELINE
+TRANSFORMS = transforms.Compose(
+    [
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        transforms.RandomGrayscale(),
+        transforms.RandomHorizontalFlip(),
+    ]
+)
+AUTOAUGMENT = transforms.Compose(
+    [
+        transforms.ToTensor(),
+        transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
+    ]
+)
