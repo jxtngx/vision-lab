@@ -124,17 +124,6 @@ GroundTruth = dcc.Graph(
     },
 )
 
-# Predictions = dcc.Graph(
-#     id="right-fig",
-#     figure=create_figure(PREDS[LABELIDX][0], "Decoded"),
-#     config={
-#         "responsive": True,
-#         "displayModeBar": True,
-#         "displaylogo": False,
-#     },
-# )
-
-
 Predictions = dbc.Card(
     [
         dbc.CardHeader("Predicted Class"),
