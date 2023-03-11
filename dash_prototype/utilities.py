@@ -13,6 +13,9 @@
 # limitations under the License.
 
 
+import json
+
+import numpy as np
 import pandas as pd
 import plotly.express as px
 from dash import dash_table
@@ -21,12 +24,20 @@ from lightning.pytorch.utilities.model_summary import ModelSummary
 from visionpod import conf
 
 
-def metrics_collection(y_true, y_predict):
-    pass
+def metrics_summary():
+    summary = json.load(open(conf.WANDBSUMMARYPATH))
+    collection = {
+        "Val Loss": summary["val_loss"],
+        "Val Acc": summary["val_acc"],
+        "Test Loss": summary["test_loss"],
+        "Test Acc": summary["test_acc"],
+    }
+    return collection
 
 
 def create_figure(image, title_text):
-    fig = px.imshow(image.view(conf.IMAGESIZE, conf.IMAGESIZE))
+    image = np.transpose(image.numpy(), (1, 2, 0))
+    fig = px.imshow(image)
     fig.update_layout(
         title=dict(
             text=title_text,

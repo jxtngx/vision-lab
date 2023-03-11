@@ -58,7 +58,7 @@ class PodTrainer(L.Trainer):
             **trainer_init_kwargs
         )
 
-    def persist_predictions(self, predictions_dir: Optional[Union[str, Path]] = None) -> None:
+    def persist_predictions(self, predictions_dir: Optional[Union[str, Path]] = conf.PREDSPATH) -> None:
         """helper method to persist predictions on completion of a training run
 
         # Arguments

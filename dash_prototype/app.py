@@ -12,31 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-from dataclasses import dataclass
-from pathlib import Path
-
 import dash
 import dash_bootstrap_components as dbc
 import lightning as L
 import torch
 from dash import html
 from dash.dependencies import Input, Output
-from pages import Body, create_figure, find_index, NavBar
+from pages import Body, create_figure, find_index, LABELNAMES, NavBar
 from torch.utils.data import TensorDataset
 
-
-@dataclass
-class Data:
-    """class for storing ground truth and prediction torch.TensorDatasets"""
-
-    predictions_fname: Path = os.path.join("data", "predictions", "predictions.pt")
-    predictions: TensorDataset = torch.load(predictions_fname)
-    ground_truths_fname: Path = os.path.join("data", "training_split", "val.pt")
-    ground_truths: TensorDataset = torch.load(ground_truths_fname)
+from visionpod import conf
 
 
 class DashWorker(L.LightningWork):
+
+    predictions: TensorDataset = torch.load(conf.PREDSPATH)
+    ground_truths: TensorDataset = torch.load(conf.VALPATH)
+
     def run(self):
         app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         app.layout = html.Div(
@@ -48,17 +40,17 @@ class DashWorker(L.LightningWork):
         )
 
         @app.callback(
-            [Output("left-fig", "figure"), Output("right-fig", "figure")],
+            [Output("left-fig", "figure"), Output("right-fig", "children")],
             [Input("dropdown", "value")],
         )
         def update_figure(label_value):
             xidx = 0
-            idx = find_index(Data.ground_truths, label=label_value, label_idx=1)
-            gt = Data.ground_truths[idx][xidx]
-            pred = Data.predictions[idx][xidx]
+            labelidx = 1
+            idx = find_index(self.ground_truths, label=LABELNAMES.index(label_value), label_idx=1)
+            gt = self.ground_truths[idx][xidx]
+            pred = LABELNAMES[torch.argmax(self.predictions[idx][labelidx])]
             ground_truth_fig = create_figure(gt, "Ground Truth")
-            prediction_fig = create_figure(pred, "Decoded")
-            return ground_truth_fig, prediction_fig
+            return ground_truth_fig, pred
 
         app.run_server(host=self.host, port=self.port)
 

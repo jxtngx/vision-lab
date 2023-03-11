@@ -54,6 +54,20 @@ class TrainerWork:
         self.sweep = sweep
         self.trial_count = trial_count
 
+        self.model = PodModule(
+            lr=self.lr,
+            optimizer=self.optimizer,
+            attention_dropout=self.attention_dropout,
+            conv_stem_configs=self.conv_stem_configs,
+            dropout=self.dropout,
+            norm_layer=self.norm_layer,
+            **self.model_kwargs,
+        )
+
+        self.datamodule = PodDataModule()
+
+        self.trainer = PodTrainer(**self.trainer_flags)
+
     @property
     def best_params(self) -> Dict[str, Any]:
         return self._sweep_flow.best_params
@@ -118,33 +132,20 @@ class TrainerWork:
         input_sample = self.trainer.datamodule.train_data.dataset[0][0]
         self.trainer.model.to_onnx(conf.MODELPATH, input_sample=input_sample, export_params=True)
 
-    def persist_predictions(self) -> None:
-        self.trainer.persist_predictions()
+    def persist_predictions(self, predictions_dir) -> None:
+        self.trainer.persist_predictions(predictions_dir=predictions_dir)
 
     def persist_splits(self) -> None:
         self.trainer.datamodule.persist_splits()
 
     def _fit(self) -> None:
-
-        self.model = PodModule(
-            lr=self.lr,
-            optimizer=self.optimizer,
-            attention_dropout=self.attention_dropout,
-            conv_stem_configs=self.conv_stem_configs,
-            dropout=self.dropout,
-            norm_layer=self.norm_layer,
-            **self.model_kwargs,
-        )
-        self.datamodule = PodDataModule()
-
         self.logger = WandbLogger(
             project=self.project_name,
             name=self.run_name,
             group=self.group_name,
             save_dir=conf.WANDBPATH,
         )
-
-        self.trainer = PodTrainer(logger=self.logger, **self.trainer_flags)
+        self.trainer.logger = self.logger
         self.trainer.fit(model=self.model, datamodule=self.datamodule)
 
     def run(
@@ -152,6 +153,7 @@ class TrainerWork:
         persist_model: bool = False,
         persist_predictions: bool = False,
         persist_splits: bool = False,
+        predictions_dir=conf.PREDSPATH,
     ) -> None:
 
         if self.sweep:
@@ -161,10 +163,10 @@ class TrainerWork:
         self._fit()
 
         if persist_model:
-            self._train_work.persist_model()
+            self.persist_model()
         if persist_predictions:
-            self._train_work.persist_predictions()
+            self.persist_predictions(predictions_dir)
         if persist_splits:
-            self._train_work.persist_splits()
+            self.persist_splits()
         if issubclass(TrainerWork, LightningWork):
             sys.exit()

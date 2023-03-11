@@ -108,7 +108,7 @@ def fast_dev_run(image_size, num_classes) -> None:
 @trainer.command("train-only")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
-@click.option("--persist_model", default=True)
+@click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=True)
 @click.option("--persist_splits", default=True)
 def train_only(em, project_name, persist_model, persist_predictions, persist_splits) -> None:

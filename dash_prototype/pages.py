@@ -18,14 +18,15 @@ import dash
 import dash_bootstrap_components as dbc
 import torch
 from dash import dcc, html
-from utilities import create_figure, find_index, make_model_summary
+from utilities import create_figure, find_index, make_model_summary, metrics_summary
 
 from visionpod import conf
 from visionpod.core.module import PodModule
 
 PREDS = torch.load(conf.PREDSPATH)
 TRUTHS = torch.load(conf.VALPATH)
-LABELS = list(set(i[1] for i in TRUTHS))
+LABELNAMES = TRUTHS.dataset.classes
+LABELS = list(range(len(LABELNAMES)))
 LABELIDX = find_index(TRUTHS, label=LABELS[0], label_idx=1)
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -39,10 +40,13 @@ latest_checkpoint = available_checkpoints[0]
 chkpt_filename = os.path.join(conf.CHKPTSPATH, latest_checkpoint)
 model = PodModule.load_from_checkpoint(chkpt_filename)
 model_layers, model_params = make_model_summary(model)
+metrics = metrics_summary()
+metrics_names = list(metrics.keys())
+metrics_values = [round(i, 4) for i in list(metrics.values())]
 
 # APP LAYOUT
 NavBar = dbc.NavbarSimple(
-    brand="Linear Encoder-Decoder",
+    brand="VisionTransformer Base 32",
     color="#792ee5",
     dark=True,
     fluid=True,
@@ -54,8 +58,8 @@ Control = dbc.Card(
         [
             html.H1("Label", className="card-title"),
             dcc.Dropdown(
-                options=LABELS,
-                value=LABELS[0],
+                options=LABELNAMES,
+                value=LABELNAMES[0],
                 multi=False,
                 id="dropdown",
                 searchable=True,
@@ -120,14 +124,29 @@ GroundTruth = dcc.Graph(
     },
 )
 
-Predictions = dcc.Graph(
-    id="right-fig",
-    figure=create_figure(PREDS[LABELIDX][0], "Decoded"),
-    config={
-        "responsive": True,
-        "displayModeBar": True,
-        "displaylogo": False,
-    },
+# Predictions = dcc.Graph(
+#     id="right-fig",
+#     figure=create_figure(PREDS[LABELIDX][0], "Decoded"),
+#     config={
+#         "responsive": True,
+#         "displayModeBar": True,
+#         "displaylogo": False,
+#     },
+# )
+
+
+Predictions = dbc.Card(
+    [
+        dbc.CardHeader("Predicted Class"),
+        dbc.CardBody(
+            [
+                html.H3(
+                    LABELNAMES[torch.argmax(PREDS[LABELIDX][0])],
+                    id="right-fig",
+                ),
+            ]
+        ),
+    ],
 )
 
 Metrics = dbc.Row(
@@ -136,8 +155,8 @@ Metrics = dbc.Row(
             [
                 dbc.Card(
                     [
-                        html.H4("Metric 1", className="card-title"),
-                        html.P("0.xx", id="metric_1_text", className="metric-card-text"),
+                        html.H4(metrics_names[0], className="card-title"),
+                        html.P(metrics_values[0], id="metric_1_text", className="metric-card-text"),
                     ],
                     id="metric_1_card",
                     className="metric-container",
@@ -149,8 +168,8 @@ Metrics = dbc.Row(
             [
                 dbc.Card(
                     [
-                        html.H4("Metric 2", className="card-title"),
-                        html.P("0.xx", id="metric_2_text", className="metric-card-text"),
+                        html.H4(metrics_names[1], className="card-title"),
+                        html.P(metrics_values[1], id="metric_2_text", className="metric-card-text"),
                     ],
                     id="metric_2_card",
                     className="metric-container",
@@ -162,8 +181,8 @@ Metrics = dbc.Row(
             [
                 dbc.Card(
                     [
-                        html.H4("Metric 3", className="card-title"),
-                        html.P("0.xx", id="metric_3_text", className="metric-card-text"),
+                        html.H4(metrics_names[2], className="card-title"),
+                        html.P(metrics_values[2], id="metric_3_text", className="metric-card-text"),
                     ],
                     id="metric_3_card",
                     className="metric-container",
@@ -175,8 +194,8 @@ Metrics = dbc.Row(
             [
                 dbc.Card(
                     [
-                        html.H4("Metric 4", className="card-title"),
-                        html.P("0.xx", id="metric_4_text", className="metric-card-text"),
+                        html.H4(metrics_names[3], className="card-title"),
+                        html.P(metrics_values[3], id="metric_4_text", className="metric-card-text"),
                     ],
                     id="metric_4_card",
                     className="metric-container",
@@ -193,7 +212,7 @@ Graphs = dbc.Row(
     [
         dbc.Col([GroundTruth], className="pretty-container", width=4),
         dbc.Col(width=1),
-        dbc.Col([Predictions], className="pretty-container", width=4),
+        dbc.Col([Predictions], width=4),
     ],
     justify="center",
     align="middle",
@@ -215,4 +234,24 @@ app.layout = html.Div(
 
 
 if __name__ == "__main__":
+
+    from dash.dependencies import Input, Output
+    from torch.utils.data import TensorDataset
+
+    predictions: TensorDataset = torch.load(conf.PREDSPATH)
+    ground_truths: TensorDataset = torch.load(conf.VALPATH)
+
+    @app.callback(
+        [Output("left-fig", "figure"), Output("right-fig", "children")],
+        [Input("dropdown", "value")],
+    )
+    def update_figure(label_value):
+        xidx = 0
+        labelidx = 1
+        idx = find_index(ground_truths, label=LABELNAMES.index(label_value), label_idx=1)
+        gt = ground_truths[idx][xidx]
+        pred = LABELNAMES[torch.argmax(predictions[idx][labelidx])]
+        ground_truth_fig = create_figure(gt, "Ground Truth")
+        return ground_truth_fig, pred
+
     app.run_server(debug=True)

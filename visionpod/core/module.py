@@ -98,7 +98,7 @@ class PodModule(L.LightningModule):
         self.common_step(batch, "val")
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
-        """returns a prediction from the trained model"""
+        """returns predicted logits from the trained model"""
         x, y = batch
         return self(x)
 
@@ -117,6 +117,6 @@ class PodModule(L.LightningModule):
             self.log(f"{stage}_loss", loss)
             return loss
         if stage in ["val", "test"]:
-            acc = accuracy(y_hat, y, task=self.accuracy_task, num_classes=self.num_classes)
+            acc = accuracy(y_hat.argmax(dim=-1), y, task=self.accuracy_task, num_classes=self.num_classes)
             self.log(f"{stage}_acc", acc)
             self.log(f"{stage}_loss", loss)

@@ -25,17 +25,18 @@ from torchvision import transforms
 filepath = Path(__file__)
 PROJECTPATH = filepath.parents[1]
 PKGPATH = filepath.parent
-_logspath = os.path.join(PROJECTPATH, "logs")
-TORCHPROFILERPATH = os.path.join(_logspath, "torch_profiler")
-SIMPLEPROFILERPATH = os.path.join(_logspath, "simple_profiler")
-TENSORBOARDPATH = os.path.join(_logspath, "tensorboard")
+LOGSPATH = os.path.join(PROJECTPATH, "logs")
+TORCHPROFILERPATH = os.path.join(LOGSPATH, "torch_profiler")
+SIMPLEPROFILERPATH = os.path.join(LOGSPATH, "simple_profiler")
+TENSORBOARDPATH = os.path.join(LOGSPATH, "tensorboard")
 CHKPTSPATH = os.path.join(PROJECTPATH, "models", "checkpoints")
 MODELPATH = os.path.join(PROJECTPATH, "models", "onnx", "model.onnx")
 PREDSPATH = os.path.join(PROJECTPATH, "data", "predictions", "predictions.pt")
 VALPATH = os.path.join(PROJECTPATH, "data", "training_split", "val.pt")
-DATASETPATH = os.path.join(PROJECTPATH, "data")
+DATASETPATH = os.path.join(PROJECTPATH, "data", "cache")
 SPLITSPATH = os.path.join(PROJECTPATH, "data", "training_split")
 WANDBPATH = os.path.join(PROJECTPATH, "logs", "wandb")
+WANDBSUMMARYPATH = os.path.join(PROJECTPATH, "logs", "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
 OPTUNAPATH = os.path.join(PROJECTPATH, "logs", "optuna")
 
 
@@ -53,8 +54,8 @@ MODELKWARGS = dict(
     weights=False,
 )
 MODELHYPERS = dict(
-    dropout=0.0,
-    attention_dropout=0.0,
+    dropout=0.25,
+    attention_dropout=0.25,
     norm_layer=partial(torch.nn.LayerNorm, eps=1e-6),
     conv_stem_configs=None,
 )
