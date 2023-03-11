@@ -26,7 +26,9 @@ __Arguments__
 
 
 ```python
-PodTrainer.persist_predictions(predictions_dir=None)
+PodTrainer.persist_predictions(
+    predictions_dir="/Users/justin/Developer/lightning-pod-projects/lightning-pod-vision/data/predictions/predictions.pt",
+)
 ```
 
 

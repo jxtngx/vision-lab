@@ -6,14 +6,14 @@ visionpod.core.module.PodModule(
     optimizer="Adam",
     lr=0.001,
     accuracy_task="multiclass",
-    vit_req_image_size=32,
-    vit_req_num_classes=10,
-    vit_hp_dropout=0.0,
-    vit_hp_attention_dropout=0.0,
-    vit_hp_norm_layer=None,
-    vit_opt_conv_stem_configs=None,
-    vit_init_opt_progress=False,
-    vit_init_opt_weights=False,
+    image_size=32,
+    num_classes=10,
+    dropout=0.0,
+    attention_dropout=0.0,
+    norm_layer=None,
+    conv_stem_configs=None,
+    progress=False,
+    weights=False,
 )
 ```
 
@@ -25,14 +25,14 @@ __Arguments__
 - __optimizer__ `str`: "Adam". A valid [torch.optim](https://pytorch.org/docs/stable/optim.html) name.
 - __lr__ `float`: 1e-3
 - __accuracy_task__ `str`: "multiclass". One of (binary, multiclass, multilabel).
-- __vit_req_image_size__ `int`: 32
-- __vit_req_num_classes__ `int`: 10
-- __vit_hp_dropout__ `float`: 0.0
-- __vit_hp_attention_dropout__ `float`: 0.0
-- __vit_hp_norm_layer__ `torch.nn.modules.module.Module | None`: None
-- __vit_opt_conv_stem_configs__ `List[torchvision.models.vision_transformer.ConvStemConfig] | None`: None
-- __vit_init_opt_progress__ `bool`: False
-- __vit_init_opt_weights__ `bool`: False
+- __image_size__ `int`: 32
+- __num_classes__ `int`: 10
+- __dropout__ `float`: 0.0
+- __attention_dropout__ `float`: 0.0
+- __norm_layer__ `torch.nn.modules.module.Module | None`: None
+- __conv_stem_configs__ `List[torchvision.models.vision_transformer.ConvStemConfig] | None`: None
+- __opt_progress__: False
+- __opt_weights__: False
 
 
 ----
@@ -97,7 +97,7 @@ PodModule.predict_step(batch, batch_idx, dataloader_idx=0)
 ```
 
 
-returns a prediction from the trained model
+returns predicted logits from the trained model
 
 
 ----
