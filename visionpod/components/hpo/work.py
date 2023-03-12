@@ -19,8 +19,7 @@ from typing import Any, Dict, List, Optional
 
 import optuna
 import wandb
-from lightning import LightningFlow
-from lightning.pytorch.callbacks import EarlyStopping
+from lightning import LightningWork
 from lightning.pytorch.loggers import WandbLogger
 from optuna.trial import FrozenTrial, Trial, TrialState
 from rich.console import Console
@@ -32,26 +31,43 @@ from visionpod.core.trainer import PodTrainer
 from visionpod.pipeline.datamodule import PodDataModule
 
 
-class ObjectiveWork:
+class SweepWork:
+    """
+    Notes:
+        see: https://community.wandb.ai/t/run-best-model-off-sweep/2423
+    """
+
     def __init__(
         self,
-        sweep_config: Dict[str, Any],
-        project_name: str,
-        wandb_save_dir: str,
+        wandb_save_dir: Optional[str] = conf.WANDBPATH,
+        project_name: Optional[str] = None,
+        optuna_study_name: Optional[str] = None,
+        trial_count: int = 10,
         experiment_manager: str = "wandb",
+        sweep_config: Dict[str, Any] = conf.SWEEPCONFIG,
+        trainer_init_kwargs: Dict[str, Any] = conf.SWEEPFLAGS,
     ):
         self.experiment_manager = experiment_manager
         self.project_name = project_name
+        self.optuna_study_name = optuna_study_name
         self.wandb_save_dir = wandb_save_dir
         self.sweep_config = sweep_config
+        self.trainer_init_kwargs = trainer_init_kwargs
+
         if self.experiment_manager == "wandb":
+            self.trial_number = 1
             self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=project_name)
+
         if self.experiment_manager == "optuna":
             self.sweep_id = wandb.util.generate_id()
+            self._study = optuna.create_study(direction="maximize", study_name=self.optuna_study_name)
+
         self.sweep_name = "-".join(["Sweep", self.sweep_id])
         self.sweep_config.update({"name": self.sweep_name})
         self.datamodule = PodDataModule()
-        self.trial_number = 1
+        self.trial_count = trial_count
+
+        self._wandb_api = wandb.Api()
 
     @property
     def wandb_settings(self) -> Dict[str, Any]:
@@ -80,6 +96,13 @@ class ObjectiveWork:
     @property
     def best_trial(self) -> FrozenTrial:
         return self._optuna_study.best_trial
+
+    @property
+    def best_params(self):
+        if self.experiment_manager == "wandb":
+            return self._wandb_api.sweep(self._objective_work.sweep_url).best_run().config
+        if self.experiment_manager == "optuna":
+            return self._study.best_params
 
     @property
     def artifact_path(self) -> str:
@@ -137,13 +160,6 @@ class ObjectiveWork:
         config = dict(trial.params)
         config["trial.number"] = trial.number
 
-        trainer_init_kwargs = {
-            "max_epochs": 10,
-            "callbacks": [
-                EarlyStopping(monitor="training_loss", mode="min"),
-            ],
-        }
-
         if hasattr(self, "trainer"):
             # stops previous wandb run so that a new run can be initialized on new trial
             # also helps to avoid hanging process in wandb sdk
@@ -160,7 +176,7 @@ class ObjectiveWork:
                 save_dir=self.wandb_save_dir,
                 config=config,
             ),
-            **trainer_init_kwargs,
+            **self.trainer_init_kwargs,
         )
 
         # set optuna logs dir
@@ -186,16 +202,9 @@ class ObjectiveWork:
 
         model = PodModule(optimizer=optimizer, lr=lr)
 
-        trainer_init_kwargs = {
-            "max_epochs": 10,
-            "callbacks": [
-                EarlyStopping(monitor="training_loss", mode="min"),
-            ],
-        }
-
         self.trainer = PodTrainer(
             logger=logger,
-            **trainer_init_kwargs,
+            **self.trainer_init_kwargs,
         )
 
         # logs hyperparameters to logs/wandb_logs/wandb/{run_name}/files/config.yaml
@@ -207,63 +216,6 @@ class ObjectiveWork:
         self.trial_number += 1
 
         return self.trainer.callback_metrics["val_acc"].item()
-
-    def run(
-        self,
-        trial_count: int = 10,
-        optuna_study_name: Optional[str] = None,
-    ) -> float:
-        if self.experiment_manager == "optuna":
-            self._study = optuna.create_study(direction="maximize", study_name=optuna_study_name)
-            self._study.optimize(self._optuna_objective, n_trials=trial_count, timeout=600)
-        if self.experiment_manager == "wandb":
-            wandb.agent(self.sweep_id, function=self._wandb_objective, count=trial_count)
-
-    def stop(self) -> None:
-        if self.experiment_manager == "wandb":
-            os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
-        if self.experiment_manager == "optuna":
-            self.trainer.logger.experiment.finish()
-
-
-class SweepWork:
-    def __init__(
-        self,
-        project_name: Optional[str] = None,
-        trial_count: int = 10,
-        wandb_dir: Optional[str] = conf.WANDBPATH,
-        experiment_manager: str = "wandb",
-    ) -> None:
-        """
-        Notes:
-            see: https://community.wandb.ai/t/run-best-model-off-sweep/2423
-        """
-        # settings
-        self.experiment_manager = experiment_manager
-        self.project_name = project_name
-        self.wandb_dir = wandb_dir
-        self.trial_count = trial_count
-        # _ helps to avoid LightningFlow from checking JSON serialization if converting to Lightning App
-        self._sweep_config = dict(
-            method="random",
-            metric={"goal": "maximize", "name": "val_acc"},
-            parameters={
-                "lr": {"min": 0.0001, "max": 0.1},
-                "optimizer": {"distribution": "categorical", "values": ["Adam", "RMSprop", "SGD"]},
-                # "dropout": {"min": 0.2, "max": 0.5},
-            },
-        )
-        self._objective_work = ObjectiveWork(
-            self._sweep_config, self.project_name, self.wandb_dir, experiment_manager=self.experiment_manager
-        )
-        self._wandb_api = wandb.Api()
-
-    @property
-    def best_params(self):
-        if self.experiment_manager == "wandb":
-            return self._wandb_api.sweep(self._objective_work.sweep_url).best_run().config
-        if self.experiment_manager == "optuna":
-            return self._objective_work._study.best_params
 
     @staticmethod
     def _display_report(trial_metric_names: List[str], trial_info: List[str]) -> None:
@@ -279,16 +231,17 @@ class SweepWork:
 
     def run(
         self,
-        experiment_manager: str,
         persist_model: bool = False,
         persist_predictions: bool = False,
         persist_splits: bool = False,
         display_report: bool = False,
-    ) -> None:
-        # this is blocking
-        self._objective_work.run(trial_count=self.trial_count)
-        # will only run after objective is complete
-        self._objective_work.stop()
+    ) -> float:
+
+        if self.experiment_manager == "wandb":
+            wandb.agent(self.sweep_id, function=self._wandb_objective, count=self.trial_count)
+
+        if self.experiment_manager == "optuna":
+            self._study.optimize(self._optuna_objective, n_trials=self.trial_count, timeout=600)
 
         if display_report:
             self._display_report(
@@ -296,10 +249,17 @@ class SweepWork:
                 trial_info=list(self.best_params.values()),
             )
         if persist_model:
-            self._objective_work.persist_model()
+            self.persist_model()
         if persist_predictions:
-            self._objective_work.persist_predictions()
+            self.persist_predictions()
         if persist_splits:
-            self._objective_work.persist_splits()
-        if issubclass(SweepWork, LightningFlow):
-            sys.exit()
+            self.persist_splits()
+        if issubclass(SweepWork, LightningWork):
+            self.stop()
+
+    def stop(self) -> None:
+        if self.experiment_manager == "wandb":
+            os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
+        if self.experiment_manager == "optuna":
+            self.trainer.logger.experiment.finish()
+        sys.exit()

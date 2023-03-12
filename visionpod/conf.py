@@ -74,7 +74,12 @@ TRAINFLAGS = dict(
     precision=16,
     **_maybe_use_mps,
 )
-SWEEPFLAGS = dict()
+SWEEPFLAGS = dict(
+    max_epochs=10,
+    callbacks=[
+        EarlyStopping(monitor="training_loss", mode="min"),
+    ],
+)
 
 # DATAMODULE
 BATCHSIZE = 128
@@ -102,4 +107,15 @@ INVERSETRANSFORM = transforms.Compose(
         transforms.Normalize(mean=[0.0, 0.0, 0.0], std=[1 / i for i in stddev]),
         transforms.Normalize(mean=mean, std=[1.0, 1.0, 1.0]),
     ]
+)
+
+# HPO
+SWEEPCONFIG = dict(
+    method="random",
+    metric={"goal": "maximize", "name": "val_acc"},
+    parameters={
+        "lr": {"min": 0.0001, "max": 0.1},
+        "optimizer": {"distribution": "categorical", "values": ["Adam", "RMSprop", "SGD"]},
+        # "dropout": {"min": 0.2, "max": 0.5},
+    },
 )
