@@ -32,17 +32,17 @@ TENSORBOARDPATH = os.path.join(LOGSPATH, "tensorboard")
 CHKPTSPATH = os.path.join(PROJECTPATH, "models", "checkpoints")
 MODELPATH = os.path.join(PROJECTPATH, "models", "onnx", "model.onnx")
 PREDSPATH = os.path.join(PROJECTPATH, "data", "predictions", "predictions.pt")
-VALPATH = os.path.join(PROJECTPATH, "data", "training_split", "val.pt")
 DATASETPATH = os.path.join(PROJECTPATH, "data", "cache")
 SPLITSPATH = os.path.join(PROJECTPATH, "data", "training_split")
+TRAINSPLITPATH = os.path.join(PROJECTPATH, "data", "training_split", "train.pt")
+VALSPLITPATH = os.path.join(PROJECTPATH, "data", "training_split", "val.pt")
+TESTSPLITPATH = os.path.join(PROJECTPATH, "data", "training_split", "test.pt")
 WANDBPATH = os.path.join(PROJECTPATH, "logs", "wandb")
 WANDBSUMMARYPATH = os.path.join(PROJECTPATH, "logs", "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
 OPTUNAPATH = os.path.join(PROJECTPATH, "logs", "optuna")
 
 
 # MODULE AND MODEL KWARGS
-IMAGESIZE = 32
-NUMCLASSES = 10
 MODULEKWARGS = dict(
     lr=1e-3,
     optimizer="Adam",
@@ -61,28 +61,27 @@ MODELHYPERS = dict(
 )
 
 # TRAINER FLAGS
-maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
+_maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
 GLOBALSEED = 42
-TRAINFLAGS = dict(
-    max_epochs=100,
-    callbacks=[EarlyStopping(monitor="training_loss", mode="min")],
+FASTTRAINFLAGS = dict(
+    max_epochs=5,
     precision=16,
-    **maybe_use_mps,
+    **_maybe_use_mps,
+)
+TRAINFLAGS = dict(
+    max_epochs=50,
+    callbacks=[EarlyStopping(monitor="val_loss", mode="min")],
+    precision=16,
+    **_maybe_use_mps,
 )
 SWEEPFLAGS = dict()
 
-# PIPELINE
-TRANSFORMS = transforms.Compose(
+# DATAMODULE
+BATCHSIZE = 128
+TOTENSORTRANSFORM = transforms.Compose([transforms.ToTensor()])
+TRAINTRANSFORMS = transforms.Compose(
     [
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-        transforms.RandomGrayscale(),
-        transforms.RandomHorizontalFlip(),
-    ]
-)
-AUTOAUGMENT = transforms.Compose(
-    [
-        transforms.ToTensor(),
         transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
+        transforms.ToTensor(),
     ]
 )

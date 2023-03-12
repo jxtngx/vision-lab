@@ -18,17 +18,10 @@ import lightning as L
 import torch
 from dash import html
 from dash.dependencies import Input, Output
-from pages import Body, create_figure, find_index, LABELNAMES, NavBar
-from torch.utils.data import TensorDataset
-
-from visionpod import conf
+from pages import Body, create_figure, DATASET, find_index, LABELNAMES, NavBar, PREDICTIONS
 
 
 class DashWorker(L.LightningWork):
-
-    predictions: TensorDataset = torch.load(conf.PREDSPATH)
-    ground_truths: TensorDataset = torch.load(conf.VALPATH)
-
     def run(self):
         app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         app.layout = html.Div(
@@ -40,17 +33,17 @@ class DashWorker(L.LightningWork):
         )
 
         @app.callback(
-            [Output("left-fig", "figure"), Output("right-fig", "children")],
+            [Output("gt-fig", "figure"), Output("pred-card", "children")],
             [Input("dropdown", "value")],
         )
         def update_figure(label_value):
             xidx = 0
             labelidx = 1
-            idx = find_index(self.ground_truths, label=LABELNAMES.index(label_value), label_idx=1)
-            gt = self.ground_truths[idx][xidx]
-            pred = LABELNAMES[torch.argmax(self.predictions[idx][labelidx])]
-            ground_truth_fig = create_figure(gt, "Ground Truth")
-            return ground_truth_fig, pred
+            idx = find_index(DATASET, label=LABELNAMES.index(label_value), label_idx=labelidx)
+            gt = DATASET[idx][xidx]
+            pred = LABELNAMES[torch.argmax(PREDICTIONS[idx][labelidx])]
+            fig = create_figure(gt, "Ground Truth")
+            return fig, pred
 
         app.run_server(host=self.host, port=self.port)
 

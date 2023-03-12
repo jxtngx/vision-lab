@@ -93,7 +93,7 @@ The structure of the project is:
 - `tests` are tests for visionpod
 - `visionpod` is the Python package, Lightning App, and VisionTransformer
 - `visionpod-ui` is the NextJS frontend deployed to Vercel
-- `visiopod-ui-proto` is a Plotly Dash UI as a Lightning App
+- `research-demo` is a Plotly Dash UI as a Lightning App
 
 ## Setup
 
@@ -120,7 +120,7 @@ Using this template will require accounts for Lightning, Weights and Biases, Sup
 After creating a W&B account and installing the development environment, a training run can be ran locally with:
 
 ```sh
-pod trainer train-only
+pod trainer fast-train-run
 ```
 
 Running the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.
@@ -128,7 +128,7 @@ Running the above will download the CIFAR10 dataset from torchvision, and cache 
 Once the run is complete, a prototype UI can be ran locally with:
 
 ```sh
-pod run prototype
+pod run demo-ui
 ```
 
 ## Roadmap

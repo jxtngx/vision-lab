@@ -65,5 +65,5 @@ class PodTrainer(L.Trainer):
             predictions_dir: the directory path where predictions should be saved to
         """
         self.test(ckpt_path="best", datamodule=self.datamodule)
-        predictions = self.predict(self.model, self.datamodule.val_dataloader())
+        predictions = self.predict(self.model, self.datamodule.test_dataloader())
         torch.save(predictions, predictions_dir)

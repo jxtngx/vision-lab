@@ -57,9 +57,9 @@ def bug_report() -> None:
     os.remove(trainer)
 
 
-@run.command("dash")
-def dash() -> None:
-    dashproto = os.path.join(PROJECTPATH, "dash_prototype", "app.py")
+@run.command("demo-ui")
+def prototype() -> None:
+    dashproto = os.path.join(PROJECTPATH, "research-demo", "app.py")
     run_command = f"lightning run app {dashproto}"
     os.system(run_command)
 
@@ -89,12 +89,6 @@ def trainer() -> None:
     pass
 
 
-@trainer.command("help")
-def help() -> None:
-    trainer = os.path.join(PKGPATH, "core", "trainer.py")
-    os.system(f"python {trainer} --help")
-
-
 @trainer.command("fast-dev-run")
 @click.option("--image_size", default=conf.MODELKWARGS["image_size"])
 @click.option("--num_classes", default=conf.MODELKWARGS["num_classes"])
@@ -105,15 +99,39 @@ def fast_dev_run(image_size, num_classes) -> None:
     trainer.fit(model=model, datamodule=datamodule)
 
 
-@trainer.command("train-only")
+@trainer.command("fast-train-run")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=True)
 @click.option("--persist_splits", default=True)
-def train_only(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
+def fast_train_run(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
     trainer = TrainerWork(
-        trainer_flags=conf.TRAINFLAGS,
+        trainer_flags=conf.FASTTRAINFLAGS,
+        experiment_manager=em,
+        project_name=project_name,
+        sweep=False,
+        trial_count=None,
+        fast_train_run=True,
+    )
+    trainer.run(
+        persist_model=persist_model,
+        persist_predictions=persist_predictions,
+        persist_splits=persist_splits,
+    )
+
+
+@trainer.command("train")
+@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
+@click.option("--project-name", default="visionpod")
+@click.option("--persist_model", default=False)
+@click.option("--persist_predictions", default=True)
+@click.option("--persist_splits", default=True)
+def train(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
+    flags = conf.TRAINFLAGS
+    flags["callbacks"] = []
+    trainer = TrainerWork(
+        trainer_flags=flags,
         experiment_manager=em,
         project_name=project_name,
         sweep=False,
@@ -126,22 +144,22 @@ def train_only(em, project_name, persist_model, persist_predictions, persist_spl
     )
 
 
-@trainer.command("sweep-only")
+@trainer.command("sweep")
 @click.option("--project-name", default="visionpod")
 def sweep_only(project_name) -> None:
     pass
 
 
-@trainer.command("sweep-and-train")
+@trainer.command("tune")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-@click.option("--image_size", default=conf.IMAGESIZE)
-@click.option("--num_classes", default=conf.NUMCLASSES)
-def sweep_and_train(
+@click.option("--image_size", default=conf.MODELKWARGS["image_size"])
+@click.option("--num_classes", default=conf.MODELKWARGS["num_classes"])
+def tune(
     em, project_name, trial_count, persist_model, persist_predictions, persist_splits, image_size, num_classes
 ) -> None:
     project_name = "-".join([project_name, em])

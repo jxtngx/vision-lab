@@ -37,6 +37,7 @@ class TrainerWork:
         trial_count: Optional[int] = None,
         experiment_manager: str = "wandb",
         project_name: Optional[str] = None,
+        fast_train_run: bool = False,
     ) -> None:
 
         if not sweep and not module_kwargs:
@@ -53,6 +54,7 @@ class TrainerWork:
         self.project_name = project_name
         self.sweep = sweep
         self.trial_count = trial_count
+        self.fast_train_run = fast_train_run
 
         self.model = PodModule(
             lr=self.lr,
@@ -117,16 +119,22 @@ class TrainerWork:
     @property
     def group_name(self) -> str:
         if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow._sweep_config["name"]
+            return "Tuned Training Runs"
         else:
-            return "Solo Training Runs"
+            if self.fast_train_run:
+                return "Fast Training Runs"
+            else:
+                return "Solo Training Runs"
 
     @property
-    def run_name(self) -> str | None:
+    def run_name(self) -> str:
         if hasattr(self, "_sweep_flow"):
-            return self.group_name.replace("Sweep", "train")
+            return self.group_name.replace("Sweep", "tuned")
         else:
-            return "-".join(["SoloRun", wandb.util.generate_id()])
+            if self.fast_train_run:
+                return "-".join(["fast-run", wandb.util.generate_id()])
+            else:
+                return "-".join(["solo-run", wandb.util.generate_id()])
 
     def persist_model(self) -> None:
         input_sample = self.trainer.datamodule.train_data.dataset[0][0]
@@ -137,16 +145,6 @@ class TrainerWork:
 
     def persist_splits(self) -> None:
         self.trainer.datamodule.persist_splits()
-
-    def _fit(self) -> None:
-        self.logger = WandbLogger(
-            project=self.project_name,
-            name=self.run_name,
-            group=self.group_name,
-            save_dir=conf.WANDBPATH,
-        )
-        self.trainer.logger = self.logger
-        self.trainer.fit(model=self.model, datamodule=self.datamodule)
 
     def run(
         self,
@@ -160,7 +158,14 @@ class TrainerWork:
             self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=self.trial_count)
             self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
 
-        self._fit()
+        self.logger = WandbLogger(
+            project=self.project_name,
+            name=self.run_name,
+            group=self.group_name,
+            save_dir=conf.WANDBPATH,
+        )
+        self.trainer.logger = self.logger
+        self.trainer.fit(model=self.model, datamodule=self.datamodule)
 
         if persist_model:
             self.persist_model()

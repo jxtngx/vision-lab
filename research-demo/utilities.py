@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import json
+import os
 
 import numpy as np
 import pandas as pd
@@ -22,9 +22,10 @@ from dash import dash_table
 from lightning.pytorch.utilities.model_summary import ModelSummary
 
 from visionpod import conf
+from visionpod.core.module import PodModule
 
 
-def metrics_summary():
+def make_metrics_summary():
     summary = json.load(open(conf.WANDBSUMMARYPATH))
     collection = {
         "Val Loss": summary["val_loss"],
@@ -88,12 +89,17 @@ def make_model_param_text(model_summary: list):
     return model_params
 
 
-def make_model_summary(model):
+def make_model_summary():
+    available_checkpoints = os.listdir(conf.CHKPTSPATH)
+    available_checkpoints.remove("README.md")
+    latest_checkpoint = available_checkpoints[0]
+    chkpt_filename = os.path.join(conf.CHKPTSPATH, latest_checkpoint)
+    model = PodModule.load_from_checkpoint(chkpt_filename)
     model_summary = ModelSummary(model)
     model_summary = model_summary.__str__().split("\n")
     model_layers = make_model_layer_table(model_summary)
     model_params = make_model_param_text(model_summary)
-    return model_layers, model_params
+    return {"layers": model_layers, "params": model_params}
 
 
 def find_index(dataset, label, label_idx):
