@@ -78,10 +78,28 @@ SWEEPFLAGS = dict()
 
 # DATAMODULE
 BATCHSIZE = 128
-TOTENSORTRANSFORM = transforms.Compose([transforms.ToTensor()])
+mean = [0.49139968, 0.48215841, 0.44653091]
+stddev = [0.24703223, 0.24348513, 0.26158784]
+cifar_norm = transforms.Normalize(mean=mean, std=stddev)
+TESTTRANSFORM = transforms.Compose([transforms.ToTensor()])
 TRAINTRANSFORMS = transforms.Compose(
     [
         transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
         transforms.ToTensor(),
+    ]
+)
+NORMTRAINTRANSFORMS = transforms.Compose(
+    [
+        transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
+        transforms.ToTensor(),
+        cifar_norm,
+    ]
+)
+NORMTESTTRANSFORM = transforms.Compose([transforms.ToTensor(), cifar_norm])
+# see https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821
+INVERSETRANSFORM = transforms.Compose(
+    [
+        transforms.Normalize(mean=[0.0, 0.0, 0.0], std=[1 / i for i in stddev]),
+        transforms.Normalize(mean=mean, std=[1.0, 1.0, 1.0]),
     ]
 )

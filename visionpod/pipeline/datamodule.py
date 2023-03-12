@@ -38,7 +38,7 @@ class PodDataModule(LightningDataModule):
         train_size: float = 0.8,
         num_workers: int = NUMWORKERS,
         train_transforms: Callable = conf.TRAINTRANSFORMS,
-        test_transforms: Callable = conf.TOTENSORTRANSFORM,
+        test_transforms: Callable = conf.TESTTRANSFORM,
         batch_size: int = conf.BATCHSIZE,
     ):
         super().__init__()
