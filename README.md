@@ -91,8 +91,8 @@ The structure of the project is:
 - `requirements` + `requirements.txt` helps CI/CD jobs install Python requirements
 - `research` contains companion notebooks and a Plotly Dash UI
 - `tests` are tests for visionpod
+- `ui` is the NextJS frontend deployed to Vercel
 - `visionpod` is the Python package, Lightning App, and VisionTransformer
-- `visionpod-ui` is the NextJS frontend deployed to Vercel
 
 ## Setup
 
@@ -106,7 +106,7 @@ source .venv/bin/activate
 pip install -e ".[full]"
 pre-commit install
 deactivate
-cd visionpod-ui
+cd ui
 yarn config set nodeLinker node-module
 yarn install
 cd ..
@@ -119,7 +119,7 @@ Using this template will require accounts for Lightning, Weights and Biases, Sup
 After creating a W&B account and installing the development environment, a training run can be ran locally with:
 
 ```sh
-pod trainer fast-train-run
+pod trainer run fast-train
 ```
 
 Running the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.

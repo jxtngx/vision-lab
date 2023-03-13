@@ -113,6 +113,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env*.local
 
 # Spyder project settings
 .spyderproject
@@ -168,9 +169,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
-.env*.local
-
 # vercel
 .vercel
 
@@ -195,7 +193,6 @@ outputs/
 /data/cache/
 /data/predictions/*.pt
 /data/training_split/*.pt
-
 
 # docs
 /docs-src/docs/tutorial*
