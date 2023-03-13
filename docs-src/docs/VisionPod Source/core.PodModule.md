@@ -14,6 +14,7 @@ visionpod.core.module.PodModule(
     conv_stem_configs=None,
     progress=False,
     weights=False,
+    vit_type="b_32",
 )
 ```
 
@@ -31,8 +32,9 @@ __Arguments__
 - __attention_dropout__ `float`: 0.0
 - __norm_layer__ `torch.nn.modules.module.Module | None`: None
 - __conv_stem_configs__ `List[torchvision.models.vision_transformer.ConvStemConfig] | None`: None
-- __opt_progress__: False
-- __opt_weights__: False
+- __progress__ `bool`: False
+- __weights__ `bool`: False
+- __vit_type__ `str`: one of (b_16, b_32, l_16, l_32). Default is b_32.
 
 
 ----
