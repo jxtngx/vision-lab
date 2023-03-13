@@ -142,4 +142,6 @@ The general outline for building this project is:
 - design and build front end
 - improve on feedback
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/JustinGoheen/lightning-pod-lite)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/JustinGoheen/lightning-pod-vision)
+
+<!-- [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/[your GitHub username]/[your repository]) -->
