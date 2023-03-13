@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from functools import partial
 from typing import List, Optional
 
@@ -20,7 +19,7 @@ import lightning as L
 import torch.nn.functional as F
 from torch import nn, optim
 from torchmetrics.functional import accuracy
-from torchvision.models import vit_b_32 as VisionTransformer
+from torchvision import models
 from torchvision.models import ViT_B_32_Weights as Weights
 from torchvision.models.vision_transformer import ConvStemConfig
 
@@ -38,8 +37,9 @@ class PodModule(L.LightningModule):
         attention_dropout: 0.0
         norm_layer: None
         conv_stem_configs: None
-        opt_progress: False
-        opt_weights: False
+        progress: False
+        weights: False
+        vit_type: one of (b_16, b_32, l_16, l_32). Default is b_32.
     """
 
     def __init__(
@@ -55,8 +55,12 @@ class PodModule(L.LightningModule):
         conv_stem_configs: Optional[List[ConvStemConfig]] = None,
         progress: bool = False,
         weights: bool = False,
+        vit_type: str = "b_32",
     ):
         super().__init__()
+
+        if vit_type not in ("b_16", "b_32", "l_16", "l_32"):
+            raise ValueError("vit_type must be one of (b_16, b_32, l_16, l_32)")
 
         if not norm_layer:
             norm_layer = partial(nn.LayerNorm, eps=1e-6)
@@ -70,7 +74,9 @@ class PodModule(L.LightningModule):
             conv_stem_configs=conv_stem_configs,
         )
 
-        self.model = VisionTransformer(
+        vision_transformer = getattr(models, f"vit_{vit_type}")
+
+        self.model = vision_transformer(
             weights=Weights if weights else None,
             progress=progress,
             **vit_kwargs,
