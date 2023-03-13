@@ -101,9 +101,12 @@ class Sweep:
 
 class DataModule:
     batch_size = 128
-    _mean = [0.49139968, 0.48215841, 0.44653091]
-    _stddev = [0.24703223, 0.24348513, 0.26158784]
-    _cifar_norm = transforms.Normalize(mean=_mean, std=_stddev)
+    mean = [0.49139968, 0.48215841, 0.44653091]
+    stddev = [0.24703223, 0.24348513, 0.26158784]
+    inverse_mean = [-i for i in mean]
+    inverse_stddev = [1 / i for i in stddev]
+    cifar_norm = transforms.Normalize(mean=mean, std=stddev)
+    test_transform = transforms.Compose([transforms.ToTensor()])
     test_transform = transforms.Compose([transforms.ToTensor()])
     train_transform = transforms.Compose(
         [
@@ -115,14 +118,14 @@ class DataModule:
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
-            _cifar_norm,
+            cifar_norm,
         ]
     )
-    norm_test_transform = transforms.Compose([transforms.ToTensor(), _cifar_norm])
+    norm_test_transform = transforms.Compose([transforms.ToTensor(), cifar_norm])
     # see https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821
     inverse_transform = transforms.Compose(
         [
-            transforms.Normalize(mean=[0.0, 0.0, 0.0], std=[1 / i for i in _stddev]),
-            transforms.Normalize(mean=_mean, std=[1.0, 1.0, 1.0]),
+            transforms.Normalize(mean=[0.0, 0.0, 0.0], std=inverse_stddev),
+            transforms.Normalize(mean=inverse_mean, std=[1.0, 1.0, 1.0]),
         ]
     )
