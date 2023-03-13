@@ -22,7 +22,7 @@ from omegaconf.dictconfig import DictConfig
 
 # SET PATHS
 filepath = Path(__file__)
-PROJECTPATH = os.getcwd()
+project = os.getcwd()
 
 
 @hydra.main(

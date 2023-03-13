@@ -17,7 +17,7 @@ from pathlib import Path
 
 import click
 
-from visionpod import conf
+from visionpod import config
 from visionpod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
 from visionpod.components.train import TrainerWork
 from visionpod.core.module import PodModule
@@ -27,8 +27,8 @@ from visionpod.fabric.docs.autogen import PodDocsGenerator
 from visionpod.pipeline.datamodule import PodDataModule
 
 FILEPATH = Path(__file__)
-PKGPATH = FILEPATH.parents[1]
-PROJECTPATH = FILEPATH.parents[2]
+package = FILEPATH.parents[1]
+project = FILEPATH.parents[2]
 
 
 @click.group()
@@ -51,16 +51,16 @@ def bug_report() -> None:
     bugreport.main()
     print("\n")
     make_bug_trainer()
-    trainer = os.path.join(PKGPATH, "core", "bug_trainer.py")
+    trainer = os.path.join(package, "core", "bug_trainer.py")
     run_command = " ".join(["python", trainer, " 2> boring_trainer_error.md"])
     os.system(run_command)
     os.remove(trainer)
 
 
 @run.command("demo-ui")
-def prototype() -> None:
-    dashproto = os.path.join(PROJECTPATH, "research-demo", "app.py")
-    run_command = f"lightning run app {dashproto}"
+def demo_ui() -> None:
+    ui = os.path.join(project, "research", "demo", "app.py")
+    run_command = f"lightning run app {ui}"
     os.system(run_command)
 
 
@@ -78,7 +78,7 @@ def build_docs() -> None:
 def start_docs() -> None:
     _cwd = os.getcwd()
     try:
-        os.chdir(os.path.join(PROJECTPATH, "docs-src"))
+        os.chdir(os.path.join(project, "docs-src"))
         os.system("yarn start")
     except KeyboardInterrupt:
         os.chdir(_cwd)
@@ -89,17 +89,22 @@ def trainer() -> None:
     pass
 
 
-@trainer.command("fast-dev-run")
-@click.option("--image_size", default=conf.MODELKWARGS["image_size"])
-@click.option("--num_classes", default=conf.MODELKWARGS["num_classes"])
+@trainer.group("run")
+def trainer_run() -> None:
+    pass
+
+
+@trainer_run.command("fast-dev")
+@click.option("--image_size", default=config.Args.model_kwargs["image_size"])
+@click.option("--num_classes", default=config.Args.model_kwargs["num_classes"])
 def fast_dev_run(image_size, num_classes) -> None:
     model = PodModule(image_size=image_size, num_classes=num_classes)
     datamodule = PodDataModule()
-    trainer = PodTrainer(fast_dev_run=True, **conf.TRAINFLAGS)
+    trainer = PodTrainer(fast_dev_run=True, **config.Trainer.default_flags)
     trainer.fit(model=model, datamodule=datamodule)
 
 
-@trainer.command("fast-train-run")
+@trainer_run.command("fast-train")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--persist_model", default=False)
@@ -107,7 +112,7 @@ def fast_dev_run(image_size, num_classes) -> None:
 @click.option("--persist_splits", default=True)
 def fast_train_run(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
     trainer = TrainerWork(
-        trainer_flags=conf.FASTTRAINFLAGS,
+        trainer_flags=config.Trainer.fast_flags,
         experiment_manager=em,
         project_name=project_name,
         sweep=False,
@@ -121,15 +126,16 @@ def fast_train_run(em, project_name, persist_model, persist_predictions, persist
     )
 
 
-@trainer.command("train")
+@trainer_run.command("untuned")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=True)
 @click.option("--persist_splits", default=True)
-def train(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
-    flags = conf.TRAINFLAGS
+def traier_run(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
+    flags = config.Trainer.default_flags
     flags["callbacks"] = []
+    flags["max_epochs"] = 25
     trainer = TrainerWork(
         trainer_flags=flags,
         experiment_manager=em,
@@ -144,21 +150,21 @@ def train(em, project_name, persist_model, persist_predictions, persist_splits) 
     )
 
 
-@trainer.command("sweep")
+@trainer_run.command("sweep")
 @click.option("--project-name", default="visionpod")
 def sweep_only(project_name) -> None:
     pass
 
 
-@trainer.command("tune")
+@trainer_run.command("tuned")
 @click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
 @click.option("--persist_splits", is_flag=True)
-@click.option("--image_size", default=conf.MODELKWARGS["image_size"])
-@click.option("--num_classes", default=conf.MODELKWARGS["num_classes"])
+@click.option("--image_size", default=config.Args.model_kwargs["image_size"])
+@click.option("--num_classes", default=config.Args.model_kwargs["num_classes"])
 def tune(
     em, project_name, trial_count, persist_model, persist_predictions, persist_splits, image_size, num_classes
 ) -> None:

@@ -22,28 +22,30 @@ from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
 
+from visionpod import config
+
 FILEPATH = Path(__file__)
-PROJECTPATH = FILEPATH.parents[2]
-PKGPATH = FILEPATH.parents[1]
+PROJECT = config.Paths.project
+PACKAGE = config.Paths.package
 
 
 def _preserve_dir(main_source_dir: str, sub_source_dir: str, destination: str) -> None:
-    destinationpath = os.path.join(PROJECTPATH, destination)
+    destinationpath = os.path.join(PROJECT, destination)
     if not os.path.isdir(destinationpath):
         os.mkdir(destinationpath)
-    src = os.path.join(PROJECTPATH, main_source_dir, sub_source_dir)
-    dest = os.path.join(PROJECTPATH, destinationpath, main_source_dir, sub_source_dir)
+    src = os.path.join(PROJECT, main_source_dir, sub_source_dir)
+    dest = os.path.join(PROJECT, destinationpath, main_source_dir, sub_source_dir)
     shutil.copytree(src, dest)
 
 
 def preserve_examples() -> None:
-    _preserve_dir(PKGPATH.name, "core", "examples")
-    _preserve_dir(PKGPATH.name, "pipeline", "examples")
+    _preserve_dir(PACKAGE.name, "core", "examples")
+    _preserve_dir(PACKAGE.name, "pipeline", "examples")
 
 
 def _clean_and_build_package(module_to_copy: Union[str, Path]) -> None:
     src = os.path.join(FILEPATH.parent, "init", module_to_copy)
-    dest = os.path.join(PROJECTPATH, PKGPATH, module_to_copy)
+    dest = os.path.join(PROJECT, PACKAGE, module_to_copy)
     shutil.rmtree(dest)
     shutil.copytree(src, dest)
 
@@ -62,32 +64,32 @@ def teardown() -> None:
     do_not_delete = "README.md"
 
     target_dirs = [
-        os.path.join(PROJECTPATH, "models", "checkpoints"),
-        os.path.join(PROJECTPATH, "models", "onnx"),
-        os.path.join(PROJECTPATH, "logs", "optuna"),
-        os.path.join(PROJECTPATH, "logs", "tensorboard"),
-        os.path.join(PROJECTPATH, "logs", "torch_profiler"),
-        os.path.join(PROJECTPATH, "logs", "wandb_logs"),
-        os.path.join(PROJECTPATH, "data", "cache"),
-        os.path.join(PROJECTPATH, "data", "predictions"),
-        os.path.join(PROJECTPATH, "data", "training_split"),
-        os.path.join(PROJECTPATH, "docs"),
+        os.path.join(PROJECT, "models", "checkpoints"),
+        os.path.join(PROJECT, "models", "onnx"),
+        os.path.join(PROJECT, "logs", "optuna"),
+        os.path.join(PROJECT, "logs", "tensorboard"),
+        os.path.join(PROJECT, "logs", "torch_profiler"),
+        os.path.join(PROJECT, "logs", "wandb_logs"),
+        os.path.join(PROJECT, "data", "cache"),
+        os.path.join(PROJECT, "data", "predictions"),
+        os.path.join(PROJECT, "data", "training_split"),
+        os.path.join(PROJECT, "docs"),
     ]
 
     for dir in target_dirs:
         for target in os.listdir(dir):
-            targetpath = os.path.join(PROJECTPATH, dir, target)
+            targetpath = os.path.join(PROJECT, dir, target)
             if not os.path.isdir(targetpath):
                 if target != do_not_delete:
                     os.remove(targetpath)
             else:
-                dirpath = os.path.join(PROJECTPATH, dir, target)
+                dirpath = os.path.join(PROJECT, dir, target)
                 shutil.rmtree(dirpath)
 
 
 def make_bug_trainer():
-    source = os.path.join(PROJECTPATH, "vision_pod", "cli", "bugreport", "trainer.py")
-    destination = os.path.join(PROJECTPATH, "vision_pod", "core", "bug_trainer.py")
+    source = os.path.join(PROJECT, "vision_pod", "cli", "bugreport", "trainer.py")
+    destination = os.path.join(PROJECT, "vision_pod", "core", "bug_trainer.py")
     shutil.copyfile(source, destination)
 
 
@@ -100,7 +102,7 @@ def show_purge_table(command_name) -> None:
     # ROWS
     trash = ["data", "logs", "models"]
     if command_name == "init":
-        trash.append(os.path.join(PKGPATH, "core"))
+        trash.append(os.path.join(PACKAGE, "core"))
     for dirname in trash:
         dirpath = os.path.join(os.getcwd(), dirname)
         contents = ", ".join([f for f in os.listdir(dirpath) if f != "README.md"])

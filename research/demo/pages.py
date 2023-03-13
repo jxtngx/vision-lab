@@ -18,10 +18,10 @@ import torch
 from dash import dcc, html
 from utilities import create_figure, find_index, make_metrics_summary, make_model_summary
 
-from visionpod import conf
+from visionpod import config
 
-PREDICTIONS = torch.load(conf.PREDSPATH)
-DATASET = torch.load(conf.TESTSPLITPATH)
+PREDICTIONS = torch.load(config.Paths.predictions)
+DATASET = torch.load(config.Paths.test_split)
 LABELNAMES = DATASET.classes
 LABELS = list(range(len(LABELNAMES)))
 LABELIDX = find_index(DATASET, label=LABELS[0], label_idx=1)

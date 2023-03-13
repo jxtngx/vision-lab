@@ -19,7 +19,7 @@ import wandb
 from lightning import LightningWork
 from lightning.pytorch.loggers import WandbLogger
 
-from visionpod import conf
+from visionpod import config
 from visionpod.components.hpo import SweepWork
 from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
@@ -29,10 +29,10 @@ from visionpod.pipeline.datamodule import PodDataModule
 class TrainerWork:
     def __init__(
         self,
-        trainer_flags: Dict[str, Any] = conf.TRAINFLAGS,
-        module_kwargs: Dict[str, Any] = conf.MODULEKWARGS,
-        model_kwargs: Dict[str, Any] = conf.MODELKWARGS,
-        model_hypers: Dict[str, Any] = conf.MODELHYPERS,
+        trainer_flags: Dict[str, Any] = config.Trainer.default_flags,
+        module_kwargs: Dict[str, Any] = config.Args.module_kwargs,
+        model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
+        model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
         sweep: bool = False,
         trial_count: Optional[int] = None,
         experiment_manager: str = "wandb",
@@ -124,7 +124,7 @@ class TrainerWork:
             if self.fast_train_run:
                 return "Fast Training Runs"
             else:
-                return "Solo Training Runs"
+                return "Untuned Training Runs"
 
     @property
     def run_name(self) -> str:
@@ -138,7 +138,7 @@ class TrainerWork:
 
     def persist_model(self) -> None:
         input_sample = self.trainer.datamodule.train_data.dataset[0][0]
-        self.trainer.model.to_onnx(conf.MODELPATH, input_sample=input_sample, export_params=True)
+        self.trainer.model.to_onnx(config.Paths.model, input_sample=input_sample, export_params=True)
 
     def persist_predictions(self, predictions_dir) -> None:
         self.trainer.persist_predictions(predictions_dir=predictions_dir)
@@ -151,7 +151,7 @@ class TrainerWork:
         persist_model: bool = False,
         persist_predictions: bool = False,
         persist_splits: bool = False,
-        predictions_dir=conf.PREDSPATH,
+        predictions_dir=config.Paths.predictions,
     ) -> None:
 
         if self.sweep:
@@ -162,7 +162,7 @@ class TrainerWork:
             project=self.project_name,
             name=self.run_name,
             group=self.group_name,
-            save_dir=conf.WANDBPATH,
+            save_dir=config.Paths.wandb_logs,
         )
         self.trainer.logger = self.logger
         self.trainer.fit(model=self.model, datamodule=self.datamodule)

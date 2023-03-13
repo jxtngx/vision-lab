@@ -21,12 +21,12 @@ import plotly.express as px
 from dash import dash_table
 from lightning.pytorch.utilities.model_summary import ModelSummary
 
-from visionpod import conf
+from visionpod import config
 from visionpod.core.module import PodModule
 
 
 def make_metrics_summary():
-    summary = json.load(open(conf.WANDBSUMMARYPATH))
+    summary = json.load(open(config.Paths.wandb_summary))
     collection = {
         "Val Loss": summary["val_loss"],
         "Val Acc": summary["val_acc"],
@@ -90,10 +90,10 @@ def make_model_param_text(model_summary: list):
 
 
 def make_model_summary():
-    available_checkpoints = os.listdir(conf.CHKPTSPATH)
+    available_checkpoints = os.listdir(config.Paths.checkpoints)
     available_checkpoints.remove("README.md")
     latest_checkpoint = available_checkpoints[0]
-    chkpt_filename = os.path.join(conf.CHKPTSPATH, latest_checkpoint)
+    chkpt_filename = os.path.join(config.Paths.checkpoints, latest_checkpoint)
     model = PodModule.load_from_checkpoint(chkpt_filename)
     model_summary = ModelSummary(model)
     model_summary = model_summary.__str__().split("\n")

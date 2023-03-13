@@ -5,9 +5,9 @@ from pathlib import Path
 from keras_autodoc import DocumentationGenerator
 
 FILEPATH = Path(__file__)
-PKGPATH = FILEPATH.parents[2]
-PROJECTPATH = FILEPATH.parents[3]
-DOCSDIR = os.path.join(PROJECTPATH, "docs-src", "docs")
+package = FILEPATH.parents[2]
+project = FILEPATH.parents[3]
+DOCSDIR = os.path.join(project, "docs-src", "docs")
 
 
 class PodDocsGenerator:
@@ -32,9 +32,9 @@ class PodDocsGenerator:
         }
 
         doc_generator = DocumentationGenerator(pages)
-        doc_generator.generate(f"{PROJECTPATH}/docs-src/docs/VisionPod Source")
+        doc_generator.generate(f"{project}/docs-src/docs/VisionPod Source")
 
-        root_readme = os.path.join(PROJECTPATH, "README.md")
+        root_readme = os.path.join(project, "README.md")
         docs_intro = os.path.join(DOCSDIR, "intro.md")
 
         shutil.copyfile(src=root_readme, dst=docs_intro)

@@ -22,7 +22,7 @@ from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers import Logger, TensorBoardLogger
 from lightning.pytorch.profilers import Profiler, PyTorchProfiler
 
-from visionpod import conf
+from visionpod import config
 
 
 class PodTrainer(L.Trainer):
@@ -48,17 +48,17 @@ class PodTrainer(L.Trainer):
     ) -> None:
 
         if set_seed:
-            seed_everything(conf.GLOBALSEED, workers=True)
+            seed_everything(config.Settings.seed, workers=True)
 
         super().__init__(
-            logger=logger or TensorBoardLogger(conf.TENSORBOARDPATH, name="logs"),
-            profiler=profiler or PyTorchProfiler(dirpath=conf.TORCHPROFILERPATH, filename="profiler"),
-            callbacks=callbacks + [ModelCheckpoint(dirpath=conf.CHKPTSPATH, filename="model")],
+            logger=logger or TensorBoardLogger(config.Paths.tensorboard, name="logs"),
+            profiler=profiler or PyTorchProfiler(dirpath=config.Paths.torch_profiler, filename="profiler"),
+            callbacks=callbacks + [ModelCheckpoint(dirpath=config.Paths.checkpoints, filename="model")],
             plugins=plugins,
             **trainer_init_kwargs
         )
 
-    def persist_predictions(self, predictions_dir: Optional[Union[str, Path]] = conf.PREDSPATH) -> None:
+    def persist_predictions(self, predictions_dir: Optional[Union[str, Path]] = config.Paths.predictions) -> None:
         """helper method to persist predictions on completion of a training run
 
         # Arguments

@@ -25,7 +25,7 @@ from optuna.trial import FrozenTrial, Trial, TrialState
 from rich.console import Console
 from rich.table import Table
 
-from visionpod import conf
+from visionpod import config
 from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
 from visionpod.pipeline.datamodule import PodDataModule
@@ -39,13 +39,13 @@ class SweepWork:
 
     def __init__(
         self,
-        wandb_save_dir: Optional[str] = conf.WANDBPATH,
+        wandb_save_dir: Optional[str] = config.Paths.wandb_logs,
         project_name: Optional[str] = None,
         optuna_study_name: Optional[str] = None,
         trial_count: int = 10,
         experiment_manager: str = "wandb",
-        sweep_config: Dict[str, Any] = conf.SWEEPCONFIG,
-        trainer_init_kwargs: Dict[str, Any] = conf.SWEEPFLAGS,
+        sweep_config: Dict[str, Any] = config.Sweep.config,
+        trainer_init_kwargs: Dict[str, Any] = config.Trainer.sweep_flags,
     ):
         self.experiment_manager = experiment_manager
         self.project_name = project_name
@@ -124,18 +124,18 @@ class SweepWork:
         root_logger = logging.getLogger("optuna")
         root_logger.setLevel(logging.DEBUG)
 
-        artifact_dir = os.path.join(conf.OPTUNAPATH, self.artifact_path)
+        artifact_dir = os.path.join(config.Paths.optuna, self.artifact_path)
 
         if not os.path.isdir(artifact_dir):
             os.mkdir(artifact_dir)
 
-        file_handler = logging.FileHandler(filename=os.path.join(conf.OPTUNAPATH, artifact_dir, "optuna.log"))
+        file_handler = logging.FileHandler(filename=os.path.join(config.Paths.optuna, artifact_dir, "optuna.log"))
         file_handler.setFormatter(optuna.logging.create_default_formatter())
         root_logger.addHandler(file_handler)
 
     def persist_model(self) -> None:
         input_sample = self.trainer.datamodule.train_data.dataset[0][0]
-        self.trainer.model.to_onnx(conf.MODELPATH, input_sample=input_sample, export_params=True)
+        self.trainer.model.to_onnx(config.Paths.model, input_sample=input_sample, export_params=True)
 
     def persist_predictions(self) -> None:
         self.trainer.persist_predictions()
