@@ -10,14 +10,9 @@ tags: [W&B]
 _This post is in public draft_.
 
 This post follows a [contribution branch](https://github.com/Lightning-Universe/Training-Studio-app/pull/269)
-of lightning-training-studio and a [feature branch](https://github.com/JustinGoheen/lightning-pod/tree/feature/add-training-studio)
-of lightning-pod.
+of lightning-training-studio and a lightning-pod-vision's visionpod.components [.hpo.work](https://github.com/JustinGoheen/lightning-pod-vision/blob/master/visionpod/components/hpo/work.py) and [.train.work](https://github.com/JustinGoheen/lightning-pod-vision/blob/master/visionpod/components/train/work.py).
 
 The intent is to enable [grouped](https://docs.wandb.ai/guides/track/advanced/grouping) wandb runs for wandb [Sweeps](https://docs.wandb.ai/guides/sweeps) during hyperparameter optimization by creating a custom Lightning Logger to use with a lightning-training-studio [Sweep](https://github.com/Lightning-Universe/Training-Studio-app/blob/master/lightning_training_studio/components/sweep.py).
-
-See lightning-pod's [optuna-flow](https://github.com/JustinGoheen/lightning-pod/blob/master/lightning_pod/flows/optuna_flow.py)
-for an example of HPO with Lightning and Optuna that logs grouped trials to Weights
-& Biases.
 
 ## Topics
 
@@ -56,15 +51,14 @@ scikit-learn defines hyperparameters in [Tuning the hyper-parameters of an estim
 
 ### Lightning Module Hyperparameters
 
-In the example [lightning_pod.core.module](https://github.com/JustinGoheen/lightning-pod/blob/master/lightning_pod/core/module.py), the hyperparameters are `lr`, `dropout`, and `optimizer` where:
+In the example [visionpod.core.module](https://github.com/JustinGoheen/lightning-pod-vision/blob/master/visionpod/core/module.py) (a VisionTransform), the tuneable parameters are `lr`, `optimizer`, `dropout`, `attention_dropout`, `norm_layer` where:
 
 - `lr` is the learning rate applied to the optimizer
-- `dropout` is the probability of an element to be zeroed
+- `dropout` and `attention_dropout` is the probability of an element to be zeroed
 - `optimizer` is a categorical hyperparameter of [PyTorch Optimization algorithms](https://pytorch.org/docs/stable/optim.html#algorithms) such as RMSProp, Adam, or SGD.
+- `norm_layer` is valid PyTorch [normalization layer](https://pytorch.org/docs/stable/nn.html#normalization-layers) layer.
 
 The hyperparameters of a LightningModule are determined according to the layers of the network i.e. any hyperparameter that can be set in an outer or inner layer of the network can be initialized as a keyword argument of the LightningModule's \_\_init\_\_ method.
-
-See [Conv-TasNet](https://github.com/naplab/Conv-TasNet/blob/master/conv_tasnet.py) as an example of using keyword arguments as a means of setting outer and inner layer hyperparameters.
 
 ### Hyperparameter Optimization
 
