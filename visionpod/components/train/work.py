@@ -152,7 +152,7 @@ class TrainerWork:
 
         if self.sweep:
             self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=self.trial_count)
-            self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
+            self._sweep_flow.run()
 
         self.logger = WandbLogger(
             project=self.project_name,

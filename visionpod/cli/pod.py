@@ -144,11 +144,7 @@ def fast_sweep(project_name, persist_model, persist_predictions) -> None:
         project_name=project_name,
         trainer_init_kwargs=config.Trainer.fast_flags,
     )
-    trainer.run(
-        persist_model=persist_model,
-        persist_predictions=persist_predictions,
-        display_report=True,
-    )
+    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions)
 
 
 @trainer_run.command("tuned")

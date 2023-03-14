@@ -14,12 +14,10 @@
 
 import os
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from lightning import LightningWork
 from lightning.pytorch.loggers import WandbLogger
-from rich.console import Console
-from rich.table import Table
 
 import wandb
 from visionpod import config
@@ -107,32 +105,10 @@ class SweepWork:
 
         return self.trainer.callback_metrics["val_acc"].item()
 
-    @staticmethod
-    def _display_report(trial_metric_names: List[str], trial_info: List[str]) -> None:
-        table = Table(title="Study Statistics")
-
-        for col in trial_metric_names:
-            table.add_column(col, header_style="cyan")
-
-        table.add_row(*trial_info)
-
-        console = Console()
-        console.print(table, new_line_start=True)
-
-    def run(
-        self,
-        persist_model: bool = False,
-        persist_predictions: bool = False,
-        display_report: bool = False,
-    ) -> float:
+    def run(self, persist_model: bool = False, persist_predictions: bool = False) -> float:
 
         wandb.agent(self.sweep_id, function=self.objective, count=self.trial_count)
 
-        if display_report:
-            self._display_report(
-                trial_metric_names=list(self.best_params.keys()),
-                trial_info=list(str(i) for i in self.best_params.values()),
-            )
         if persist_model:
             self.persist_model()
         if persist_predictions:
