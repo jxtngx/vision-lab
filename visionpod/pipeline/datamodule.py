@@ -14,7 +14,6 @@
 
 import multiprocessing
 import os
-from pathlib import Path
 from typing import Any, Callable, Union
 
 import torch
@@ -25,8 +24,6 @@ from torch.utils.data import DataLoader, random_split
 from visionpod import config
 from visionpod.pipeline.dataset import PodDataset
 
-filepath = Path(__file__)
-project = os.getcwd()
 NUMWORKERS = int(multiprocessing.cpu_count() // 2)
 
 
@@ -34,45 +31,63 @@ class PodDataModule(LightningDataModule):
     def __init__(
         self,
         dataset: Any = PodDataset,
-        data_dir: str = config.Paths.dataset,
+        data_cache: str = config.Paths.dataset,
+        data_splits: str = config.Paths.splits,
         train_size: float = 0.8,
         num_workers: int = NUMWORKERS,
         train_transforms: Callable = config.DataModule.train_transform,
         test_transforms: Callable = config.DataModule.test_transform,
         batch_size: int = config.DataModule.batch_size,
+        data_version: int = 0,
+        reversion: bool = False,
     ):
         super().__init__()
-        self.data_dir = data_dir
+        self.data_cache = data_cache
+        self.data_splits = data_splits
         self.dataset = dataset
         self.train_size = train_size
         self.num_workers = num_workers
         self.train_transforms = train_transforms
         self.test_transforms = test_transforms
         self.batch_size = batch_size
+        self.data_version = data_version
+        self.reversion = reversion
+        self.data_cache_exists = os.path.isdir(self.data_cache)
 
     def prepare_data(self) -> None:
-        self.dataset(self.data_dir, download=True, train=True)
-        self.dataset(self.data_dir, download=True, train=False)
+        if self.reversion or not self.data_cache_exists:
+            if self.data_cache_exists:
+                vfiles = (
+                    f"v{self.data_version}-train.pt",
+                    f"v{self.data_version}-val.pt",
+                    f"v{self.data_version}-test.pt",
+                )
+                if any(v in os.listdir(self.data_splits) for v in vfiles):
+                    raise ValueError("a split version of the same version number already exists")
+            self.dataset(self.data_cache, download=True, train=True)
+            self.dataset(self.data_cache, download=True, train=False)
+            self._persist_splits()
 
     def setup(self, stage: Union[str, None] = None) -> None:
         if stage == "fit" or stage is None:
-            seed_everything(config.Settings.seed)
-            train = self.dataset(self.data_dir, train=True, transform=self.train_transforms)
-            val = self.dataset(self.data_dir, train=True, transform=self.test_transforms)
-            train_size = int(len(train) * self.train_size)
-            val_size = len(train) - train_size
-            self.train_data, _ = random_split(train, lengths=[train_size, val_size])
-            _, self.val_data = random_split(val, lengths=[train_size, val_size])
+            self.train_data = torch.load(os.path.join(self.data_splits, f"v{self.data_version}-train.pt"))
+            self.val_data = torch.load(os.path.join(self.data_splits, f"v{self.data_version}-val.pt"))
         if stage == "test" or stage is None:
-            self.test_data = self.dataset(self.data_dir, train=False, transform=self.test_transforms)
+            self.test_data = torch.load(os.path.join(self.data_splits, f"v{self.data_version}-test.pt"))
 
-    def persist_splits(self):
+    def _persist_splits(self):
         """saves all splits for reproducibility"""
-        torch.save(self.train_data, config.Paths.train_split)
-        torch.save(self.val_data, config.Paths.val_split)
-        if not hasattr(self, "test_data"):
-            self.setup(stage="test")
-        torch.save(self.test_data, config.Paths.test_split)
+        seed_everything(config.Settings.seed)
+        train = self.dataset(self.data_cache, train=True, transform=self.train_transforms)
+        val = self.dataset(self.data_cache, train=True, transform=self.test_transforms)
+        train_size = int(len(train) * self.train_size)
+        val_size = len(train) - train_size
+        train_data, _ = random_split(train, lengths=[train_size, val_size])
+        _, val_data = random_split(val, lengths=[train_size, val_size])
+        test_data = self.dataset(self.data_cache, train=False, transform=self.test_transforms)
+        torch.save(train_data, os.path.join(self.data_splits, f"v{self.data_version}-train.pt"))
+        torch.save(val_data, os.path.join(self.data_splits, f"v{self.data_version}-val.pt"))
+        torch.save(test_data, os.path.join(self.data_splits, f"v{self.data_version}-test.pt"))
 
     def train_dataloader(self) -> TRAIN_DATALOADERS:
         return DataLoader(self.train_data, shuffle=True, num_workers=self.num_workers, batch_size=self.batch_size)

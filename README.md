@@ -69,7 +69,6 @@ The NextJS app's progress can be viewed at [visionpod.vercel.app](https://vision
 **Model Development and Serving**
 
 - [Lightning](Lightning.ai): developing and serving the model
-- [Optuna](https://optuna.readthedocs.io/en/stable/): hyperparameter optimization trials
 - [Weights and Biases](https://wandb.ai/site): experiment management
 - [FastAPI](https://fastapi.tiangolo.com): developing an API to serve the model with
 - [Locust](https://github.com/locustio/locust): API load balance testing

@@ -15,10 +15,10 @@
 import sys
 from typing import Any, Dict, Optional
 
-import wandb
 from lightning import LightningWork
 from lightning.pytorch.loggers import WandbLogger
 
+import wandb
 from visionpod import config
 from visionpod.components.hpo import SweepWork
 from visionpod.core.module import PodModule
@@ -29,7 +29,7 @@ from visionpod.pipeline.datamodule import PodDataModule
 class TrainerWork:
     def __init__(
         self,
-        trainer_flags: Dict[str, Any] = config.Trainer.default_flags,
+        trainer_flags: Dict[str, Any] = config.Trainer.train_flags,
         module_kwargs: Dict[str, Any] = config.Args.module_kwargs,
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
@@ -143,20 +143,16 @@ class TrainerWork:
     def persist_predictions(self, predictions_dir) -> None:
         self.trainer.persist_predictions(predictions_dir=predictions_dir)
 
-    def persist_splits(self) -> None:
-        self.trainer.datamodule.persist_splits()
-
     def run(
         self,
         persist_model: bool = False,
         persist_predictions: bool = False,
-        persist_splits: bool = False,
         predictions_dir=config.Paths.predictions,
     ) -> None:
 
         if self.sweep:
             self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=self.trial_count)
-            self._sweep_flow.run(experiment_manager=self.experiment_manager, display_report=False)
+            self._sweep_flow.run()
 
         self.logger = WandbLogger(
             project=self.project_name,
@@ -171,7 +167,5 @@ class TrainerWork:
             self.persist_model()
         if persist_predictions:
             self.persist_predictions(predictions_dir)
-        if persist_splits:
-            self.persist_splits()
         if issubclass(TrainerWork, LightningWork):
             sys.exit()
