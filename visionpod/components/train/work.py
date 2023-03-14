@@ -143,14 +143,10 @@ class TrainerWork:
     def persist_predictions(self, predictions_dir) -> None:
         self.trainer.persist_predictions(predictions_dir=predictions_dir)
 
-    def persist_splits(self) -> None:
-        self.trainer.datamodule.persist_splits()
-
     def run(
         self,
         persist_model: bool = False,
         persist_predictions: bool = False,
-        persist_splits: bool = False,
         predictions_dir=config.Paths.predictions,
     ) -> None:
 
@@ -171,7 +167,5 @@ class TrainerWork:
             self.persist_model()
         if persist_predictions:
             self.persist_predictions(predictions_dir)
-        if persist_splits:
-            self.persist_splits()
         if issubclass(TrainerWork, LightningWork):
             sys.exit()

@@ -66,7 +66,6 @@ def teardown() -> None:
     target_dirs = [
         os.path.join(PROJECT, "models", "checkpoints"),
         os.path.join(PROJECT, "models", "onnx"),
-        os.path.join(PROJECT, "logs", "optuna"),
         os.path.join(PROJECT, "logs", "tensorboard"),
         os.path.join(PROJECT, "logs", "torch_profiler"),
         os.path.join(PROJECT, "logs", "wandb_logs"),

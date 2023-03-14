@@ -44,7 +44,6 @@ class Paths:
     test_split = os.path.join(splits, "test.pt")
     wandb_logs = os.path.join(project, "logs", "wandb")
     wandb_summary = os.path.join(project, "logs", "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
-    optuna = os.path.join(project, "logs", "optuna")
 
 
 class Args:
@@ -106,7 +105,6 @@ class DataModule:
     inverse_mean = [-i for i in mean]
     inverse_stddev = [1 / i for i in stddev]
     cifar_norm = transforms.Normalize(mean=mean, std=stddev)
-    test_transform = transforms.Compose([transforms.ToTensor()])
     test_transform = transforms.Compose([transforms.ToTensor()])
     train_transform = transforms.Compose(
         [

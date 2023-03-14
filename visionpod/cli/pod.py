@@ -99,93 +99,76 @@ def trainer_run() -> None:
 def fast_dev(image_size, num_classes) -> None:
     model = PodModule(image_size=image_size, num_classes=num_classes)
     datamodule = PodDataModule()
-    trainer = PodTrainer(fast_dev_run=True, **config.Trainer.default_flags)
+    trainer = PodTrainer(fast_dev_run=True, **config.Trainer.fast_flags)
     trainer.fit(model=model, datamodule=datamodule)
 
 
 @trainer_run.command("fast-train")
-@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=True)
-@click.option("--persist_splits", default=True)
-def fast_train(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
+def fast_train(project_name, persist_model, persist_predictions) -> None:
     trainer = TrainerWork(
         trainer_flags=config.Trainer.fast_flags,
-        experiment_manager=em,
         project_name=project_name,
         sweep=False,
         trial_count=None,
         fast_train_run=True,
     )
-    trainer.run(
-        persist_model=persist_model,
-        persist_predictions=persist_predictions,
-        persist_splits=persist_splits,
-    )
+    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions)
 
 
 @trainer_run.command("untuned")
-@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=True)
-@click.option("--persist_splits", default=True)
-def untuned(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
+def untuned(project_name, persist_model, persist_predictions) -> None:
     flags = config.Trainer.train_flags
     flags["callbacks"] = []
     flags["max_epochs"] = 25
     trainer = TrainerWork(
         trainer_flags=flags,
-        experiment_manager=em,
         project_name=project_name,
         sweep=False,
         trial_count=None,
     )
-    trainer.run(
-        persist_model=persist_model,
-        persist_predictions=persist_predictions,
-        persist_splits=persist_splits,
-    )
+    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions)
 
 
 @trainer_run.command("fast-sweep")
-@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=False)
-@click.option("--persist_splits", default=False)
-def fast_sweep(em, project_name, persist_model, persist_predictions, persist_splits) -> None:
+def fast_sweep(project_name, persist_model, persist_predictions) -> None:
     trainer = SweepWork(
-        experiment_manager=em,
         project_name=project_name,
         trainer_init_kwargs=config.Trainer.fast_flags,
     )
     trainer.run(
         persist_model=persist_model,
         persist_predictions=persist_predictions,
-        persist_splits=persist_splits,
         display_report=True,
     )
 
 
 @trainer_run.command("tuned")
-@click.option("--em", default="wandb", type=click.Choice(["wandb", "optuna"]))
 @click.option("--project-name", default="visionpod")
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
-@click.option("--persist_splits", is_flag=True)
 @click.option("--image_size", default=config.Args.model_kwargs["image_size"])
 @click.option("--num_classes", default=config.Args.model_kwargs["num_classes"])
 def tuned(
-    em, project_name, trial_count, persist_model, persist_predictions, persist_splits, image_size, num_classes
+    project_name,
+    trial_count,
+    persist_model,
+    persist_predictions,
+    image_size,
+    num_classes,
 ) -> None:
-    project_name = "-".join([project_name, em])
-    trainer = TrainerWork(experiment_manager=em, project_name=project_name, trial_count=trial_count)
+    trainer = TrainerWork(project_name=project_name, trial_count=trial_count)
     trainer.run(
         project_name,
         persist_model=persist_model,
         persist_predictions=persist_predictions,
-        persist_splits=persist_splits,
     )
