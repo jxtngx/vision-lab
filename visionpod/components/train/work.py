@@ -15,10 +15,10 @@
 import sys
 from typing import Any, Dict, Optional
 
-import wandb
 from lightning import LightningWork
 from lightning.pytorch.loggers import WandbLogger
 
+import wandb
 from visionpod import config
 from visionpod.components.hpo import SweepWork
 from visionpod.core.module import PodModule
@@ -29,7 +29,7 @@ from visionpod.pipeline.datamodule import PodDataModule
 class TrainerWork:
     def __init__(
         self,
-        trainer_flags: Dict[str, Any] = config.Trainer.default_flags,
+        trainer_flags: Dict[str, Any] = config.Trainer.train_flags,
         module_kwargs: Dict[str, Any] = config.Args.module_kwargs,
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,

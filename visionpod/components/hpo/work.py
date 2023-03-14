@@ -18,13 +18,13 @@ import sys
 from typing import Any, Dict, List, Optional
 
 import optuna
-import wandb
 from lightning import LightningWork
 from lightning.pytorch.loggers import WandbLogger
 from optuna.trial import FrozenTrial, Trial, TrialState
 from rich.console import Console
 from rich.table import Table
 
+import wandb
 from visionpod import config
 from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
@@ -60,7 +60,7 @@ class SweepWork:
 
         if self.experiment_manager == "optuna":
             self.sweep_id = wandb.util.generate_id()
-            self._study = optuna.create_study(direction="maximize", study_name=self.optuna_study_name)
+            self.optuna_study = optuna.create_study(direction="maximize", study_name=self.optuna_study_name)
 
         self.sweep_name = "-".join(["Sweep", self.sweep_id])
         self.sweep_config.update({"name": self.sweep_name})
@@ -82,27 +82,27 @@ class SweepWork:
         return self.trainer.logger.experiment.entity
 
     @property
-    def trials(self) -> List[FrozenTrial]:
+    def optuna_trials(self) -> List[FrozenTrial]:
         return self._optuna_study.trials
 
     @property
-    def pruned_trial(self) -> List[FrozenTrial]:
+    def optuna_pruned_trial(self) -> List[FrozenTrial]:
         return self._optuna_study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
 
     @property
-    def complete_trials(self) -> List[FrozenTrial]:
+    def optuna_complete_trials(self) -> List[FrozenTrial]:
         return self._optuna_study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
 
     @property
-    def best_trial(self) -> FrozenTrial:
+    def optuna_best_trial(self) -> FrozenTrial:
         return self._optuna_study.best_trial
 
     @property
     def best_params(self):
         if self.experiment_manager == "wandb":
-            return self._wandb_api.sweep(self._objective_work.sweep_url).best_run().config
+            return self._wandb_api.sweep(self.sweep_url).best_run().config
         if self.experiment_manager == "optuna":
-            return self._study.best_params
+            return self.optuna_study.best_params
 
     @property
     def artifact_path(self) -> str:
@@ -241,12 +241,12 @@ class SweepWork:
             wandb.agent(self.sweep_id, function=self._wandb_objective, count=self.trial_count)
 
         if self.experiment_manager == "optuna":
-            self._study.optimize(self._optuna_objective, n_trials=self.trial_count, timeout=600)
+            self.optuna_study.optimize(self._optuna_objective, n_trials=self.trial_count, timeout=600)
 
         if display_report:
             self._display_report(
                 trial_metric_names=list(self.best_params.keys()),
-                trial_info=list(self.best_params.values()),
+                trial_info=list(str(i) for i in self.best_params.values()),
             )
         if persist_model:
             self.persist_model()

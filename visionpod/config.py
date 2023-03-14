@@ -73,17 +73,16 @@ class Trainer:
         precision=16,
         **_maybe_use_mps,
     )
-    default_flags = dict(
+    train_flags = dict(
         max_epochs=100,
-        callbacks=[EarlyStopping(monitor="val_loss", mode="min")],
         precision=16,
+        callbacks=[EarlyStopping(monitor="val_loss", mode="min")],
         **_maybe_use_mps,
     )
     sweep_flags = dict(
-        max_epochs=10,
-        callbacks=[
-            EarlyStopping(monitor="training_loss", mode="min"),
-        ],
+        max_epochs=20,
+        precision=16,
+        **_maybe_use_mps,
     )
 
 
@@ -94,7 +93,8 @@ class Sweep:
         parameters={
             "lr": {"min": 0.0001, "max": 0.1},
             "optimizer": {"distribution": "categorical", "values": ["Adam", "RMSprop", "SGD"]},
-            # "dropout": {"min": 0.2, "max": 0.5},
+            "dropout": {"min": 0.2, "max": 0.5},
+            "attention_dropout": {"min": 0.2, "max": 0.5},
         },
     )
 
