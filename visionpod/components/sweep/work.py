@@ -46,10 +46,12 @@ class SweepWork(LightningWork):
         self.sweep_config = sweep_config
         self.trainer_init_kwargs = trainer_init_kwargs
         self.trial_number = 1
+        self.run_sentinel = 0
         self.trial_count = trial_count
+        # must be instantiated in __init__
+        # ._ makes a non JSON-serializable attribute private to LightningWork
         self._datamodule = PodDataModule()
         self._wandb_api = wandb.Api()
-        self.run_sentinel = 0
         self._trainer = None
         self.sweep_id = None
         self.sweep_name = None
@@ -105,16 +107,19 @@ class SweepWork(LightningWork):
         return self._trainer.callback_metrics["val_acc"].item()
 
     def run(self) -> float:
-        print(self.run_sentinel)
-        if self.run_sentinel == 0:
+        # guard if wandb.agent isn't blocking
+        if self.run_sentinel == 0:  # remove if agent is blocking
             self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=self.project_name)
             self.sweep_name = "-".join(["Sweep", self.sweep_id])
             self.sweep_config.update({"name": self.sweep_name})
+        # should be blocking
         wandb.agent(self.sweep_id, function=self.objective, count=self.trial_count)
-        # should only run after agent is done
-        if self.run_sentinel == self.trial_count:
+        # called after agent is complete
+        # protect if agent isn't blocking
+        if self.trial_number == self.trial_count:
             os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
-        self.run_sentinel += 1
+        # increment sentinel so that sweep_id and sweep_name aren't updated
+        self.run_sentinel += 1  # remove if agent is blocking
 
 
 app = LightningApp(SweepWork(**config.Sweep.work_kwargs))
