@@ -18,9 +18,8 @@ from lightning import LightningApp, LightningWork
 from lightning.pytorch.loggers import WandbLogger
 
 import wandb
-from visionpod import config, PodModule, PodTrainer
+from visionpod import config, PodDataModule, PodModule, PodTrainer
 from visionpod.components import SweepWork
-from visionpod.pipeline.datamodule import PodDataModule
 
 
 class TrainerWork(LightningWork):

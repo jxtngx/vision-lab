@@ -16,7 +16,8 @@ import os
 from pathlib import Path
 
 import torch
-from visionpod.pipeline.datamodule import PodDataModule
+
+from visionpod import PodDataModule
 
 
 def test_module_not_abstract():

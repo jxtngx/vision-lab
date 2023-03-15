@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from visionpod.core import PodModule, PodTrainer  # noqa: F401
+from visionpod.pipeline import PodDataModule  # noqa: F401
