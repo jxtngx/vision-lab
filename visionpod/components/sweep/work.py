@@ -56,7 +56,7 @@ class SweepWork(LightningWork):
         self.sweep_id = None
         self.sweep_name = None
 
-        print("status", self.status)
+        print("sweep huh")
 
     @property
     def wandb_settings(self) -> Dict[str, Any] | None:

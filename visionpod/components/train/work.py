@@ -24,7 +24,7 @@ from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
 from visionpod.pipeline.datamodule import PodDataModule
 
-print("huh 1")
+print("trainer huh 1")
 
 
 class TrainerWork(LightningWork):
@@ -53,7 +53,7 @@ class TrainerWork(LightningWork):
             raise ValueError("set sweep cannot be true if providing module_kwargs")
 
         if sweep:
-            print("huh 2")
+            print("trainer huh 2")
             self._sweep_work = SweepWork(**sweep_kwargs)
 
         self.project_name = project_name
@@ -158,7 +158,7 @@ class TrainerWork(LightningWork):
     ) -> None:
 
         if self.sweep:
-            print(f"sweep: {self.sweep}")
+            print("trainer huh 3")
             # should be blocking
             self._sweep_work.run()
             # should only run after above is complete

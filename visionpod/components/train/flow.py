@@ -16,7 +16,8 @@
 from lightning import LightningApp, LightningFlow
 
 from visionpod import config
-from visionpod.components import SweepWork, TrainerWork
+from visionpod.components.sweep import SweepWork
+from visionpod.components.train.work import TrainerWork
 
 
 class TrainerFlow(LightningFlow):
