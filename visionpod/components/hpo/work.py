@@ -85,10 +85,14 @@ class SweepWork:
             save_dir=self.wandb_save_dir,
         )
 
-        lr = wandb.config.lr
-        optimizer = wandb.config.optimizer
+        hyperparameters = dict(
+            optimizer=wandb.config.optimizer,
+            lr=wandb.config.lr,
+            dropout=wandb.config.dropout,
+            attention_dropout=wandb.config.attention_dropout,
+        )
 
-        model = PodModule(optimizer=optimizer, lr=lr)
+        model = PodModule(**hyperparameters)
 
         self.trainer = PodTrainer(
             logger=logger,
@@ -96,7 +100,7 @@ class SweepWork:
         )
 
         # logs hyperparameters to logs/wandb_logs/wandb/{run_name}/files/config.yaml
-        hyperparameters = dict(optimizer=optimizer, lr=lr)
+
         self.trainer.logger.log_hyperparams(hyperparameters)
 
         self.trainer.fit(model=model, datamodule=self.datamodule)
