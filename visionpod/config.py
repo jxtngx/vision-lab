@@ -17,6 +17,7 @@ from functools import partial
 from pathlib import Path
 
 import torch
+from lightning.app import CloudCompute
 from lightning.pytorch.accelerators.mps import MPSAccelerator
 from lightning.pytorch.callbacks import EarlyStopping
 from torchvision import transforms
@@ -79,7 +80,7 @@ class Trainer:
         **_maybe_use_mps,
     )
     sweep_flags = dict(
-        max_epochs=20,
+        max_epochs=5,
         precision=16,
         **_maybe_use_mps,
     )
@@ -135,3 +136,8 @@ class DataModule:
             transforms.Normalize(mean=inverse_mean, std=[1.0, 1.0, 1.0]),
         ]
     )
+
+
+class Compute:
+    train_compute = CloudCompute()
+    sweep_compute = CloudCompute()

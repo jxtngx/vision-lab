@@ -56,6 +56,8 @@ class SweepWork(LightningWork):
         self.sweep_id = None
         self.sweep_name = None
 
+        print("status", self.status)
+
     @property
     def wandb_settings(self) -> Dict[str, Any] | None:
         if hasattr(self, "trainer"):
@@ -77,6 +79,7 @@ class SweepWork(LightningWork):
             return self._wandb_api.sweep(self.sweep_url).best_run().config
 
     def objective(self) -> float:
+
         logger = WandbLogger(
             project=self.project_name,
             name="-".join(["sweep", self.sweep_id, "trial", str(self.trial_number)]),
@@ -108,6 +111,8 @@ class SweepWork(LightningWork):
 
     def run(self) -> float:
         # guard if wandb.agent isn't blocking
+        print(f"trial number: {self.trial_number}")
+        print(f"run sentinel: {self.run_sentinel}")
         if self.run_sentinel == 0:  # remove if agent is blocking
             self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=self.project_name)
             self.sweep_name = "-".join(["Sweep", self.sweep_id])
