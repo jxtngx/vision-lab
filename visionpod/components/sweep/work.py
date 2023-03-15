@@ -44,19 +44,20 @@ class SweepWork(LightningWork):
         self.project_name = project_name
         self.wandb_save_dir = wandb_save_dir
         self.sweep_config = sweep_config
-        self.sweep_id = None
-        self.sweep_name = None
         self.trainer_init_kwargs = trainer_init_kwargs
         self.trial_number = 1
         self.trial_count = trial_count
         self._datamodule = PodDataModule()
         self._wandb_api = wandb.Api()
         self.run_sentinel = 0
+        self._trainer = None
+        self.sweep_id = None
+        self.sweep_name = None
 
     @property
     def wandb_settings(self) -> Dict[str, Any] | None:
         if hasattr(self, "trainer"):
-            return self.trainer.logger.experiment.settings
+            return self._trainer.logger.experiment.settings
 
     @property
     def sweep_url(self) -> str | None:
@@ -66,7 +67,7 @@ class SweepWork(LightningWork):
     @property
     def entity(self) -> str | None:
         if hasattr(self, "trainer"):
-            return self.trainer.logger.experiment.entity
+            return self._trainer.logger.experiment.entity
 
     @property
     def best_params(self) -> Dict[str, Any] | None:
@@ -90,18 +91,18 @@ class SweepWork(LightningWork):
 
         model = PodModule(**hyperparameters)
 
-        self.trainer = PodTrainer(
+        self._trainer = PodTrainer(
             logger=logger,
             **self.trainer_init_kwargs,
         )
 
-        self.trainer.logger.log_hyperparams(hyperparameters)
+        self._trainer.logger.log_hyperparams(hyperparameters)
 
-        self.trainer.fit(model=model, datamodule=self._datamodule)
+        self._trainer.fit(model=model, datamodule=self._datamodule)
 
         self.trial_number += 1
 
-        return self.trainer.callback_metrics["val_acc"].item()
+        return self._trainer.callback_metrics["val_acc"].item()
 
     def run(self) -> float:
         print(self.run_sentinel)
@@ -116,4 +117,4 @@ class SweepWork(LightningWork):
         self.run_sentinel += 1
 
 
-app = LightningApp(SweepWork(config.Sweep.work_kwargs))
+app = LightningApp(SweepWork(**config.Sweep.work_kwargs))
