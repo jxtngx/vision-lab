@@ -96,6 +96,14 @@ class Sweep:
             "attention_dropout": {"min": 0.2, "max": 0.5},
         },
     )
+    work_kwargs = dict(
+        wandb_save_dir=Paths.wandb_logs,
+        project_name="visionpod",
+        trial_count=10,
+        sweep_config=config,
+        trainer_init_kwargs=Trainer.sweep_flags,
+        parallel=False,
+    )
 
 
 class DataModule:

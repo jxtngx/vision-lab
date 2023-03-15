@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 from typing import Any, Dict, Optional
 
 from lightning import LightningWork
@@ -20,13 +19,13 @@ from lightning.pytorch.loggers import WandbLogger
 
 import wandb
 from visionpod import config
-from visionpod.components.hpo import SweepWork
+from visionpod.components.sweep import SweepWork
 from visionpod.core.module import PodModule
 from visionpod.core.trainer import PodTrainer
 from visionpod.pipeline.datamodule import PodDataModule
 
 
-class TrainerWork:
+class TrainerWork(LightningWork):
     def __init__(
         self,
         trainer_flags: Dict[str, Any] = config.Trainer.train_flags,
@@ -34,11 +33,16 @@ class TrainerWork:
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
         sweep: bool = False,
+        sweep_kwargs: Optional[Dict[str, Any]] = None,
         trial_count: Optional[int] = None,
-        experiment_manager: str = "wandb",
         project_name: Optional[str] = None,
         fast_train_run: bool = False,
+        fast_sweep_run: bool = False,
+        parallel: bool = True,
+        **kwargs
     ) -> None:
+
+        super().__init__(parallel=parallel, **kwargs)
 
         if not sweep and not module_kwargs:
             raise ValueError("either module_kwargs must be provided, or sweep must be true")
@@ -46,15 +50,18 @@ class TrainerWork:
         if sweep and module_kwargs:
             raise ValueError("set sweep cannot be true if providing module_kwargs")
 
+        if sweep:
+            self._sweep_work = SweepWork(**sweep_kwargs)
+
         self.trainer_flags = trainer_flags
         self.module_kwargs = module_kwargs
         self.model_hypers = model_hypers
         self.model_kwargs = model_kwargs
-        self.experiment_manager = experiment_manager
         self.project_name = project_name
         self.sweep = sweep
         self.trial_count = trial_count
         self.fast_train_run = fast_train_run
+        self.fast_sweep_run = fast_sweep_run
 
         self.model = PodModule(
             lr=self.lr,
@@ -71,54 +78,50 @@ class TrainerWork:
         self.trainer = PodTrainer(**self.trainer_flags)
 
     @property
-    def best_params(self) -> Dict[str, Any]:
-        return self._sweep_flow.best_params
-
-    @property
     def lr(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["lr"]
+        if self.sweep:
+            return self.best_params["lr"]
         else:
             return self.module_kwargs["lr"]
 
     @property
     def optimizer(self) -> str:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["optimizer"]
+        if self.sweep:
+            return self.best_params["optimizer"]
         else:
             return self.module_kwargs["optimizer"]
 
     @property
     def dropout(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["dropout"]
+        if self.sweep:
+            return self.best_params["dropout"]
         else:
             return self.model_hypers["dropout"]
 
     @property
     def attention_dropout(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["attention_dropout"]
+        if self.sweep:
+            return self.best_params["attention_dropout"]
         else:
             return self.model_hypers["attention_dropout"]
 
     @property
     def norm_layer(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["norm_layer"]
+        if self.sweep:
+            return self.best_params["norm_layer"]
         else:
             return self.model_hypers["norm_layer"]
 
     @property
     def conv_stem_configs(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["conv_stem_configs"]
+        if self.sweep:
+            return self.best_params["conv_stem_configs"]
         else:
             return self.model_hypers["conv_stem_configs"]
 
     @property
     def group_name(self) -> str:
-        if hasattr(self, "_sweep_flow"):
+        if self.sweep:
             return "Tuned Training Runs"
         else:
             if self.fast_train_run:
@@ -128,7 +131,7 @@ class TrainerWork:
 
     @property
     def run_name(self) -> str:
-        if hasattr(self, "_sweep_flow"):
+        if self.sweep:
             return self.group_name.replace("Sweep", "tuned")
         else:
             if self.fast_train_run:
@@ -151,8 +154,10 @@ class TrainerWork:
     ) -> None:
 
         if self.sweep:
-            self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=self.trial_count)
-            self._sweep_flow.run()
+            # should be blocking
+            self._sweep_work.run()
+            # should only run after above is complete
+            self._sweep_work.stop()
 
         self.logger = WandbLogger(
             project=self.project_name,
@@ -167,5 +172,3 @@ class TrainerWork:
             self.persist_model()
         if persist_predictions:
             self.persist_predictions(predictions_dir)
-        if issubclass(TrainerWork, LightningWork):
-            sys.exit()

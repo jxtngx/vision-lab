@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import os
-import sys
 from typing import Any, Dict, Optional
 
-from lightning import LightningWork
+from lightning import LightningApp, LightningWork
 from lightning.pytorch.loggers import WandbLogger
 
 import wandb
@@ -26,56 +25,53 @@ from visionpod.core.trainer import PodTrainer
 from visionpod.pipeline.datamodule import PodDataModule
 
 
-class SweepWork:
-    """
-    Notes:
-        see: https://community.wandb.ai/t/run-best-model-off-sweep/2423
-    """
+class SweepWork(LightningWork):
+    """manages hyperparameter tuning with W&B Sweeps"""
 
     def __init__(
         self,
         wandb_save_dir: Optional[str] = config.Paths.wandb_logs,
-        project_name: Optional[str] = None,
+        project_name: Optional[str] = "visionpod",
         trial_count: int = 10,
         sweep_config: Dict[str, Any] = config.Sweep.config,
         trainer_init_kwargs: Dict[str, Any] = config.Trainer.sweep_flags,
+        parallel: bool = False,
+        **kwargs,
     ):
+
+        super().__init__(parallel=parallel, cache_calls=True, **kwargs)
+
         self.project_name = project_name
         self.wandb_save_dir = wandb_save_dir
         self.sweep_config = sweep_config
+        self.sweep_id = None
+        self.sweep_name = None
         self.trainer_init_kwargs = trainer_init_kwargs
         self.trial_number = 1
         self.trial_count = trial_count
-
-        self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=project_name)
-        self.sweep_name = "-".join(["Sweep", self.sweep_id])
-        self.sweep_config.update({"name": self.sweep_name})
-        self.datamodule = PodDataModule()
-
+        self._datamodule = PodDataModule()
         self._wandb_api = wandb.Api()
+        self.run_sentinel = 0
 
     @property
-    def wandb_settings(self) -> Dict[str, Any]:
-        return self.trainer.logger.experiment.settings
+    def wandb_settings(self) -> Dict[str, Any] | None:
+        if hasattr(self, "trainer"):
+            return self.trainer.logger.experiment.settings
 
     @property
-    def sweep_url(self) -> str:
-        return "/".join([self.entity, self.project_name, "sweeps", self.sweep_id])
+    def sweep_url(self) -> str | None:
+        if hasattr(self, "trainer"):
+            return "/".join([self.entity, self.project_name, "sweeps", self.sweep_id])
 
     @property
-    def entity(self) -> str:
-        return self.trainer.logger.experiment.entity
+    def entity(self) -> str | None:
+        if hasattr(self, "trainer"):
+            return self.trainer.logger.experiment.entity
 
     @property
-    def best_params(self):
-        return self._wandb_api.sweep(self.sweep_url).best_run().config
-
-    def persist_model(self) -> None:
-        input_sample = self.trainer.datamodule.train_data.dataset[0][0]
-        self.trainer.model.to_onnx(config.Paths.model, input_sample=input_sample, export_params=True)
-
-    def persist_predictions(self) -> None:
-        self.trainer.persist_predictions()
+    def best_params(self) -> Dict[str, Any] | None:
+        if hasattr(self, "trainer"):
+            return self._wandb_api.sweep(self.sweep_url).best_run().config
 
     def objective(self) -> float:
         logger = WandbLogger(
@@ -99,27 +95,25 @@ class SweepWork:
             **self.trainer_init_kwargs,
         )
 
-        # logs hyperparameters to logs/wandb_logs/wandb/{run_name}/files/config.yaml
-
         self.trainer.logger.log_hyperparams(hyperparameters)
 
-        self.trainer.fit(model=model, datamodule=self.datamodule)
+        self.trainer.fit(model=model, datamodule=self._datamodule)
 
         self.trial_number += 1
 
         return self.trainer.callback_metrics["val_acc"].item()
 
-    def run(self, persist_model: bool = False, persist_predictions: bool = False) -> float:
-
+    def run(self) -> float:
+        print(self.run_sentinel)
+        if self.run_sentinel == 0:
+            self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=self.project_name)
+            self.sweep_name = "-".join(["Sweep", self.sweep_id])
+            self.sweep_config.update({"name": self.sweep_name})
         wandb.agent(self.sweep_id, function=self.objective, count=self.trial_count)
+        # should only run after agent is done
+        if self.run_sentinel == self.trial_count:
+            os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
+        self.run_sentinel += 1
 
-        if persist_model:
-            self.persist_model()
-        if persist_predictions:
-            self.persist_predictions()
-        if issubclass(SweepWork, LightningWork):
-            self.stop()
 
-    def stop(self) -> None:
-        os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
-        sys.exit()
+app = LightningApp(SweepWork(config.Sweep.work_kwargs))
