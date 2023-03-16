@@ -117,15 +117,37 @@ cd ..
 
 ## Usage
 
-Using this template will require accounts for Lightning, Weights and Biases, Supabase, Zuplo and Vercel.
+Using this template will require accounts for Lightning + Weights and Biases.
 
-After creating a W&B account and installing the development environment, a training run can be ran locally with:
+After creating a W&B account and installing the development environment, a training run can be ran locally with any of the following command line examples.
+
+If you are on an M1 powered mac, be sure to set the following environment variable to train with MPS:
+
+```sh
+export PYTORCH_ENABLE_MPS_FALLBACK=1
+```
+
+then, to train or run a Sweep, do any of the following:
 
 ```sh
 pod trainer run fast-train
 ```
 
-Running the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.
+alternately, a Lightning App version can be ran with:
+
+```sh
+cd apps/
+lightning run app trainer_app.py
+```
+
+or, if you'd prefer to perform a wandb Sweep and then run a tuned trainer, do:
+
+```sh
+cd apps/
+lightning run app tuned_trainer.py
+```
+
+Running any of the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.
 
 Once the run is complete, a prototype UI can be ran locally with:
 
