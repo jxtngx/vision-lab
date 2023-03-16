@@ -110,7 +110,6 @@ class Sweep:
         wandb_save_dir=Paths.wandb_logs,
         project_name="visionpod",
         trial_count=10,
-        sweep_config=config,
         trainer_init_kwargs=Trainer.sweep_flags,
         parallel=False,
     )

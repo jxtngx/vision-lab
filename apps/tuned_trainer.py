@@ -23,9 +23,10 @@ app = LightningApp(
         fast_train_run=False,
         sweep=True,
         module_kwargs=None,
-        sweep_work_kwargs=config.Sweep.work_kwargs,
-        sweep_confif=config.Sweep.config,
+        sweep_init_kwargs=config.Sweep.work_kwargs,
+        sweep_config=config.Sweep.config,
         trainer_flags=config.Trainer.train_flags,
+        persist_predictions=True,
     )
 )
 
