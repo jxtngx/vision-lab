@@ -15,10 +15,11 @@
 import os
 from typing import Any, Dict, Optional
 
-from lightning import LightningApp, LightningWork
+import wandb
+from lightning import LightningWork
+from lightning.app.utilities.enum import WorkStageStatus
 from lightning.pytorch.loggers import WandbLogger
 
-import wandb
 from visionpod import config, PodDataModule, PodModule, PodTrainer
 
 
@@ -28,7 +29,7 @@ class SweepWork(LightningWork):
     def __init__(
         self,
         wandb_save_dir: Optional[str] = config.Paths.wandb_logs,
-        project_name: Optional[str] = "visionpod",
+        project_name: Optional[str] = config.Settings.projectname,
         trial_count: int = 10,
         sweep_config: Dict[str, Any] = config.Sweep.config,
         trainer_init_kwargs: Dict[str, Any] = config.Trainer.sweep_flags,
@@ -48,7 +49,7 @@ class SweepWork(LightningWork):
         # must be instantiated in __init__
         # ._ makes a non JSON-serializable attribute private to LightningWork
         self._datamodule = PodDataModule()
-        self._wandb_api = wandb.Api()
+        self._wandb_api = wandb.Api(api_key=config.ExperimentManager.WANDB_API_KEY)
         self._trainer = None
         self.sweep_id = None
         self.sweep_name = None
@@ -82,21 +83,21 @@ class SweepWork(LightningWork):
             save_dir=self.wandb_save_dir,
         )
 
-        hyperparameters = dict(
+        learnable_parameters = dict(
             optimizer=wandb.config.optimizer,
             lr=wandb.config.lr,
             dropout=wandb.config.dropout,
             attention_dropout=wandb.config.attention_dropout,
         )
 
-        model = PodModule(**hyperparameters)
+        model = PodModule(**learnable_parameters)
 
         self._trainer = PodTrainer(
             logger=logger,
             **self.trainer_init_kwargs,
         )
 
-        self._trainer.logger.log_hyperparams(hyperparameters)
+        self._trainer.logger.log_hyperparams(learnable_parameters)
 
         self._trainer.fit(model=model, datamodule=self._datamodule)
 
@@ -106,8 +107,6 @@ class SweepWork(LightningWork):
 
     def run(self) -> float:
         # guard if wandb.agent isn't blocking
-        print(f"trial number: {self.trial_number}")
-        print(f"run sentinel: {self.run_sentinel}")
         if self.run_sentinel == 0:  # remove if agent is blocking
             self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=self.project_name)
             self.sweep_name = "-".join(["Sweep", self.sweep_id])
@@ -118,8 +117,6 @@ class SweepWork(LightningWork):
         # protect if agent isn't blocking
         if self.trial_number == self.trial_count:
             os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
+            self.status.stage = WorkStageStatus.SUCCEEDED
         # increment sentinel so that sweep_id and sweep_name aren't updated
         self.run_sentinel += 1  # remove if agent is blocking
-
-
-app = LightningApp(SweepWork(**config.Sweep.work_kwargs))

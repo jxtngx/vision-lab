@@ -13,18 +13,28 @@
 # limitations under the License.
 
 import os
+import sys
 from functools import partial
 from pathlib import Path
 
 import torch
 from lightning.app import CloudCompute
+from lightning.app.utilities.cloud import is_running_in_cloud
 from lightning.pytorch.accelerators.mps import MPSAccelerator
 from lightning.pytorch.callbacks import EarlyStopping
 from torchvision import transforms
 
+IS_CLOUD_RUN = is_running_in_cloud()
+
 
 class Settings:
     seed = 42
+    projectname = "visionpod"
+
+
+class System:
+    is_cloud_run = is_running_in_cloud()
+    platform = sys.platform
 
 
 class Paths:
@@ -139,5 +149,10 @@ class DataModule:
 
 
 class Compute:
-    train_compute = CloudCompute()
-    sweep_compute = CloudCompute()
+    train_compute = CloudCompute(name="")
+    sweep_compute = CloudCompute(name="default", idle_timeout=10)
+
+
+class ExperimentManager:
+    WANDB_API_KEY = None if not IS_CLOUD_RUN else os.getenv("WANDB-API-KEY")
+    WANDB_ENTITY = None if not IS_CLOUD_RUN else os.getenv("WANDB-ENTITY")
