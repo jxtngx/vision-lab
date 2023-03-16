@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 from typing import Any, Callable, Dict, Optional
 
 from lightning import LightningApp, LightningWork
+from lightning.app.utilities.enum import WorkStageStatus
 from lightning.pytorch.loggers import WandbLogger
 
 import wandb
 from visionpod import config, PodDataModule, PodModule, PodTrainer
-from visionpod.components import SweepWork
 
 
 class TrainerWork(LightningWork):
@@ -30,7 +31,7 @@ class TrainerWork(LightningWork):
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
         sweep: bool = False,
-        sweep_kwargs: Optional[Dict[str, Any]] = None,
+        sweep_kwargs: Optional[Dict[str, Any]] = {},
         trial_count: Optional[int] = None,
         project_name: Optional[str] = "visionpod",
         fast_train_run: bool = False,
@@ -48,6 +49,8 @@ class TrainerWork(LightningWork):
             raise ValueError("set sweep cannot be true if providing module_kwargs")
 
         if sweep:
+            from visionpod.components import SweepWork
+
             self._sweep_work = SweepWork(**sweep_kwargs)
 
         self.project_name = project_name
@@ -61,17 +64,9 @@ class TrainerWork(LightningWork):
         self._module_kwargs = module_kwargs
         self._model_kwargs = model_kwargs
         self._model_hypers = model_hypers
-
-        self._model = PodModule(
-            lr=self.lr,
-            optimizer=self.optimizer,
-            attention_dropout=self.attention_dropout,
-            conv_stem_configs=self.conv_stem_configs,
-            dropout=self.dropout,
-            norm_layer=self.norm_layer,
-            **self._model_kwargs,
-        )
-        self._datamodule = PodDataModule()
+        # init here to appease App and make private
+        self._model = None
+        self._datamodule = None
         self._trainer = None
         self._logger = None
 
@@ -157,6 +152,18 @@ class TrainerWork(LightningWork):
             # should only run after above is complete
             self._sweep_work.stop()
 
+        self._model = PodModule(
+            lr=self.lr,
+            optimizer=self.optimizer,
+            attention_dropout=self.attention_dropout,
+            conv_stem_configs=self.conv_stem_configs,
+            dropout=self.dropout,
+            norm_layer=self.norm_layer,
+            **self._model_kwargs,
+        )
+
+        self._datamodule = PodDataModule()
+
         self._logger = WandbLogger(
             project=self.project_name,
             name=self.run_name,
@@ -167,10 +174,14 @@ class TrainerWork(LightningWork):
         self._trainer = PodTrainer(logger=self._logger, **self._trainer_flags)
         self._trainer.fit(model=self._model, datamodule=self._datamodule)
 
+        self._trainer.logger.experiment.finish()
+
         if persist_model:
             self.persist_model()
         if persist_predictions:
             self.persist_predictions(predictions_dir)
+
+        self.status.stage = WorkStageStatus.SUCCEEDED
 
 
 app = LightningApp(
@@ -180,3 +191,7 @@ app = LightningApp(
         sweep=False,
     )
 )
+
+if sys.platform == "darwin":
+    if app.named_works[0][1].has_succeeded:
+        app.named_works[0][1].stop()
