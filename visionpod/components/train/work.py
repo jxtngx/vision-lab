@@ -23,7 +23,7 @@ from visionpod import config, PodDataModule, PodModule, PodTrainer
 
 
 class TrainerWork(LightningWork):
-    """trains PodModule in sin"""
+    """trains PodModule with optional HPO Sweep"""
 
     def __init__(
         self,
@@ -31,8 +31,8 @@ class TrainerWork(LightningWork):
         module_kwargs: Optional[Dict[str, Any]] = config.Args.module_kwargs,
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
-        sweep_kwargs: Optional[Dict[str, Any]] = None,
-        trial_count: Optional[int] = None,
+        sweep_work_kwargs: Optional[Dict[str, Any]] = None,
+        sweep_config: Optional[Dict[str, Any]] = None,
         project_name: Optional[str] = config.Settings.projectname,
         sweep: bool = False,
         fast_train_run: bool = False,
@@ -52,18 +52,18 @@ class TrainerWork(LightningWork):
         if sweep and module_kwargs:
             raise ValueError("set sweep cannot be true if providing module_kwargs")
 
-        if sweep and not sweep_kwargs:
+        if sweep and not sweep_work_kwargs:
             raise ValueError("sweep_kwargs must be provided if running a sweep")
 
         if sweep:
             # guard against app.run.dispatch
             from visionpod.components import SweepWork
 
-            self._sweep_work = SweepWork(**sweep_kwargs)
+            sweep_payload = {**sweep_work_kwargs, **sweep_config}
+            self._sweep_work = SweepWork(**sweep_payload)
 
         self.project_name = project_name
         self.sweep = sweep
-        self.trial_count = trial_count
         self.fast_train_run = fast_train_run
         self.fast_sweep_run = fast_sweep_run
         self.persist_model = persist_model

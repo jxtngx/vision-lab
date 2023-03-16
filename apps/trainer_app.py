@@ -26,6 +26,8 @@ app = LightningApp(
     )
 )
 
+root_work = app.named_works[0][1]
+
 if not config.System.is_cloud_run:
-    if app.named_works[0][1].has_succeeded:
-        app.named_works[0][1].stop()
+    if root_work.has_succeeded:
+        root_work.stop()

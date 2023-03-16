@@ -24,12 +24,11 @@ from lightning.pytorch.accelerators.mps import MPSAccelerator
 from lightning.pytorch.callbacks import EarlyStopping
 from torchvision import transforms
 
-IS_CLOUD_RUN = is_running_in_cloud()
-
 
 class Settings:
     seed = 42
     projectname = "visionpod"
+    data_version = "0"
 
 
 class System:
@@ -50,9 +49,9 @@ class Paths:
     predictions = os.path.join(project, "data", "predictions", "predictions.pt")
     dataset = os.path.join(project, "data", "cache")
     splits = os.path.join(project, "data", "training_split")
-    train_split = os.path.join(splits, "train.pt")
-    val_split = os.path.join(splits, "val.pt")
-    test_split = os.path.join(splits, "test.pt")
+    train_split = os.path.join(splits, f"v{Settings.data_version}-train.pt")
+    val_split = os.path.join(splits, f"v{Settings.data_version}-val.pt")
+    test_split = os.path.join(splits, f"v{Settings.data_version}-test.pt")
     wandb_logs = os.path.join(project, "logs", "wandb")
     wandb_summary = os.path.join(project, "logs", "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
 
@@ -149,10 +148,11 @@ class DataModule:
 
 
 class Compute:
-    train_compute = CloudCompute(name="")
+    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=10)
     sweep_compute = CloudCompute(name="default", idle_timeout=10)
+    flow_compute = CloudCompute(name="default")
 
 
 class ExperimentManager:
-    WANDB_API_KEY = None if not IS_CLOUD_RUN else os.getenv("WANDB-API-KEY")
-    WANDB_ENTITY = None if not IS_CLOUD_RUN else os.getenv("WANDB-ENTITY")
+    WANDB_API_KEY = None if not System.is_cloud_run else os.getenv("WANDB-API-KEY")
+    WANDB_ENTITY = None if not System.is_cloud_run else os.getenv("WANDB-ENTITY")

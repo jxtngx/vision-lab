@@ -16,9 +16,18 @@
 from lightning import LightningApp
 
 from visionpod import config
-from visionpod.components import SweepWork
+from visionpod.components import TrainerWork
 
-app = LightningApp(SweepWork(**config.Sweep.work_kwargs))
+app = LightningApp(
+    TrainerWork(
+        fast_train_run=False,
+        sweep=True,
+        module_kwargs=None,
+        sweep_work_kwargs=config.Sweep.work_kwargs,
+        sweep_confif=config.Sweep.config,
+        trainer_flags=config.Trainer.train_flags,
+    )
+)
 
 root_work = app.named_works[0][1]
 

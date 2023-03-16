@@ -33,6 +33,8 @@ metrics = make_metrics_summary()
 metrics_names = list(metrics.keys())
 metrics_values = [round(i, 4) for i in list(metrics.values())]
 
+print(metrics)
+
 # APP LAYOUT
 NavBar = dbc.NavbarSimple(
     brand="VisionTransformer Base 32",
