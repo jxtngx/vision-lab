@@ -25,8 +25,8 @@ from visionpod import config, PodModule
 
 
 def make_metrics_summary():
-    summary = json.load(open(config.Paths.wandb_summary))
-    print(summary)
+    summary = json.load(open(config.Paths.demo_wandb_summary))
+    summary = dict(summary)
     collection = {
         "Val Loss": summary["val_loss"],
         "Val Acc": summary["val_acc"],
