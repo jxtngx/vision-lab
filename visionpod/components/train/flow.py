@@ -28,7 +28,7 @@ class TrainerFlow(LightningFlow):
         super().__init__()
 
         if sweep:
-            self._sweep_work = SweepWork(**config.Sweep.work_kwargs)
+            self._sweep_work = SweepWork(**config.Sweep.init_kwargs)
 
         self._trainer_work = TrainerWork()
 

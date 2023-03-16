@@ -80,11 +80,6 @@ class Args:
 
 class Trainer:
     _maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
-    fast_flags = dict(
-        max_epochs=5,
-        precision=16,
-        **_maybe_use_mps,
-    )
     train_flags = dict(
         max_epochs=100,
         precision=16,
@@ -92,6 +87,16 @@ class Trainer:
         **_maybe_use_mps,
     )
     sweep_flags = dict(
+        max_epochs=10,
+        precision=16,
+        **_maybe_use_mps,
+    )
+    fast_flags = dict(
+        max_epochs=10,
+        precision=16,
+        **_maybe_use_mps,
+    )
+    fast_sweep_flags = dict(
         max_epochs=5,
         precision=16,
         **_maybe_use_mps,
@@ -109,11 +114,18 @@ class Sweep:
             "attention_dropout": {"min": 0.2, "max": 0.5},
         },
     )
-    work_kwargs = dict(
+    init_kwargs = dict(
         wandb_save_dir=Paths.wandb_logs,
         project_name="visionpod",
         trial_count=10,
-        trainer_init_kwargs=Trainer.sweep_flags,
+        trainer_init_flags=Trainer.sweep_flags,
+        parallel=False,
+    )
+    fast_init_kwargs = dict(
+        wandb_save_dir=Paths.wandb_logs,
+        project_name="visionpod",
+        trial_count=5,
+        trainer_init_flags=Trainer.fast_sweep_flags,
         parallel=False,
     )
 

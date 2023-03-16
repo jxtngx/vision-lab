@@ -32,7 +32,7 @@ class SweepWork(LightningWork):
         project_name: Optional[str] = config.Settings.projectname,
         trial_count: int = 10,
         sweep_config: Dict[str, Any] = config.Sweep.config,
-        trainer_init_kwargs: Dict[str, Any] = config.Trainer.sweep_flags,
+        trainer_init_flags: Dict[str, Any] = config.Trainer.sweep_flags,
         parallel: bool = False,
         **kwargs,
     ):
@@ -42,7 +42,7 @@ class SweepWork(LightningWork):
         self.project_name = project_name
         self.wandb_save_dir = wandb_save_dir
         self.sweep_config = sweep_config
-        self.trainer_init_kwargs = trainer_init_kwargs
+        self.trainer_init_flags = trainer_init_flags
         self.trial_number = 1
         self.run_sentinel = 0
         self.trial_count = trial_count
@@ -94,7 +94,7 @@ class SweepWork(LightningWork):
 
         self._trainer = PodTrainer(
             logger=logger,
-            **self.trainer_init_kwargs,
+            **self.trainer_init_flags,
         )
 
         self._trainer.logger.log_hyperparams(learnable_parameters)

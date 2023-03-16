@@ -32,6 +32,7 @@ class TrainerWork(LightningWork):
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
         sweep_init_kwargs: Optional[Dict[str, Any]] = None,
+        sweep_trainer_flags: Optional[Dict[str, Any]] = None,
         sweep_config: Optional[Dict[str, Any]] = None,
         project_name: Optional[str] = config.Settings.projectname,
         sweep: bool = False,
@@ -59,7 +60,10 @@ class TrainerWork(LightningWork):
             # guard against app.run.dispatch
             from visionpod.components import SweepWork
 
-            self._sweep_work = SweepWork(sweep_config=sweep_config, **sweep_init_kwargs)
+            self._sweep_work = SweepWork(
+                sweep_config=sweep_config,
+                **sweep_init_kwargs,
+            )
 
         self.project_name = project_name
         self.sweep = sweep
