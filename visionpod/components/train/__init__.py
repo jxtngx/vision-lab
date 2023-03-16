@@ -12,4 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from visionpod.components.train.flow import TrainerFlow  # noqa: F401
 from visionpod.components.train.work import TrainerWork  # noqa: F401

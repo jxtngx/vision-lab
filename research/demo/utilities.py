@@ -21,8 +21,7 @@ import plotly.express as px
 from dash import dash_table
 from lightning.pytorch.utilities.model_summary import ModelSummary
 
-from visionpod import config
-from visionpod.core.module import PodModule
+from visionpod import config, PodModule
 
 
 def make_metrics_summary():

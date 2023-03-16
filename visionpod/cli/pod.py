@@ -16,15 +16,11 @@ import os
 
 import click
 
-from visionpod import config
+from visionpod import config, PodDataModule, PodModule, PodTrainer
 from visionpod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
-from visionpod.components.hpo import SweepWork
-from visionpod.components.train import TrainerWork
-from visionpod.core.module import PodModule
-from visionpod.core.trainer import PodTrainer
+from visionpod.components import SweepWork, TrainerWork
 from visionpod.fabric.bugreport import bugreport
 from visionpod.fabric.docs.autogen import PodDocsGenerator
-from visionpod.pipeline.datamodule import PodDataModule
 
 PACKAGE = config.Paths.package
 PROJECT = config.Paths.project
@@ -144,7 +140,7 @@ def fast_sweep(project_name, persist_model, persist_predictions) -> None:
         project_name=project_name,
         trainer_init_kwargs=config.Trainer.fast_flags,
     )
-    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions)
+    trainer.run()
 
 
 @trainer_run.command("tuned")

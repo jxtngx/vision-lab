@@ -193,6 +193,7 @@ outputs/
 /data/cache/
 /data/predictions/*.pt
 /data/training_split/*.pt
+/apps/wandb
 
 # docs
 /docs-src/docs/tutorial*

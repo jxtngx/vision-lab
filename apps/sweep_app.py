@@ -12,4 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from visionpod.pipeline.datamodule import PodDataModule  # noqa: F401
+
+from lightning import LightningApp
+
+from visionpod import config
+from visionpod.components import SweepWork
+
+app = LightningApp(SweepWork(**config.Sweep.work_kwargs))
+
+if not config.System.is_cloud_run:
+    if app.named_works[0][1].has_succeeded:
+        app.named_works[0][1].stop()

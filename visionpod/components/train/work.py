@@ -12,33 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-from typing import Any, Dict, Optional
-
-from lightning import LightningWork
-from lightning.pytorch.loggers import WandbLogger
+from typing import Any, Callable, Dict, Optional
 
 import wandb
-from visionpod import config
-from visionpod.components.hpo import SweepWork
-from visionpod.core.module import PodModule
-from visionpod.core.trainer import PodTrainer
-from visionpod.pipeline.datamodule import PodDataModule
+from lightning import LightningWork
+from lightning.app.utilities.enum import WorkStageStatus
+from lightning.pytorch.loggers import WandbLogger
+
+from visionpod import config, PodDataModule, PodModule, PodTrainer
 
 
-class TrainerWork:
+class TrainerWork(LightningWork):
+    """trains PodModule in sin"""
+
     def __init__(
         self,
         trainer_flags: Dict[str, Any] = config.Trainer.train_flags,
-        module_kwargs: Dict[str, Any] = config.Args.module_kwargs,
+        module_kwargs: Optional[Dict[str, Any]] = config.Args.module_kwargs,
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
-        sweep: bool = False,
+        sweep_kwargs: Optional[Dict[str, Any]] = None,
         trial_count: Optional[int] = None,
-        experiment_manager: str = "wandb",
-        project_name: Optional[str] = None,
+        project_name: Optional[str] = config.Settings.projectname,
+        sweep: bool = False,
         fast_train_run: bool = False,
+        fast_sweep_run: bool = False,
+        parallel: bool = False,
+        persist_model: bool = False,
+        persist_predictions: bool = False,
+        predictions_dir=config.Paths.predictions,
+        **work_kwargs,
     ) -> None:
+
+        super().__init__(parallel=parallel, cache_calls=True, **work_kwargs)
 
         if not sweep and not module_kwargs:
             raise ValueError("either module_kwargs must be provided, or sweep must be true")
@@ -46,79 +52,82 @@ class TrainerWork:
         if sweep and module_kwargs:
             raise ValueError("set sweep cannot be true if providing module_kwargs")
 
-        self.trainer_flags = trainer_flags
-        self.module_kwargs = module_kwargs
-        self.model_hypers = model_hypers
-        self.model_kwargs = model_kwargs
-        self.experiment_manager = experiment_manager
+        if sweep and not sweep_kwargs:
+            raise ValueError("sweep_kwargs must be provided if running a sweep")
+
+        if sweep:
+            # guard against app.run.dispatch
+            from visionpod.components import SweepWork
+
+            self._sweep_work = SweepWork(**sweep_kwargs)
+
         self.project_name = project_name
         self.sweep = sweep
         self.trial_count = trial_count
         self.fast_train_run = fast_train_run
+        self.fast_sweep_run = fast_sweep_run
+        self.persist_model = persist_model
+        self.persist_predictions = persist_predictions
+        self.predictions_dir = predictions_dir
 
-        self.model = PodModule(
-            lr=self.lr,
-            optimizer=self.optimizer,
-            attention_dropout=self.attention_dropout,
-            conv_stem_configs=self.conv_stem_configs,
-            dropout=self.dropout,
-            norm_layer=self.norm_layer,
-            **self.model_kwargs,
-        )
+        # ._ make private to LightningWork
+        self._trainer_flags = trainer_flags
+        self._module_kwargs = module_kwargs
+        self._model_kwargs = model_kwargs
+        self._model_hypers = model_hypers
+        # init here to appease App and make private
+        self._model = None
+        self._datamodule = None
+        self._trainer = None
+        self._logger = None
 
-        self.datamodule = PodDataModule()
-
-        self.trainer = PodTrainer(**self.trainer_flags)
+        wandb.Api(api_key=config.ExperimentManager.WANDB_API_KEY)
 
     @property
-    def best_params(self) -> Dict[str, Any]:
-        return self._sweep_flow.best_params
-
-    @property
-    def lr(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["lr"]
+    def lr(self) -> float | None:
+        if hasattr(self, "_sweep_work"):
+            return self.best_params["lr"]
         else:
-            return self.module_kwargs["lr"]
+            return self._module_kwargs["lr"]
 
     @property
-    def optimizer(self) -> str:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["optimizer"]
+    def optimizer(self) -> str | None:
+        if hasattr(self, "_sweep_work"):
+            return self.best_params["optimizer"]
         else:
-            return self.module_kwargs["optimizer"]
+            return self._module_kwargs["optimizer"]
 
     @property
-    def dropout(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["dropout"]
+    def dropout(self) -> float | None:
+        if hasattr(self, "_sweep_work"):
+            return self.best_params["dropout"]
         else:
-            return self.model_hypers["dropout"]
+            return self._model_hypers["dropout"]
 
     @property
-    def attention_dropout(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["attention_dropout"]
+    def attention_dropout(self) -> float | None:
+        if hasattr(self, "_sweep_work"):
+            return self.best_params["attention_dropout"]
         else:
-            return self.model_hypers["attention_dropout"]
+            return self._model_hypers["attention_dropout"]
 
     @property
-    def norm_layer(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["norm_layer"]
+    def norm_layer(self) -> Callable | None:
+        if hasattr(self, "_sweep_work"):
+            return self.best_params["norm_layer"]
         else:
-            return self.model_hypers["norm_layer"]
+            return self._model_hypers["norm_layer"]
 
     @property
-    def conv_stem_configs(self) -> float:
-        if hasattr(self, "_sweep_flow"):
-            return self._sweep_flow.best_params["conv_stem_configs"]
+    def conv_stem_configs(self):
+        if hasattr(self, "_sweep_work"):
+            return self.best_params["conv_stem_configs"]
         else:
-            return self.model_hypers["conv_stem_configs"]
+            return self._model_hypers["conv_stem_configs"]
 
     @property
     def group_name(self) -> str:
-        if hasattr(self, "_sweep_flow"):
+        if hasattr(self, "_sweep_work"):
             return "Tuned Training Runs"
         else:
             if self.fast_train_run:
@@ -128,7 +137,7 @@ class TrainerWork:
 
     @property
     def run_name(self) -> str:
-        if hasattr(self, "_sweep_flow"):
+        if hasattr(self, "_sweep_work"):
             return self.group_name.replace("Sweep", "tuned")
         else:
             if self.fast_train_run:
@@ -136,36 +145,54 @@ class TrainerWork:
             else:
                 return "-".join(["solo-run", wandb.util.generate_id()])
 
-    def persist_model(self) -> None:
-        input_sample = self.trainer.datamodule.train_data.dataset[0][0]
-        self.trainer.model.to_onnx(config.Paths.model, input_sample=input_sample, export_params=True)
+    @property
+    def entity(self) -> str | None:
+        if hasattr(self, "_logger"):
+            return self._logger.experiment.entity
 
-    def persist_predictions(self, predictions_dir) -> None:
-        self.trainer.persist_predictions(predictions_dir=predictions_dir)
+    def _persist_model(self) -> None:
+        input_sample = self._trainer.datamodule.train_data.dataset[0][0]
+        self._trainer.model.to_onnx(config.Paths.model, input_sample=input_sample, export_params=True)
 
-    def run(
-        self,
-        persist_model: bool = False,
-        persist_predictions: bool = False,
-        predictions_dir=config.Paths.predictions,
-    ) -> None:
+    def _persist_predictions(self, predictions_dir) -> None:
+        self._trainer.persist_predictions(predictions_dir=predictions_dir)
+
+    def run(self) -> None:
 
         if self.sweep:
-            self._sweep_flow = SweepWork(project_name=self.project_name, trial_count=self.trial_count)
-            self._sweep_flow.run()
+            # should be blocking
+            self._sweep_work.run()
+            # should only run after above is complete
+            if self._sweep_work.status.stage == "succeeded":
+                self._sweep_work.stop()
 
-        self.logger = WandbLogger(
+        self._model = PodModule(
+            lr=self.lr,
+            optimizer=self.optimizer,
+            attention_dropout=self.attention_dropout,
+            conv_stem_configs=self.conv_stem_configs,
+            dropout=self.dropout,
+            norm_layer=self.norm_layer,
+            **self._model_kwargs,
+        )
+
+        self._datamodule = PodDataModule()
+
+        self._logger = WandbLogger(
             project=self.project_name,
             name=self.run_name,
             group=self.group_name,
             save_dir=config.Paths.wandb_logs,
         )
-        self.trainer.logger = self.logger
-        self.trainer.fit(model=self.model, datamodule=self.datamodule)
 
-        if persist_model:
-            self.persist_model()
-        if persist_predictions:
-            self.persist_predictions(predictions_dir)
-        if issubclass(TrainerWork, LightningWork):
-            sys.exit()
+        self._trainer = PodTrainer(logger=self._logger, **self._trainer_flags)
+        self._trainer.fit(model=self._model, datamodule=self._datamodule)
+
+        self._trainer.logger.experiment.finish()
+
+        if self.persist_model:
+            self._persist_model()
+        if self.persist_predictions:
+            self._persist_predictions(self.predictions_dir)
+
+        self.status.stage = WorkStageStatus.SUCCEEDED
