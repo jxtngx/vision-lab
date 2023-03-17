@@ -133,7 +133,7 @@ then, to train or run a Sweep, do any of the following:
 pod trainer run fast-train
 ```
 
-alternately, a Lightning App version can be ran with:
+a Lightning App version can be ran with:
 
 ```sh
 cd apps/
@@ -152,7 +152,8 @@ Running any of the above will download the CIFAR10 dataset from torchvision, and
 Once the run is complete, a prototype UI can be ran locally with:
 
 ```sh
-pod run demo-ui
+cd research/demo
+lightning run app app.py
 ```
 
 ## Roadmap
