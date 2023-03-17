@@ -31,13 +31,10 @@ class TrainerWork(LightningWork):
         module_kwargs: Optional[Dict[str, Any]] = config.Args.module_kwargs,
         model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
         model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
-        sweep_init_kwargs: Optional[Dict[str, Any]] = None,
-        sweep_trainer_flags: Optional[Dict[str, Any]] = None,
-        sweep_config: Optional[Dict[str, Any]] = None,
         project_name: Optional[str] = config.Settings.projectname,
         sweep: bool = False,
+        learned_config: Optional[str] = None,
         fast_train_run: bool = False,
-        fast_sweep_run: bool = False,
         parallel: bool = False,
         persist_model: bool = False,
         persist_predictions: bool = False,
@@ -53,22 +50,12 @@ class TrainerWork(LightningWork):
         if sweep and module_kwargs:
             raise ValueError("set sweep cannot be true if providing module_kwargs")
 
-        if sweep and not sweep_init_kwargs:
-            raise ValueError("sweep_kwargs must be provided if running a sweep")
-
-        if sweep:
-            # guard against app.run.dispatch
-            from visionpod.components import SweepWork
-
-            self._sweep_work = SweepWork(
-                sweep_config=sweep_config,
-                **sweep_init_kwargs,
-            )
+        if sweep and not learned_config:
+            raise ValueError("learned_config must be provided if running a tuned run")
 
         self.project_name = project_name
         self.sweep = sweep
         self.fast_train_run = fast_train_run
-        self.fast_sweep_run = fast_sweep_run
         self.persist_model = persist_model
         self.persist_predictions = persist_predictions
         self.predictions_dir = predictions_dir
@@ -129,6 +116,11 @@ class TrainerWork(LightningWork):
             return self._model_hypers["conv_stem_configs"]
 
     @property
+    def best_params(self) -> Dict[str, Any] | None:
+        if hasattr(self, "_sweep_work"):
+            return self._sweep_work.best_params
+
+    @property
     def group_name(self) -> str:
         if hasattr(self, "_sweep_work"):
             return "Tuned Training Runs"
@@ -141,12 +133,17 @@ class TrainerWork(LightningWork):
     @property
     def run_name(self) -> str:
         if hasattr(self, "_sweep_work"):
-            return self.group_name.replace("Sweep", "tuned")
+            return self._sweep_work.group_name.replace("Sweep", "tuned")
         else:
             if self.fast_train_run:
                 return "-".join(["fast-run", wandb.util.generate_id()])
             else:
                 return "-".join(["solo-run", wandb.util.generate_id()])
+
+    @property
+    def sweep_url(self) -> str | None:
+        if hasattr(self, "_trainer"):
+            return "/".join([self.entity, self.project_name, "sweeps", self.sweep_id])
 
     @property
     def entity(self) -> str | None:
@@ -161,13 +158,6 @@ class TrainerWork(LightningWork):
         self._trainer.persist_predictions(predictions_dir=predictions_dir)
 
     def run(self) -> None:
-
-        if self.sweep:
-            # should be blocking
-            self._sweep_work.run()
-            # should only run after above is complete
-            if self._sweep_work.status.stage == "succeeded":
-                self._sweep_work.stop()
 
         self._model = PodModule(
             lr=self.lr,
@@ -186,6 +176,8 @@ class TrainerWork(LightningWork):
             name=self.run_name,
             group=self.group_name,
             save_dir=config.Paths.wandb_logs,
+            id=wandb.util.generate_id(),
+            reinit=True,
         )
 
         self._trainer = PodTrainer(logger=self._logger, **self._trainer_flags)

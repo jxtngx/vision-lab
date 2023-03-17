@@ -20,14 +20,10 @@ from visionpod.components import TrainerWork
 
 app = LightningApp(
     TrainerWork(
-        fast_train_run=True,
-        sweep=True,
-        module_kwargs=None,
-        sweep_config=config.Sweep.config,
-        sweep_init_kwargs=config.Sweep.fast_init_kwargs,
-        sweep_trainer_flags=config.Trainer.fast_sweep_flags,
         trainer_flags=config.Trainer.fast_flags,
-        persist_predictions=True,
+        sweep_trainer_flag=config.Sweep.trainer_flags,
+        fast_train_run=True,
+        sweep=False,
     )
 )
 

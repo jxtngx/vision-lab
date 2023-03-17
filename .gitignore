@@ -188,6 +188,7 @@ outputs/
 /logs/torch_profiler/fit*
 /logs/torch_profiler/predict*
 /logs/torch_profiler/test*
+/logs/tuned_configs/*.json
 /wandb/
 /logs/wandb/wandb
 /data/cache/

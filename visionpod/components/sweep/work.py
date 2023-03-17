@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 from typing import Any, Dict, Optional
 
 import wandb
 from lightning import LightningWork
-from lightning.app.utilities.enum import WorkStageStatus
 from lightning.pytorch.loggers import WandbLogger
 
 from visionpod import config, PodDataModule, PodModule, PodTrainer
@@ -32,7 +32,7 @@ class SweepWork(LightningWork):
         project_name: Optional[str] = config.Settings.projectname,
         trial_count: int = 10,
         sweep_config: Dict[str, Any] = config.Sweep.config,
-        trainer_init_flags: Dict[str, Any] = config.Trainer.sweep_flags,
+        trainer_init_flags: Dict[str, Any] = config.Sweep.trainer_flags,
         parallel: bool = False,
         **kwargs,
     ):
@@ -43,44 +43,53 @@ class SweepWork(LightningWork):
         self.wandb_save_dir = wandb_save_dir
         self.sweep_config = sweep_config
         self.trainer_init_flags = trainer_init_flags
-        self.trial_number = 1
-        self.run_sentinel = 0
         self.trial_count = trial_count
+        self.trial_number = 1
         # must be instantiated in __init__
         # ._ makes a non JSON-serializable attribute private to LightningWork
-        self._datamodule = PodDataModule()
-        self._wandb_api = wandb.Api(api_key=config.ExperimentManager.WANDB_API_KEY)
-        self._trainer = None
         self.sweep_id = None
         self.sweep_name = None
+        self._datamodule = None
+        self._wandb_api = None
+        self._trainer = None
 
     @property
     def wandb_settings(self) -> Dict[str, Any] | None:
-        if hasattr(self, "trainer"):
+        if hasattr(self, "_trainer"):
             return self._trainer.logger.experiment.settings
 
     @property
     def sweep_url(self) -> str | None:
-        if hasattr(self, "trainer"):
+        if hasattr(self, "_trainer"):
             return "/".join([self.entity, self.project_name, "sweeps", self.sweep_id])
 
     @property
     def entity(self) -> str | None:
-        if hasattr(self, "trainer"):
+        if hasattr(self, "_trainer"):
             return self._trainer.logger.experiment.entity
 
     @property
+    def group_name(self) -> str:
+        return self.sweep_config["name"]
+
+    @property
     def best_params(self) -> Dict[str, Any] | None:
-        if hasattr(self, "trainer"):
+        if hasattr(self, "_trainer"):
             return self._wandb_api.sweep(self.sweep_url).best_run().config
+
+    def log_results(self) -> None:
+        fp = os.path.join(config.Paths.tuned_configs, f"{self.sweep_name.replace('Sweep', 'sweep')}.json")
+        with open(fp, "w") as filepath:
+            json.dump(self.best_params, filepath, indent=4, sort_keys=True)
 
     def objective(self) -> float:
 
         logger = WandbLogger(
             project=self.project_name,
             name="-".join(["sweep", self.sweep_id, "trial", str(self.trial_number)]),
-            group=self.sweep_config["name"],
+            group=self.group_name,
             save_dir=self.wandb_save_dir,
+            reinit=True,
         )
 
         learnable_parameters = dict(
@@ -105,18 +114,14 @@ class SweepWork(LightningWork):
 
         return self._trainer.callback_metrics["val_acc"].item()
 
-    def run(self) -> float:
-        # guard if wandb.agent isn't blocking
-        if self.run_sentinel == 0:  # remove if agent is blocking
-            self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=self.project_name)
-            self.sweep_name = "-".join(["Sweep", self.sweep_id])
-            self.sweep_config.update({"name": self.sweep_name})
-        # should be blocking
+    def run(self) -> None:
+        self._datamodule = PodDataModule()
+        self._wandb_api = wandb.Api(api_key=config.ExperimentManager.WANDB_API_KEY)
+        os.environ[wandb.env.DIR] = self.wandb_save_dir
+        self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=self.project_name)
+        self.sweep_name = "-".join(["Sweep", self.sweep_id])
+        self.sweep_config.update({"name": self.sweep_name})
         wandb.agent(self.sweep_id, function=self.objective, count=self.trial_count)
-        # called after agent is complete
-        # protect if agent isn't blocking
-        if self.trial_number == self.trial_count:
-            os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
-            self.status.stage = WorkStageStatus.SUCCEEDED
-        # increment sentinel so that sweep_id and sweep_name aren't updated
-        self.run_sentinel += 1  # remove if agent is blocking
+        os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
+        wandb.finish()
+        self.log_results()

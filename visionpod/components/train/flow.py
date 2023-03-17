@@ -16,30 +16,30 @@
 from lightning import LightningApp, LightningFlow
 
 from visionpod import config
-from visionpod.components.sweep import SweepWork
+from visionpod.components.sweep.work import SweepWork
 from visionpod.components.train.work import TrainerWork
 
 
 class TrainerFlow(LightningFlow):
-    def __init__(
-        self,
-        sweep: bool = True,
-    ):
+    def __init__(self):
         super().__init__()
 
-        if sweep:
-            self._sweep_work = SweepWork(**config.Sweep.init_kwargs)
+        self._sweep_work = SweepWork(
+            trainer_init_flags=config.Sweep.fast_trainer_flags,
+            **config.Sweep.fast_init_kwargs,
+        )
 
-        self._trainer_work = TrainerWork()
-
-        self.sweep = sweep
+        self._trainer_work = TrainerWork(
+            fast_train_run=True,
+            sweep=False,
+            trainer_flags=config.Trainer.fast_flags,
+        )
 
     def run(self):
-        if self.sweep:
-            # should be blocking
-            self._sweep_work.run()
-            # stop after optimization is complete
-            self._sweep_work.stop()
+        # should be blocking
+        self._sweep_work.run()
+        # stop after optimization is complete
+        self._sweep_work.stop()
 
         # also blocking
         self._trainer_work.run()

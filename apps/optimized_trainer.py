@@ -20,14 +20,22 @@ from visionpod.components import TrainerWork
 
 app = LightningApp(
     TrainerWork(
-        trainer_flags=config.Trainer.fast_flags,
         fast_train_run=True,
-        sweep=False,
+        sweep=True,
+        module_kwargs=None,
+        sweep_config=config.Sweep.config,
+        sweep_init_kwargs=config.Sweep.fast_init_kwargs,
+        sweep_trainer_flags=config.Sweep.fast_trainer_flags,
+        trainer_flags=config.Trainer.fast_flags,
+        persist_predictions=True,
     )
 )
 
 root_work = app.named_works[0][1]
 
+
 if not config.System.is_cloud_run:
     if root_work.has_succeeded:
+        print(root_work.status)
+        print(root_work.has_succeeded)
         root_work.stop()
