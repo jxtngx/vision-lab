@@ -24,9 +24,7 @@ from visionpod.components.train.work import TrainerWork
 class TrainerFlow(LightningFlow):
     def __init__(self, sweep_payload: Dict[str, Any], trainer_payload: Dict[str, Any]):
         super().__init__()
-
         self.sweep_work = SweepWork(**sweep_payload)
-
         self.trainer_work = TrainerWork(**trainer_payload)
 
     def run(self):

@@ -180,9 +180,7 @@ class TrainerWork(LightningWork):
 
         self.run_id = wandb.util.generate_id()
 
-        # account for solo runs where a sweep_id is passed to __init__
-        # passing in sweep_id to .run is useful for flows with sweeps and tuned runs
-        if not hasattr(self, "tuned_config_path") and self.tune:
+        if not hasattr(self, "tuned_config_path"):
             self.tuned_config_path = os.path.join(config.Paths.tuned_configs, f"sweep-{sweep_id}.json")
             self.sweep_id = sweep_id
 
