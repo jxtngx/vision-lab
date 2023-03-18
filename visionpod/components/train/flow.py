@@ -13,38 +13,23 @@
 # limitations under the License.
 
 
-from lightning import LightningApp, LightningFlow
+from typing import Any, Dict
 
-from visionpod import config
+from lightning import LightningFlow
+
 from visionpod.components.sweep.work import SweepWork
 from visionpod.components.train.work import TrainerWork
 
 
 class TrainerFlow(LightningFlow):
-    def __init__(self):
+    def __init__(self, sweep_payload: Dict[str, Any], trainer_payload: Dict[str, Any]):
         super().__init__()
 
-        self._sweep_work = SweepWork(
-            trainer_init_flags=config.Sweep.fast_trainer_flags,
-            **config.Sweep.fast_init_kwargs,
-        )
+        self.sweep_work = SweepWork(**sweep_payload)
 
-        self._trainer_work = TrainerWork(
-            fast_train_run=True,
-            sweep=False,
-            trainer_flags=config.Trainer.fast_flags,
-        )
+        self.trainer_work = TrainerWork(**trainer_payload)
 
     def run(self):
-        # should be blocking
-        self._sweep_work.run()
-        # stop after optimization is complete
-        self._sweep_work.stop()
-
-        # also blocking
-        self._trainer_work.run()
-        # stop after training is complete
-        self._trainer_work.stop()
-
-
-app = LightningApp(TrainerFlow())
+        self.sweep_work.run()
+        self.trainer_work.run(sweep_id=self.sweep_work.sweep_id)
+        self.stop()

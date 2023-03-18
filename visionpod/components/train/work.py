@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import os
 from typing import Any, Callable, Dict, Optional
 
 import wandb
-from lightning import LightningWork
+from lightning import CloudCompute, LightningWork
 from lightning.app.utilities.enum import WorkStageStatus
 from lightning.pytorch.loggers import WandbLogger
 
@@ -27,38 +29,49 @@ class TrainerWork(LightningWork):
 
     def __init__(
         self,
-        trainer_flags: Dict[str, Any] = config.Trainer.train_flags,
-        module_kwargs: Optional[Dict[str, Any]] = config.Args.module_kwargs,
-        model_kwargs: Dict[str, Any] = config.Args.model_kwargs,
-        model_hypers: Dict[str, Any] = config.Args.model_hyperameters,
+        trainer_flags: Optional[Dict[str, Any]] = None,
+        module_kwargs: Optional[Dict[str, Any]] = None,
+        model_kwargs: Optional[Dict[str, Any]] = None,
+        model_hypers: Optional[Dict[str, Any]] = None,
         project_name: Optional[str] = config.Settings.projectname,
-        sweep: bool = False,
-        learned_config: Optional[str] = None,
+        tuned_config_path: Optional[str] = None,
+        tune: bool = False,
         fast_train_run: bool = False,
         parallel: bool = False,
         persist_model: bool = False,
         persist_predictions: bool = False,
-        predictions_dir=config.Paths.predictions,
+        predictions_dir: str = config.Paths.predictions,
+        machine: str = config.System.machine,
         **work_kwargs,
     ) -> None:
 
-        super().__init__(parallel=parallel, cache_calls=True, **work_kwargs)
+        try:
+            cloud_compute = CloudCompute(name=machine, idle_timeout=60, interruptible=True)
+        except ValueError:
+            cloud_compute = CloudCompute(name=machine, idle_timeout=60, interruptible=False)
 
-        if not sweep and not module_kwargs:
-            raise ValueError("either module_kwargs must be provided, or sweep must be true")
+        super().__init__(
+            parallel=parallel,
+            cache_calls=True,
+            cloud_compute=cloud_compute,
+            **work_kwargs,
+        )
 
-        if sweep and module_kwargs:
-            raise ValueError("set sweep cannot be true if providing module_kwargs")
+        if not tuned_config_path and not module_kwargs and not tune:
+            raise ValueError("either module_kwargs must be set or tuned_configs_path be provided")
 
-        if sweep and not learned_config:
-            raise ValueError("learned_config must be provided if running a tuned run")
+        if tuned_config_path and module_kwargs:
+            raise ValueError("only module_kwargs or tuned_configs_path can be set")
 
         self.project_name = project_name
-        self.sweep = sweep
         self.fast_train_run = fast_train_run
         self.persist_model = persist_model
         self.persist_predictions = persist_predictions
         self.predictions_dir = predictions_dir
+        self.tuned_config_path = tuned_config_path
+        self.tune = tune
+        self.run_id = None
+        self.sweep_id = None
 
         # ._ make private to LightningWork
         self._trainer_flags = trainer_flags
@@ -75,70 +88,70 @@ class TrainerWork(LightningWork):
 
     @property
     def lr(self) -> float | None:
-        if hasattr(self, "_sweep_work"):
+        if hasattr(self, "tuned_config_path"):
             return self.best_params["lr"]
         else:
             return self._module_kwargs["lr"]
 
     @property
     def optimizer(self) -> str | None:
-        if hasattr(self, "_sweep_work"):
+        if hasattr(self, "tuned_config_path"):
             return self.best_params["optimizer"]
         else:
             return self._module_kwargs["optimizer"]
 
     @property
     def dropout(self) -> float | None:
-        if hasattr(self, "_sweep_work"):
+        if hasattr(self, "tuned_config_path"):
             return self.best_params["dropout"]
         else:
             return self._model_hypers["dropout"]
 
     @property
     def attention_dropout(self) -> float | None:
-        if hasattr(self, "_sweep_work"):
+        if hasattr(self, "tuned_config_path"):
             return self.best_params["attention_dropout"]
         else:
             return self._model_hypers["attention_dropout"]
 
     @property
     def norm_layer(self) -> Callable | None:
-        if hasattr(self, "_sweep_work"):
+        if hasattr(self, "tuned_config_path"):
             return self.best_params["norm_layer"]
         else:
             return self._model_hypers["norm_layer"]
 
     @property
     def conv_stem_configs(self):
-        if hasattr(self, "_sweep_work"):
+        if hasattr(self, "tuned_config_path"):
             return self.best_params["conv_stem_configs"]
         else:
             return self._model_hypers["conv_stem_configs"]
 
     @property
     def best_params(self) -> Dict[str, Any] | None:
-        if hasattr(self, "_sweep_work"):
-            return self._sweep_work.best_params
+        if hasattr(self, "tuned_config_path"):
+            return self._load_best_params()
 
     @property
     def group_name(self) -> str:
-        if hasattr(self, "_sweep_work"):
+        if hasattr(self, "tuned_config_path"):
             return "Tuned Training Runs"
         else:
             if self.fast_train_run:
                 return "Fast Training Runs"
             else:
-                return "Untuned Training Runs"
+                return "Training Runs"
 
     @property
     def run_name(self) -> str:
-        if hasattr(self, "_sweep_work"):
-            return self._sweep_work.group_name.replace("Sweep", "tuned")
+        if hasattr(self, "tuned_config_path"):
+            return "-".join(["sweep", self.sweep_id, "run", self.run_id])
         else:
             if self.fast_train_run:
-                return "-".join(["fast-run", wandb.util.generate_id()])
+                return "-".join(["fast-run", self.run_id])
             else:
-                return "-".join(["solo-run", wandb.util.generate_id()])
+                return "-".join(["solo-run", self.run_id])
 
     @property
     def sweep_url(self) -> str | None:
@@ -157,7 +170,21 @@ class TrainerWork(LightningWork):
     def _persist_predictions(self, predictions_dir) -> None:
         self._trainer.persist_predictions(predictions_dir=predictions_dir)
 
-    def run(self) -> None:
+    def _load_best_params(self) -> Dict[str, Any]:
+        fp = os.path.join(config.Paths.tuned_configs, self.tuned_config_path)
+        with open(fp, "r") as file:
+            best_params = json.load(file)
+        return best_params
+
+    def run(self, sweep_id: Optional[str] = None) -> None:
+
+        self.run_id = wandb.util.generate_id()
+
+        # account for solo runs where a sweep_id is passed to __init__
+        # passing in sweep_id to .run is useful for flows with sweeps and tuned runs
+        if not hasattr(self, "tuned_config_path") and self.tune:
+            self.tuned_config_path = os.path.join(config.Paths.tuned_configs, f"sweep-{sweep_id}.json")
+            self.sweep_id = sweep_id
 
         self._model = PodModule(
             lr=self.lr,
@@ -176,7 +203,7 @@ class TrainerWork(LightningWork):
             name=self.run_name,
             group=self.group_name,
             save_dir=config.Paths.wandb_logs,
-            id=wandb.util.generate_id(),
+            id=self.run_id,
             reinit=True,
         )
 

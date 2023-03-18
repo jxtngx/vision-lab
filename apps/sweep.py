@@ -20,6 +20,7 @@ from visionpod.components import SweepWork
 
 app = LightningApp(
     SweepWork(
+        sweep_config=config.Sweep.fast_init_kwargs,
         trainer_init_flags=config.Sweep.fast_trainer_flags,
         **config.Sweep.fast_init_kwargs,
     )

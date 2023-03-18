@@ -17,7 +17,8 @@ import os
 from typing import Any, Dict, Optional
 
 import wandb
-from lightning import LightningWork
+from lightning import CloudCompute, LightningWork
+from lightning.app.utilities.enum import WorkStageStatus
 from lightning.pytorch.loggers import WandbLogger
 
 from visionpod import config, PodDataModule, PodModule, PodTrainer
@@ -34,10 +35,16 @@ class SweepWork(LightningWork):
         sweep_config: Dict[str, Any] = config.Sweep.config,
         trainer_init_flags: Dict[str, Any] = config.Sweep.trainer_flags,
         parallel: bool = False,
+        machine: str = "default",
         **kwargs,
     ):
 
-        super().__init__(parallel=parallel, cache_calls=True, **kwargs)
+        super().__init__(
+            parallel=parallel,
+            cache_calls=True,
+            cloud_compute=CloudCompute(name=machine, idle_timeout=60),
+            **kwargs,
+        )
 
         self.project_name = project_name
         self.wandb_save_dir = wandb_save_dir
@@ -125,3 +132,4 @@ class SweepWork(LightningWork):
         os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
         wandb.finish()
         self.log_results()
+        self.status.stage = WorkStageStatus.SUCCEEDED

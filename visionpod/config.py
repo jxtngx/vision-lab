@@ -32,11 +32,6 @@ class Settings:
     _maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
 
 
-class System:
-    is_cloud_run = is_running_in_cloud()
-    platform = sys.platform
-
-
 class Paths:
     filepath = Path(__file__)
     project = filepath.parents[1]
@@ -61,7 +56,7 @@ class Paths:
     tuned_configs = os.path.join(logs, "tuned_configs")
 
 
-class Args:
+class Module:
     module_kwargs = dict(
         lr=1e-3,
         optimizer="Adam",
@@ -160,10 +155,21 @@ class DataModule:
     )
 
 
+class Tune:
+    sweep_payload = dict()
+    trainer_payload = dict()
+
+
 class Compute:
-    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=10)
-    sweep_compute = CloudCompute(name="default", idle_timeout=10)
+    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=60)
+    sweep_compute = CloudCompute(name="default", idle_timeout=60)
     flow_compute = CloudCompute(name="default")
+
+
+class System:
+    is_cloud_run = is_running_in_cloud()
+    platform = sys.platform
+    machine = "default" if not is_cloud_run else Compute.train_compute
 
 
 class ExperimentManager:

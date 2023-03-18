@@ -21,9 +21,9 @@ from visionpod.components import TrainerWork
 app = LightningApp(
     TrainerWork(
         trainer_flags=config.Trainer.fast_flags,
-        sweep_trainer_flag=config.Sweep.trainer_flags,
+        module_kwargs=None,
         fast_train_run=True,
-        sweep=False,
+        tuned_config_path="sweep-rhcvrslc.json",
     )
 )
 
