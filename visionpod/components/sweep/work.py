@@ -71,17 +71,17 @@ class SweepWork(LightningWork):
 
     @property
     def wandb_settings(self) -> Dict[str, Any] | None:
-        if hasattr(self, "_trainer"):
+        if self._trainer is not None:
             return self._trainer.logger.experiment.settings
 
     @property
     def sweep_url(self) -> str | None:
-        if hasattr(self, "_trainer"):
+        if self._trainer is not None:
             return "/".join([self.entity, self.project_name, "sweeps", self.sweep_id])
 
     @property
     def entity(self) -> str | None:
-        if hasattr(self, "_trainer"):
+        if self._trainer is not None:
             return self._trainer.logger.experiment.entity
 
     @property
@@ -90,7 +90,7 @@ class SweepWork(LightningWork):
 
     @property
     def best_params(self) -> Dict[str, Any] | None:
-        if hasattr(self, "_trainer"):
+        if self._trainer is not None:
             return self._wandb_api.sweep(self.sweep_url).best_run().config
 
     def log_results(self) -> None:
@@ -105,7 +105,6 @@ class SweepWork(LightningWork):
             name="-".join(["sweep", self.sweep_id, "trial", str(self.trial_number)]),
             group=self.group_name,
             save_dir=self.wandb_save_dir,
-            reinit=True,
         )
 
         learnable_parameters = dict(
@@ -117,7 +116,7 @@ class SweepWork(LightningWork):
 
         module_payload = {**self._model_kwargs, **learnable_parameters}
 
-        model = PodModule(module_payload)
+        model = PodModule(**module_payload)
 
         self._trainer = PodTrainer(
             logger=logger,

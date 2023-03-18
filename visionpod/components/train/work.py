@@ -204,7 +204,6 @@ class TrainerWork(LightningWork):
             group=self.group_name,
             save_dir=config.Paths.wandb_logs,
             id=self.run_id,
-            reinit=True,
         )
 
         self._trainer = PodTrainer(logger=self._logger, **self._trainer_flags)
