@@ -129,18 +129,10 @@ then, to train or run a Sweep, do any of the following:
 pod trainer run fast-train
 ```
 
-a Lightning App version can be ran with:
+a Lightning App that will run a W&B Sweep then a tuned training run can be ran with:
 
 ```sh
-cd apps/
-lightning run app trainer.py
-```
-
-or, if you'd prefer to perform a wandb Sweep and then run a tuned trainer, do:
-
-```sh
-cd apps/
-lightning run app optimize.py
+lightning run app app.py
 ```
 
 Running any of the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.
