@@ -214,6 +214,8 @@ outputs/
 /tests/
 # docs
 /docs-src/
+# example apps
+/apps/
 # others
 .pre-commit-config.yaml
 .vercelignore
