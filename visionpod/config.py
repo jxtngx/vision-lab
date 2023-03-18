@@ -49,9 +49,6 @@ class Paths:
     val_split = os.path.join(splits, f"v{Settings.data_version}-val.pt")
     test_split = os.path.join(splits, f"v{Settings.data_version}-test.pt")
     wandb_logs = os.path.join(project, "logs", "wandb")
-    demo_wandb_summary = os.path.join(
-        project, "logs", "wandb", "wandb", "run-20230310_191931-sthc9frp", "files", "wandb-summary.json"
-    )
     wandb_summary = os.path.join(project, "logs", "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
     tuned_configs = os.path.join(logs, "tuned_configs")
 

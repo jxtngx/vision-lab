@@ -172,19 +172,19 @@ Metrics = dbc.Row(
             ],
             width=3,
         ),
-        dbc.Col(
-            [
-                dbc.Card(
-                    [
-                        html.H4(metrics_names[3], className="card-title"),
-                        html.P(metrics_values[3], id="metric_4_text", className="metric-card-text"),
-                    ],
-                    id="metric_4_card",
-                    className="metric-container",
-                )
-            ],
-            width=3,
-        ),
+        # dbc.Col(
+        #     [
+        #         dbc.Card(
+        #             [
+        #                 html.H4(metrics_names[3], className="card-title"),
+        #                 html.P(metrics_values[3], id="metric_4_text", className="metric-card-text"),
+        #             ],
+        #             id="metric_4_card",
+        #             className="metric-container",
+        #         )
+        #     ],
+        #     width=3,
+        # ),
     ],
     id="metrics",
     justify="center",

@@ -144,8 +144,7 @@ Running any of the above will download the CIFAR10 dataset from torchvision, and
 Once the run is complete, a prototype UI can be ran locally with:
 
 ```sh
-cd research/demo
-lightning run app app.py
+lightning run app apps/dash/app.py
 ```
 
 ## Roadmap
