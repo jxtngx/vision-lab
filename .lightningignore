@@ -205,6 +205,7 @@ outputs/
 .circleci/
 .devcontainer/
 .github/
+.git/
 # notebooks
 /research/
 # nextjs ui
@@ -212,7 +213,7 @@ outputs/
 # tests
 /tests/
 # docs
-/docs-src/docs/tutorial*
+/docs-src/
 # others
 .pre-commit-config.yaml
 .vercelignore
