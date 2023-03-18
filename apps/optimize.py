@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from lightning import LightningApp
 
 from visionpod import config
-from visionpod.components import TrainerWork
+from visionpod.components import TrainerFlow
 
-app = LightningApp(
-    TrainerWork(
-        fast_train_run=False,
-        sweep=True,
-        module_kwargs=None,
-        sweep_init_kwargs=config.Sweep.work_kwargs,
-        sweep_config=config.Sweep.config,
-        trainer_flags=config.Trainer.train_flags,
-        persist_predictions=True,
-    )
+sweep_payload = dict(
+    trainer_init_flags=config.Sweep.fast_trainer_flags,
+    wandb_save_dir=config.Paths.wandb_logs,
+    project_name="visionpod",
+    trial_count=2,
+    parallel=False,
 )
 
-root_work = app.named_works[0][1]
+trainer_payload = dict(
+    trainer_flags=config.Trainer.fast_flags,
+    model_kwargs=config.Module.model_kwargs,
+    tune=True,
+)
 
-if not config.System.is_cloud_run:
-    if root_work.has_succeeded:
-        root_work.stop()
+app = LightningApp(TrainerFlow(sweep_payload=sweep_payload, trainer_payload=trainer_payload))

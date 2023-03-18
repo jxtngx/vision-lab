@@ -29,11 +29,7 @@ class Settings:
     seed = 42
     projectname = "visionpod"
     data_version = "0"
-
-
-class System:
-    is_cloud_run = is_running_in_cloud()
-    platform = sys.platform
+    _maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
 
 
 class Paths:
@@ -57,9 +53,10 @@ class Paths:
         project, "logs", "wandb", "wandb", "run-20230310_191931-sthc9frp", "files", "wandb-summary.json"
     )
     wandb_summary = os.path.join(project, "logs", "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
+    tuned_configs = os.path.join(logs, "tuned_configs")
 
 
-class Args:
+class Module:
     module_kwargs = dict(
         lr=1e-3,
         optimizer="Adam",
@@ -79,27 +76,16 @@ class Args:
 
 
 class Trainer:
-    _maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
     train_flags = dict(
         max_epochs=100,
-        precision=16,
+        precision="16-mixed",
         callbacks=[EarlyStopping(monitor="val_loss", mode="min")],
-        **_maybe_use_mps,
-    )
-    sweep_flags = dict(
-        max_epochs=10,
-        precision=16,
-        **_maybe_use_mps,
+        **Settings._maybe_use_mps,
     )
     fast_flags = dict(
-        max_epochs=10,
-        precision=16,
-        **_maybe_use_mps,
-    )
-    fast_sweep_flags = dict(
-        max_epochs=5,
-        precision=16,
-        **_maybe_use_mps,
+        max_epochs=2,
+        precision="16-mixed",
+        **Settings._maybe_use_mps,
     )
 
 
@@ -118,15 +104,23 @@ class Sweep:
         wandb_save_dir=Paths.wandb_logs,
         project_name="visionpod",
         trial_count=10,
-        trainer_init_flags=Trainer.sweep_flags,
         parallel=False,
     )
     fast_init_kwargs = dict(
         wandb_save_dir=Paths.wandb_logs,
         project_name="visionpod",
-        trial_count=5,
-        trainer_init_flags=Trainer.fast_sweep_flags,
+        trial_count=2,
         parallel=False,
+    )
+    fast_trainer_flags = dict(
+        max_epochs=2,
+        precision="16-mixed",
+        **Settings._maybe_use_mps,
+    )
+    trainer_flags = dict(
+        max_epochs=10,
+        precision="16-mixed",
+        **Settings._maybe_use_mps,
     )
 
 
@@ -161,10 +155,21 @@ class DataModule:
     )
 
 
+class Tune:
+    sweep_payload = dict()
+    trainer_payload = dict()
+
+
 class Compute:
-    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=10)
-    sweep_compute = CloudCompute(name="default", idle_timeout=10)
+    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=60)
+    sweep_compute = CloudCompute(name="default", idle_timeout=60)
     flow_compute = CloudCompute(name="default")
+
+
+class System:
+    is_cloud_run = is_running_in_cloud()
+    platform = sys.platform
+    machine = "default" if not is_cloud_run else Compute.train_compute
 
 
 class ExperimentManager:

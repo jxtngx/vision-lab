@@ -90,8 +90,8 @@ def trainer_run() -> None:
 
 
 @trainer_run.command("fast-dev")
-@click.option("--image_size", default=config.Args.model_kwargs["image_size"])
-@click.option("--num_classes", default=config.Args.model_kwargs["num_classes"])
+@click.option("--image_size", default=config.Module.model_kwargs["image_size"])
+@click.option("--num_classes", default=config.Module.model_kwargs["num_classes"])
 def fast_dev(image_size, num_classes) -> None:
     model = PodModule(image_size=image_size, num_classes=num_classes)
     datamodule = PodDataModule()
@@ -148,8 +148,8 @@ def fast_sweep(project_name, persist_model, persist_predictions) -> None:
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)
-@click.option("--image_size", default=config.Args.model_kwargs["image_size"])
-@click.option("--num_classes", default=config.Args.model_kwargs["num_classes"])
+@click.option("--image_size", default=config.Module.model_kwargs["image_size"])
+@click.option("--num_classes", default=config.Module.model_kwargs["num_classes"])
 def tuned(
     project_name,
     trial_count,
