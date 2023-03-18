@@ -31,18 +31,26 @@ class SweepWork(LightningWork):
         self,
         wandb_save_dir: Optional[str] = config.Paths.wandb_logs,
         project_name: Optional[str] = config.Settings.projectname,
-        trial_count: int = 10,
         sweep_config: Dict[str, Any] = config.Sweep.config,
         trainer_init_flags: Dict[str, Any] = config.Sweep.trainer_flags,
+        model_kwargs: Optional[Dict[str, Any]] = None,
+        trial_count: int = 10,
         parallel: bool = False,
         machine: str = "default",
+        idle_timeout: int = 60,
+        interruptible: bool = False,
         **kwargs,
     ):
+
+        try:  # if interruptible not supported error
+            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
+        except ValueError:
+            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
 
         super().__init__(
             parallel=parallel,
             cache_calls=True,
-            cloud_compute=CloudCompute(name=machine, idle_timeout=60),
+            cloud_compute=cloud_compute,
             **kwargs,
         )
 
@@ -50,6 +58,7 @@ class SweepWork(LightningWork):
         self.wandb_save_dir = wandb_save_dir
         self.sweep_config = sweep_config
         self.trainer_init_flags = trainer_init_flags
+        self._model_kwargs = model_kwargs
         self.trial_count = trial_count
         self.trial_number = 1
         # must be instantiated in __init__
@@ -106,7 +115,9 @@ class SweepWork(LightningWork):
             attention_dropout=wandb.config.attention_dropout,
         )
 
-        model = PodModule(**learnable_parameters)
+        module_payload = {**self._model_kwargs, **learnable_parameters}
+
+        model = PodModule(module_payload)
 
         self._trainer = PodTrainer(
             logger=logger,

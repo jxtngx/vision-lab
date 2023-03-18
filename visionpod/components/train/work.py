@@ -42,13 +42,15 @@ class TrainerWork(LightningWork):
         persist_predictions: bool = False,
         predictions_dir: str = config.Paths.predictions,
         machine: str = config.System.machine,
+        idle_timeout: int = 10,
+        interruptible: bool = False,
         **work_kwargs,
     ) -> None:
 
-        try:
-            cloud_compute = CloudCompute(name=machine, idle_timeout=60, interruptible=True)
+        try:  # if interruptible not supported error
+            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
         except ValueError:
-            cloud_compute = CloudCompute(name=machine, idle_timeout=60, interruptible=False)
+            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
 
         super().__init__(
             parallel=parallel,
