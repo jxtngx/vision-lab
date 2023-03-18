@@ -180,7 +180,7 @@ class TrainerWork(LightningWork):
 
         self.run_id = wandb.util.generate_id()
 
-        if not hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is None and self.tune:
             self.tuned_config_path = os.path.join(config.Paths.tuned_configs, f"sweep-{sweep_id}.json")
             self.sweep_id = sweep_id
 
