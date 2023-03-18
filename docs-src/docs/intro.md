@@ -137,14 +137,14 @@ a Lightning App version can be ran with:
 
 ```sh
 cd apps/
-lightning run app trainer_app.py
+lightning run app trainer.py
 ```
 
 or, if you'd prefer to perform a wandb Sweep and then run a tuned trainer, do:
 
 ```sh
 cd apps/
-lightning run app tuned_trainer.py
+lightning run app optimize.py
 ```
 
 Running any of the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.

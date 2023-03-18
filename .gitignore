@@ -179,9 +179,11 @@ next-env.d.ts
 # turbo
 .turbo
 
+# ruff
+.ruff_cache/
+
 # PROJECT
 # profiler, logger logs, model checkpoints, production models, data
-.ruff_cache/
 outputs/
 /models/checkpoints/model*
 /logs/tensorboard/version*
@@ -195,6 +197,5 @@ outputs/
 /data/predictions/*.pt
 /data/training_split/*.pt
 /apps/wandb
-
 # docs
 /docs-src/docs/tutorial*

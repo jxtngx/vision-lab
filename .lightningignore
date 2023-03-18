@@ -113,6 +113,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env*.local
 
 # Spyder project settings
 .spyderproject
@@ -168,9 +169,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
-.env*.local
-
 # vercel
 .vercel
 
@@ -181,14 +179,42 @@ next-env.d.ts
 # turbo
 .turbo
 
-# PROJECT
-# profiler, logger logs, model checkpoints, production models, data
-.ruff_cache
+# ruff
+.ruff_cache/
+
+# ########################### #
+# ########## PROJECT ######## #
+# ########################### #
+
+# hydra
 outputs/
-models/checkpoints/model-*
-logs/tensorboard/version*
-logs/torch_profiler/fit*
-logs/torch_profiler/predict*
-logs/torch_profiler/test*
-data/cache/PodDataset
-wandb/
+# models
+/models/checkpoints/model*
+# logs
+/logs/tensorboard/version*
+/logs/torch_profiler/fit*
+/logs/torch_profiler/predict*
+/logs/torch_profiler/test*
+/logs/tuned_configs/*.json
+/wandb/
+/logs/wandb/wandb
+/data/cache/
+/data/predictions/*.pt
+/data/training_split/*.pt
+# cicd
+.circleci/
+.devcontainer/
+.github/
+# notebooks
+/research/
+# nextjs ui
+/ui/
+# tests
+/tests/
+# docs
+/docs-src/docs/tutorial*
+# others
+.pre-commit-config.yaml
+.vercelignore
+.CITATION.cff
+helpers.txt
