@@ -70,17 +70,17 @@ class SweepWork(LightningWork):
         self._trainer = None
 
     @property
-    def wandb_settings(self) -> Dict[str, Any] | None:
+    def wandb_settings(self) -> Optional[Dict[str, Any]]:
         if self._trainer is not None:
             return self._trainer.logger.experiment.settings
 
     @property
-    def sweep_url(self) -> str | None:
+    def sweep_url(self) -> Optional[str]:
         if self._trainer is not None:
             return "/".join([self.entity, self.project_name, "sweeps", self.sweep_id])
 
     @property
-    def entity(self) -> str | None:
+    def entity(self) -> Optional[str]:
         if self._trainer is not None:
             return self._trainer.logger.experiment.entity
 
@@ -89,7 +89,7 @@ class SweepWork(LightningWork):
         return self.sweep_config["name"]
 
     @property
-    def best_params(self) -> Dict[str, Any] | None:
+    def best_params(self) -> Optional[Dict[str, Any]]:
         if self._trainer is not None:
             return self._wandb_api.sweep(self.sweep_url).best_run().config
 

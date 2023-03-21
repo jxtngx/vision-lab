@@ -89,35 +89,35 @@ class TrainerWork(LightningWork):
         wandb.Api(api_key=config.ExperimentManager.WANDB_API_KEY)
 
     @property
-    def lr(self) -> float | None:
+    def lr(self) -> Optional[float]:
         if hasattr(self, "tuned_config_path"):
             return self.best_params["lr"]
         else:
             return self._module_kwargs["lr"]
 
     @property
-    def optimizer(self) -> str | None:
+    def optimizer(self) -> Optional[str]:
         if hasattr(self, "tuned_config_path"):
             return self.best_params["optimizer"]
         else:
             return self._module_kwargs["optimizer"]
 
     @property
-    def dropout(self) -> float | None:
+    def dropout(self) -> Optional[float]:
         if hasattr(self, "tuned_config_path"):
             return self.best_params["dropout"]
         else:
             return self._model_hypers["dropout"]
 
     @property
-    def attention_dropout(self) -> float | None:
+    def attention_dropout(self) -> Optional[float]:
         if hasattr(self, "tuned_config_path"):
             return self.best_params["attention_dropout"]
         else:
             return self._model_hypers["attention_dropout"]
 
     @property
-    def norm_layer(self) -> Callable | None:
+    def norm_layer(self) -> Optional[Callable]:
         if hasattr(self, "tuned_config_path"):
             return self.best_params["norm_layer"]
         else:
@@ -131,7 +131,7 @@ class TrainerWork(LightningWork):
             return self._model_hypers["conv_stem_configs"]
 
     @property
-    def best_params(self) -> Dict[str, Any] | None:
+    def best_params(self) -> Optional[Dict[str, Any]]:
         if hasattr(self, "tuned_config_path"):
             return self._load_best_params()
 
@@ -156,12 +156,12 @@ class TrainerWork(LightningWork):
                 return "-".join(["solo-run", self.run_id])
 
     @property
-    def sweep_url(self) -> str | None:
+    def sweep_url(self) -> Optional[str]:
         if hasattr(self, "_trainer"):
             return "/".join([self.entity, self.project_name, "sweeps", self.sweep_id])
 
     @property
-    def entity(self) -> str | None:
+    def entity(self) -> Optional[str]:
         if hasattr(self, "_logger"):
             return self._logger.experiment.entity
 

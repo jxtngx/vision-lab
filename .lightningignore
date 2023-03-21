@@ -107,7 +107,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+.venv/
 env/
 venv/
 ENV/
@@ -143,81 +143,25 @@ dmypy.json
 # PyCharm
 .idea
 
-# TypeScript and JavaScript
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# next.js
-.next/
-out/
-
-# production
-build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# turbo
-.turbo
-
 # ruff
 .ruff_cache/
 
-# ########################### #
-# ########## PROJECT ######## #
-# ########################### #
-
-# hydra
+# PROJECT
+# profiler, logger logs, model checkpoints, production models, data
 outputs/
-# models
-/models/checkpoints/model*
-# logs
-/logs/tensorboard/version*
-/logs/torch_profiler/fit*
-/logs/torch_profiler/predict*
-/logs/torch_profiler/test*
-/logs/tuned_configs/*.json
-/wandb/
-/logs/wandb/wandb
-/data/cache/
-/data/predictions/*.pt
-/data/training_split/*.pt
-# cicd
-.circleci/
-.devcontainer/
-.github/
+models/checkpoints/model*
+logs/tensorboard/version*
+logs/torch_profiler/fit*
+logs/torch_profiler/predict*
+logs/torch_profiler/test*
+logs/tuned_configs/*.json
+wandb/
+logs/wandb/wandb
+data/cache/
+data/predictions/*.pt
+data/training_split/*.pt
+apps/wandb
+docs-src/
+ui/
+apps/
 .git/
-# notebooks
-/research/
-# nextjs ui
-/ui/
-# tests
-/tests/
-# docs
-/docs-src/
-# example apps
-/apps/
-# others
-.pre-commit-config.yaml
-.vercelignore
-.CITATION.cff
-helpers.txt
