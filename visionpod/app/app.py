@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from lightning import LightningApp, LightningWork
+from lightning import LightningWork
 
 
 class AutoScaledFastAPI(LightningWork):
@@ -24,6 +24,3 @@ class AutoScaledFastAPI(LightningWork):
 
     def run(self):
         ...
-
-
-app = LightningApp(AutoScaledFastAPI())
