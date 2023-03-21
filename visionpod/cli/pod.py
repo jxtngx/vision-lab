@@ -19,8 +19,8 @@ import click
 from visionpod import config, PodDataModule, PodModule, PodTrainer
 from visionpod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
 from visionpod.components import SweepWork, TrainerWork
-from visionpod.fabric.bugreport import bugreport
-from visionpod.fabric.docs.autogen import PodDocsGenerator
+from visionpod.utilities.bugreport import bugreport
+from visionpod.utilities.docs.autogen import PodDocsGenerator
 
 PACKAGE = config.Paths.package
 PROJECT = config.Paths.project
