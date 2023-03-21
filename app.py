@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from lightning import LightningApp
 
 from visionpod import config
 from visionpod.components import TrainerFlow
+
+os.environ["WANDB_CONFIG_DIR"] = config.ExperimentManager.WANDB_CONFIG_DIR
 
 sweep_payload = dict(
     project_name="visionpod",  # the wandb project name

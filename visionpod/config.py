@@ -172,3 +172,4 @@ class System:
 class ExperimentManager:
     WANDB_API_KEY = None if not System.is_cloud_run else os.getenv("WANDB-API-KEY")
     WANDB_ENTITY = None if not System.is_cloud_run else os.getenv("WANDB-ENTITY")
+    WANDB_CONFIG_DIR = Paths.wandb_logs
