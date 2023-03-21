@@ -50,7 +50,7 @@ class TrainerWork(LightningWork):
         try:  # if interruptible not supported error
             cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
         except ValueError:
-            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
+            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=False)
 
         super().__init__(
             parallel=parallel,
