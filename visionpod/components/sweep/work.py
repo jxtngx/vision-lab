@@ -41,7 +41,6 @@ class SweepWork(LightningWork):
         interruptible: bool = False,
         **kwargs,
     ):
-
         try:  # if interruptible not supported error
             cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
         except ValueError:
@@ -99,7 +98,6 @@ class SweepWork(LightningWork):
             json.dump(self.best_params, filepath, indent=4, sort_keys=True)
 
     def objective(self) -> float:
-
         logger = WandbLogger(
             project=self.project_name,
             name="-".join(["sweep", self.sweep_id, "trial", str(self.trial_number)]),

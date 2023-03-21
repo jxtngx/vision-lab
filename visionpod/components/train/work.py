@@ -46,7 +46,6 @@ class TrainerWork(LightningWork):
         interruptible: bool = False,
         **work_kwargs,
     ) -> None:
-
         try:  # if interruptible not supported error
             cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
         except ValueError:
@@ -90,54 +89,54 @@ class TrainerWork(LightningWork):
 
     @property
     def lr(self) -> Optional[float]:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return self.best_params["lr"]
         else:
             return self._module_kwargs["lr"]
 
     @property
     def optimizer(self) -> Optional[str]:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return self.best_params["optimizer"]
         else:
             return self._module_kwargs["optimizer"]
 
     @property
     def dropout(self) -> Optional[float]:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return self.best_params["dropout"]
         else:
             return self._model_hypers["dropout"]
 
     @property
     def attention_dropout(self) -> Optional[float]:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return self.best_params["attention_dropout"]
         else:
             return self._model_hypers["attention_dropout"]
 
     @property
     def norm_layer(self) -> Optional[Callable]:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return self.best_params["norm_layer"]
         else:
             return self._model_hypers["norm_layer"]
 
     @property
     def conv_stem_configs(self):
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return self.best_params["conv_stem_configs"]
         else:
             return self._model_hypers["conv_stem_configs"]
 
     @property
     def best_params(self) -> Optional[Dict[str, Any]]:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return self._load_best_params()
 
     @property
     def group_name(self) -> str:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return "Tuned Training Runs"
         else:
             if self.fast_train_run:
@@ -147,7 +146,7 @@ class TrainerWork(LightningWork):
 
     @property
     def run_name(self) -> str:
-        if hasattr(self, "tuned_config_path"):
+        if self.tuned_config_path is not None:
             return "-".join(["sweep", self.sweep_id, "run", self.run_id])
         else:
             if self.fast_train_run:
@@ -179,7 +178,6 @@ class TrainerWork(LightningWork):
         return best_params
 
     def run(self, sweep_id: Optional[str] = None) -> None:
-
         self.run_id = wandb.util.generate_id()
 
         if self.tuned_config_path is None and self.tune:
@@ -197,6 +195,7 @@ class TrainerWork(LightningWork):
         )
 
         self._datamodule = PodDataModule()
+        self._datamodule.prepare_data()
 
         self._logger = WandbLogger(
             project=self.project_name,

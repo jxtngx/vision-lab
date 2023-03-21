@@ -55,17 +55,23 @@ class PodDataModule(LightningDataModule):
         self.data_cache_exists = os.path.isdir(self.data_cache)
 
     def prepare_data(self) -> None:
-        if self.reversion or not self.data_cache_exists:
-            if self.data_cache_exists:
-                vfiles = (
-                    f"v{self.data_version}-train.pt",
-                    f"v{self.data_version}-val.pt",
-                    f"v{self.data_version}-test.pt",
-                )
-                if any(v in os.listdir(self.data_splits) for v in vfiles):
-                    raise ValueError("a split version of the same version number already exists")
-            self.dataset(self.data_cache, download=True, train=True)
-            self.dataset(self.data_cache, download=True, train=False)
+        vfiles = (
+            f"v{self.data_version}-train.pt",
+            f"v{self.data_version}-val.pt",
+            f"v{self.data_version}-test.pt",
+        )
+
+        version_exists = any(v in os.listdir(self.data_splits) for v in vfiles)
+
+        if not self.data_cache_exists:
+            self._persist_splits()
+
+        if version_exists and not self.reversion:
+            return
+
+        if self.reversion:
+            if version_exists:
+                raise ValueError("a split version of the same version number already exists")
             self._persist_splits()
 
     def setup(self, stage: Union[str, None] = None) -> None:
