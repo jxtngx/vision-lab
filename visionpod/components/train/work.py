@@ -46,15 +46,10 @@ class TrainerWork(LightningWork):
         interruptible: bool = False,
         **work_kwargs,
     ) -> None:
-        try:  # if interruptible not supported error
-            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible)
-        except ValueError:
-            cloud_compute = CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=False)
-
         super().__init__(
             parallel=parallel,
             cache_calls=True,
-            cloud_compute=cloud_compute,
+            cloud_compute=CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible),
             **work_kwargs,
         )
 

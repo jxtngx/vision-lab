@@ -106,6 +106,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env
 .venv/
 env/
 venv/
@@ -158,9 +159,13 @@ wandb/
 logs/wandb/wandb
 data/cache/
 data/predictions/*.pt
-data/training_split/*.pt
+data/training_split/*.md
 apps/wandb
 docs-src/
 ui/
 apps/
+research/
+tests/
 .git/
+cloud_run*
+CITATION.cff
