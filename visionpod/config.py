@@ -166,7 +166,7 @@ class Compute:
 class System:
     is_cloud_run = is_running_in_cloud()
     platform = sys.platform
-    machine = "default" if not is_cloud_run else Compute.train_compute
+    machine = "default" if not is_cloud_run else ""
 
 
 class ExperimentManager:

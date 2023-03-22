@@ -41,7 +41,7 @@ class TrainerWork(LightningWork):
         persist_model: bool = False,
         persist_predictions: bool = False,
         predictions_dir: str = config.Paths.predictions,
-        machine: str = config.System.machine,
+        machine: Optional[str] = None,
         idle_timeout: int = 10,
         interruptible: bool = False,
         **work_kwargs,
@@ -50,6 +50,7 @@ class TrainerWork(LightningWork):
             parallel=parallel,
             cache_calls=True,
             cloud_compute=CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible),
+            start_with_flow=False,
             **work_kwargs,
         )
 

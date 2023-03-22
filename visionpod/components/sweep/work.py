@@ -45,6 +45,7 @@ class SweepWork(LightningWork):
             parallel=parallel,
             cache_calls=True,
             cloud_compute=CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible),
+            start_with_flow=True,
             **kwargs,
         )
 
@@ -55,6 +56,7 @@ class SweepWork(LightningWork):
         self._model_kwargs = model_kwargs
         self.trial_count = trial_count
         self.trial_number = 1
+        self.finished = False
         # must be instantiated in __init__
         # ._ makes a non JSON-serializable attribute private to LightningWork
         self.sweep_id = None
@@ -88,9 +90,10 @@ class SweepWork(LightningWork):
             return self._wandb_api.sweep(self.sweep_url).best_run().config
 
     def log_results(self) -> None:
-        fp = os.path.join(config.Paths.tuned_configs, f"{self.sweep_name.replace('Sweep', 'sweep')}.json")
-        with open(fp, "w") as filepath:
-            json.dump(self.best_params, filepath, indent=4, sort_keys=True)
+        if self.finished is True:
+            fp = os.path.join(config.Paths.tuned_configs, f"{self.sweep_name.replace('Sweep', 'sweep')}.json")
+            with open(fp, "w") as filepath:
+                json.dump(self.best_params, filepath, indent=4, sort_keys=True)
 
     def objective(self) -> float:
         logger = WandbLogger(
@@ -134,5 +137,6 @@ class SweepWork(LightningWork):
         wandb.agent(self.sweep_id, function=self.objective, count=self.trial_count)
         os.system(f"wandb sweep --stop {self.entity}/{self.project_name}/{self.sweep_id}")
         wandb.finish()
+        self.finished = True  # hack to try and get log_results to wait
         self.log_results()
         self.status.stage = WorkStageStatus.SUCCEEDED
