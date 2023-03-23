@@ -32,9 +32,15 @@ class Settings:
     _maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
 
 
+class System:
+    is_cloud_run = is_running_in_cloud()
+    platform = sys.platform
+    machine = "default" if not is_cloud_run else ""
+
+
 class Paths:
     filepath = Path(__file__)
-    project = filepath.parents[1]
+    project = os.getcwd() if System.is_cloud_run else filepath.parents[1]
     package = filepath.parent
     logs = os.path.join(project, "logs")
     torch_profiler = os.path.join(logs, "torch_profiler")
@@ -161,12 +167,6 @@ class Compute:
     train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=60)
     sweep_compute = CloudCompute(name="default", idle_timeout=60)
     flow_compute = CloudCompute(name="default")
-
-
-class System:
-    is_cloud_run = is_running_in_cloud()
-    platform = sys.platform
-    machine = "default" if not is_cloud_run else ""
 
 
 class ExperimentManager:
