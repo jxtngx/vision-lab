@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import sys
 from typing import Any, Dict
 
 from lightning import LightningFlow
 
+from visionpod import config
 from visionpod.components.sweep.work import SweepWork
 from visionpod.components.train.work import TrainerWork
 
@@ -28,6 +29,20 @@ class TrainerFlow(LightningFlow):
         self.trainer_work = TrainerWork(**trainer_payload)
 
     def run(self):
+        # start sweep; sweep is blocking
         self.sweep_work.run()
+        # stop sweep when finished
+        if self.sweep_work.is_finished:
+            self.sweep_work.stop()
+        # start tuned run; tuned run is blocking
         self.trainer_work.run(sweep_id=self.sweep_work.sweep_id)
-        self.stop()
+        # stop trainer when finished
+        if self.trainer_work.is_finished:
+            self.trainer_work.stop()
+            # exit protocol if local
+            if not config.System.is_cloud_run:
+                print("local exit")
+                sys.exit()
+            # exit protocol if cloud run
+            if config.System.is_cloud_run:
+                self.stop()

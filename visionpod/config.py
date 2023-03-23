@@ -26,12 +26,16 @@ from torchvision import transforms
 
 
 class Settings:
+    mps_available = MPSAccelerator.is_available()
+    is_cloud_run = is_running_in_cloud()
     seed = 42
     projectname = "visionpod"
     data_version = "0"
     maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
+    dtype = "16-mixed" if mps_available else "bf16-mixed" if is_cloud_run else None
 
 
+# TODO consolidate System into Settings
 class System:
     is_cloud_run = is_running_in_cloud()
     sim_cpu_cloud_run = os.getenv("SIM_CPU_CLOUD_RUN")
@@ -84,13 +88,13 @@ class Module:
 class Trainer:
     train_flags = dict(
         max_epochs=100,
-        precision=System.dtype,
+        precision=Settings.dtype,
         callbacks=[EarlyStopping(monitor="val_loss", mode="min")],
         **Settings.maybe_use_mps,
     )
     fast_flags = dict(
         max_epochs=2,
-        precision=System.dtype,
+        precision=Settings.dtype,
         **Settings.maybe_use_mps,
     )
 
@@ -120,12 +124,12 @@ class Sweep:
     )
     fast_trainer_flags = dict(
         max_epochs=2,
-        precision=System.dtype,
+        precision=Settings.dtype,
         **Settings.maybe_use_mps,
     )
     trainer_flags = dict(
         max_epochs=10,
-        precision=System.dtype,
+        precision=Settings.dtype,
         **Settings.maybe_use_mps,
     )
 
@@ -137,26 +141,26 @@ class DataModule:
     inverse_mean = [-i for i in mean]
     inverse_stddev = [1 / i for i in stddev]
     cifar_norm = transforms.Normalize(mean=mean, std=stddev)
-    test_transform = transforms.Compose([transforms.ToTensor(), transforms.ConvertImageDtype(System.dtype)])
+    test_transform = transforms.Compose([transforms.ToTensor(), transforms.ConvertImageDtype(Settings.dtype)])
     train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
-            transforms.ConvertImageDtype(System.dtype),
+            transforms.ConvertImageDtype(Settings.dtype),
         ]
     )
     norm_train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
-            transforms.ConvertImageDtype(System.dtype),
+            transforms.ConvertImageDtype(Settings.dtype),
             cifar_norm,
         ]
     )
     norm_test_transform = transforms.Compose(
         [
             transforms.ToTensor(),
-            transforms.ConvertImageDtype(System.dtype),
+            transforms.ConvertImageDtype(Settings.dtype),
             cifar_norm,
         ]
     )

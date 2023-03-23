@@ -69,6 +69,7 @@ class TrainerWork(LightningWork):
         self.tune = tune
         self.run_id = None
         self.sweep_id = None
+        self.is_finished = False
 
         # ._ make private to LightningWork
         self._trainer_flags = trainer_flags
@@ -211,4 +212,5 @@ class TrainerWork(LightningWork):
         if self.persist_predictions:
             self._persist_predictions(self.predictions_dir)
 
+        self.is_finished = True
         self.status.stage = WorkStageStatus.SUCCEEDED

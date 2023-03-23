@@ -41,4 +41,5 @@ trainer_payload = dict(
     model_kwargs=config.Module.model_kwargs,  # args required by ViT
 )
 
+# TODO figure out why app is not terminating locally
 app = LightningApp(TrainerFlow(sweep_payload=sweep_payload, trainer_payload=trainer_payload))
