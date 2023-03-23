@@ -29,13 +29,16 @@ class Settings:
     seed = 42
     projectname = "visionpod"
     data_version = "0"
-    _maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
+    maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
 
 
 class System:
     is_cloud_run = is_running_in_cloud()
+    sim_cpu_cloud_run = os.getenv("SIM_CPU_CLOUD_RUN")
     platform = sys.platform
     machine = "default" if not is_cloud_run else ""
+    mps_available = MPSAccelerator.is_available()
+    dtype = "16-mixed" if mps_available else "bf16-mixed" if is_cloud_run else None
 
 
 class Paths:
@@ -81,14 +84,14 @@ class Module:
 class Trainer:
     train_flags = dict(
         max_epochs=100,
-        precision="16-mixed",
+        precision=System.dtype,
         callbacks=[EarlyStopping(monitor="val_loss", mode="min")],
-        **Settings._maybe_use_mps,
+        **Settings.maybe_use_mps,
     )
     fast_flags = dict(
         max_epochs=2,
-        precision="16-mixed",
-        **Settings._maybe_use_mps,
+        precision=System.dtype,
+        **Settings.maybe_use_mps,
     )
 
 
@@ -117,13 +120,13 @@ class Sweep:
     )
     fast_trainer_flags = dict(
         max_epochs=2,
-        precision="16-mixed",
-        **Settings._maybe_use_mps,
+        precision=System.dtype,
+        **Settings.maybe_use_mps,
     )
     trainer_flags = dict(
         max_epochs=10,
-        precision="16-mixed",
-        **Settings._maybe_use_mps,
+        precision=System.dtype,
+        **Settings.maybe_use_mps,
     )
 
 
@@ -134,21 +137,29 @@ class DataModule:
     inverse_mean = [-i for i in mean]
     inverse_stddev = [1 / i for i in stddev]
     cifar_norm = transforms.Normalize(mean=mean, std=stddev)
-    test_transform = transforms.Compose([transforms.ToTensor()])
+    test_transform = transforms.Compose([transforms.ToTensor(), transforms.ConvertImageDtype(System.dtype)])
     train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
+            transforms.ConvertImageDtype(System.dtype),
         ]
     )
     norm_train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
+            transforms.ConvertImageDtype(System.dtype),
             cifar_norm,
         ]
     )
-    norm_test_transform = transforms.Compose([transforms.ToTensor(), cifar_norm])
+    norm_test_transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.ConvertImageDtype(System.dtype),
+            cifar_norm,
+        ]
+    )
     # see https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821
     inverse_transform = transforms.Compose(
         [
@@ -164,12 +175,12 @@ class Tune:
 
 
 class Compute:
-    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=60)
-    sweep_compute = CloudCompute(name="default", idle_timeout=60)
+    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=10)
+    sweep_compute = CloudCompute(name="default", idle_timeout=10)
     flow_compute = CloudCompute(name="default")
 
 
 class ExperimentManager:
-    WANDB_API_KEY = None if not System.is_cloud_run else os.getenv("WANDB-API-KEY")
-    WANDB_ENTITY = None if not System.is_cloud_run else os.getenv("WANDB-ENTITY")
+    WANDB_API_KEY = os.getenv("WANDB_API_KEY")
+    WANDB_ENTITY = os.getenv("WANDB_ENTITY")
     WANDB_CONFIG_DIR = Paths.wandb_logs

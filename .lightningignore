@@ -157,7 +157,6 @@ logs/torch_profiler/test*
 logs/tuned_configs/*.json
 wandb/
 logs/wandb/wandb
-data/cache/
 data/predictions/*.pt
 data/training_split/*.md
 apps/wandb

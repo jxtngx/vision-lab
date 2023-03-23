@@ -40,19 +40,22 @@ class PodTrainer(L.Trainer):
     def __init__(
         self,
         logger: Optional[Logger] = None,
-        profiler: Optional[Profiler] = None,
+        profiler: Optional[Profiler] = PyTorchProfiler(dirpath=config.Paths.torch_profiler, filename="profiler"),
         callbacks: Optional[List] = [],
         plugins: Optional[List] = [],
         set_seed: bool = True,
         **trainer_init_kwargs: Dict[str, Any]
     ) -> None:
-
         if set_seed:
             seed_everything(config.Settings.seed, workers=True)
 
+        if config.System.is_cloud_run:
+            profiler = None
+            raise UserWarning("Profiler disabled for cloud runs")
+
         super().__init__(
             logger=logger or TensorBoardLogger(config.Paths.tensorboard, name="logs"),
-            profiler=profiler or PyTorchProfiler(dirpath=config.Paths.torch_profiler, filename="profiler"),
+            profiler=profiler,
             callbacks=callbacks + [ModelCheckpoint(dirpath=config.Paths.checkpoints, filename="model")],
             plugins=plugins,
             **trainer_init_kwargs
