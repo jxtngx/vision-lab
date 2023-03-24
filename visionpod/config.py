@@ -32,23 +32,15 @@ class Settings:
     projectname = "visionpod"
     data_version = "0"
     maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
-    precision_dtype = "16-mixed" if mps_available else "bf16-mixed" if is_cloud_run else None
-    tensor_dtype = torch.float16 if mps_available else torch.bfloat16 if is_cloud_run else None
-
-
-# TODO consolidate System into Settings
-class System:
+    precision_dtype = "16-mixed"
     is_cloud_run = is_running_in_cloud()
-    sim_cpu_cloud_run = os.getenv("SIM_CPU_CLOUD_RUN")
+    machine = "gpu-rtx" if is_cloud_run else "default"
     platform = sys.platform
-    machine = "default" if not is_cloud_run else ""
-    mps_available = MPSAccelerator.is_available()
-    dtype = "16-mixed" if mps_available else "bf16-mixed" if is_cloud_run else None
 
 
 class Paths:
     filepath = Path(__file__)
-    project = os.getcwd() if System.is_cloud_run else filepath.parents[1]
+    project = os.getcwd() if Settings.is_cloud_run else filepath.parents[1]
     package = filepath.parent
     # logs
     logs = os.path.join(project, "logs")

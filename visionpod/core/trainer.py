@@ -40,7 +40,7 @@ class PodTrainer(L.Trainer):
     def __init__(
         self,
         logger: Optional[Logger] = None,
-        profiler: Optional[Profiler] = PyTorchProfiler(dirpath=config.Paths.torch_profiler, filename="profiler"),
+        profiler: Optional[Profiler] = None,
         callbacks: Optional[List] = [],
         plugins: Optional[List] = [],
         set_seed: bool = True,
@@ -48,6 +48,9 @@ class PodTrainer(L.Trainer):
     ) -> None:
         if set_seed:
             seed_everything(config.Settings.seed, workers=True)
+
+        if not config.Settings.is_cloud_run:
+            profiler = PyTorchProfiler(dirpath=config.Paths.torch_profiler, filename="profiler")
 
         super().__init__(
             logger=logger or TensorBoardLogger(config.Paths.tensorboard, name="logs"),

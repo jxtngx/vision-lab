@@ -168,3 +168,8 @@ tests/
 .git/
 cloud_run*
 CITATION.cff
+.circleci/
+.github/
+.devcontainer/
+.vercelignore
+helpers.txt

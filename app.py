@@ -28,8 +28,8 @@ torchvision.disable_beta_transforms_warning()
 sweep_payload = dict(
     project_name="visionpod",  # the wandb project name
     trial_count=2,  # low trial count for proof of concept (POC)
-    machine="default",  # 1 cpu: 0.2 USD per hour
-    idle_timeout=60,  # wandb needs time to finish logging sweep
+    machine=config.Settings.machine,  # "gpu-rtx" if is_cloud_run else "default"
+    idle_timeout=60,  # time in seconds; wandb needs time to finish logging sweep
     interruptible=False,  # set to True for spot instances. False because not supported yet
     trainer_init_flags=config.Sweep.fast_trainer_flags,  # sets low max epochs for POC
     wandb_save_dir=config.Paths.wandb_logs,  # where wandb will push logs to locally
@@ -39,12 +39,12 @@ sweep_payload = dict(
 # TODO give a really verbose example of payload
 trainer_payload = dict(
     tune=True,  # let trainer know to expect a tuned config payload
-    machine="default",  # 1 cpu: 0.2 USD per hour
-    idle_timeout=30,  # give wandb time to finish
+    machine=config.Settings.machine,  # "gpu-rtx" if is_cloud_run else "default"
+    idle_timeout=30,  # time in seconds; give wandb time to finish
     interruptible=False,  # set to True for spot instances. False because not supported yet
     trainer_flags=config.Trainer.fast_flags,  # sets low max epochs for POC
     model_kwargs=config.Module.model_kwargs,  # args required by ViT
 )
 
-# TODO figure out why app is not terminating locally
+
 app = LightningApp(TrainerFlow(sweep_payload=sweep_payload, trainer_payload=trainer_payload))
