@@ -49,10 +49,6 @@ class PodTrainer(L.Trainer):
         if set_seed:
             seed_everything(config.Settings.seed, workers=True)
 
-        if config.System.is_cloud_run:
-            profiler = None
-            raise UserWarning("Profiler disabled for cloud runs")
-
         super().__init__(
             logger=logger or TensorBoardLogger(config.Paths.tensorboard, name="logs"),
             profiler=profiler,

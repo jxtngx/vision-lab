@@ -148,28 +148,24 @@ class DataModule:
     test_transform = transforms.Compose(
         [
             transforms.ToTensor(),
-            # transforms.ConvertImageDtype(Settings.tensor_dtype),
         ]
     )
     train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
-            # transforms.ConvertImageDtype(Settings.tensor_dtype),
         ]
     )
     norm_train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
-            # transforms.ConvertImageDtype(Settings.tensor_dtype),
             cifar_norm,
         ]
     )
     norm_test_transform = transforms.Compose(
         [
             transforms.ToTensor(),
-            # transforms.ConvertImageDtype(Settings.tensor_dtype),
             cifar_norm,
         ]
     )

@@ -17,6 +17,7 @@ import os
 from typing import Any, Callable, Union
 
 import torch
+import torchvision
 from lightning.pytorch import LightningDataModule, seed_everything
 from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from torch.utils.data import DataLoader, random_split
@@ -88,6 +89,7 @@ class PodDataModule(LightningDataModule):
     def _persist_splits(self):
         """saves all splits for reproducibility"""
         seed_everything(config.Settings.seed)
+        torchvision.disable_beta_transforms_warning()
         train = self.dataset(self.data_cache, train=True, transform=self.train_transforms)
         val = self.dataset(self.data_cache, train=True, transform=self.test_transforms)
         train_size = int(len(train) * self.train_size)

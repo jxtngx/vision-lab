@@ -40,11 +40,11 @@ class TrainerFlow(LightningFlow):
         if self.trainer_work.is_finished:
             self.trainer_work.stop()
             # exit protocol if local
-            if not config.System.is_cloud_run:
+            if not config.Settings.is_cloud_run:
                 print("local exit")
                 self.stop()
             # exit protocol if cloud run
-            if config.System.is_cloud_run:
+            if config.Settings.is_cloud_run:
                 print("cloud exit")
                 self.stop()
 

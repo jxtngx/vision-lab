@@ -14,12 +14,15 @@
 
 import os
 
+import torchvision
 from lightning import LightningApp
 
 from visionpod import config
 from visionpod.components import TrainerFlow
 
 os.environ["WANDB_CONFIG_DIR"] = config.ExperimentManager.WANDB_CONFIG_DIR
+
+torchvision.disable_beta_transforms_warning()
 
 # TODO give a really verbose example of payload
 sweep_payload = dict(

@@ -158,7 +158,7 @@ logs/tuned_configs/*.json
 wandb/
 logs/wandb/wandb
 data/predictions/*.pt
-data/training_split/*.md
+data/training_split/*.pt
 data/cache
 docs-src/
 ui/
