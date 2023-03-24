@@ -159,7 +159,7 @@ wandb/
 logs/wandb/wandb
 data/predictions/*.pt
 data/training_split/*.md
-apps/wandb
+data/cache
 docs-src/
 ui/
 apps/

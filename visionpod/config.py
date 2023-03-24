@@ -32,7 +32,8 @@ class Settings:
     projectname = "visionpod"
     data_version = "0"
     maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
-    dtype = "16-mixed" if mps_available else "bf16-mixed" if is_cloud_run else None
+    precision_dtype = "16-mixed" if mps_available else "bf16-mixed" if is_cloud_run else None
+    tensor_dtype = torch.float16 if mps_available else torch.bfloat16 if is_cloud_run else None
 
 
 # TODO consolidate System into Settings
@@ -49,21 +50,24 @@ class Paths:
     filepath = Path(__file__)
     project = os.getcwd() if System.is_cloud_run else filepath.parents[1]
     package = filepath.parent
+    # logs
     logs = os.path.join(project, "logs")
     torch_profiler = os.path.join(logs, "torch_profiler")
     simple_profiler = os.path.join(logs, "simple_profiler")
     tensorboard = os.path.join(logs, "tensorboard")
+    tuned_configs = os.path.join(logs, "tuned_configs")
+    wandb_logs = os.path.join(logs, "wandb")
+    wandb_summary = os.path.join(logs, "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
+    # models
     checkpoints = os.path.join(project, "models", "checkpoints")
     model = os.path.join(project, "models", "onnx", "model.onnx")
+    # data
     predictions = os.path.join(project, "data", "predictions", "predictions.pt")
     dataset = os.path.join(project, "data", "cache")
     splits = os.path.join(project, "data", "training_split")
     train_split = os.path.join(splits, f"v{Settings.data_version}-train.pt")
     val_split = os.path.join(splits, f"v{Settings.data_version}-val.pt")
     test_split = os.path.join(splits, f"v{Settings.data_version}-test.pt")
-    wandb_logs = os.path.join(project, "logs", "wandb")
-    wandb_summary = os.path.join(project, "logs", "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
-    tuned_configs = os.path.join(logs, "tuned_configs")
 
 
 class Module:
@@ -88,13 +92,13 @@ class Module:
 class Trainer:
     train_flags = dict(
         max_epochs=100,
-        precision=Settings.dtype,
+        precision=Settings.precision_dtype,
         callbacks=[EarlyStopping(monitor="val_loss", mode="min")],
         **Settings.maybe_use_mps,
     )
     fast_flags = dict(
         max_epochs=2,
-        precision=Settings.dtype,
+        precision=Settings.precision_dtype,
         **Settings.maybe_use_mps,
     )
 
@@ -124,12 +128,12 @@ class Sweep:
     )
     fast_trainer_flags = dict(
         max_epochs=2,
-        precision=Settings.dtype,
+        precision=Settings.precision_dtype,
         **Settings.maybe_use_mps,
     )
     trainer_flags = dict(
         max_epochs=10,
-        precision=Settings.dtype,
+        precision=Settings.precision_dtype,
         **Settings.maybe_use_mps,
     )
 
@@ -141,26 +145,31 @@ class DataModule:
     inverse_mean = [-i for i in mean]
     inverse_stddev = [1 / i for i in stddev]
     cifar_norm = transforms.Normalize(mean=mean, std=stddev)
-    test_transform = transforms.Compose([transforms.ToTensor(), transforms.ConvertImageDtype(Settings.dtype)])
+    test_transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            # transforms.ConvertImageDtype(Settings.tensor_dtype),
+        ]
+    )
     train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
-            transforms.ConvertImageDtype(Settings.dtype),
+            # transforms.ConvertImageDtype(Settings.tensor_dtype),
         ]
     )
     norm_train_transform = transforms.Compose(
         [
             transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10),
             transforms.ToTensor(),
-            transforms.ConvertImageDtype(Settings.dtype),
+            # transforms.ConvertImageDtype(Settings.tensor_dtype),
             cifar_norm,
         ]
     )
     norm_test_transform = transforms.Compose(
         [
             transforms.ToTensor(),
-            transforms.ConvertImageDtype(Settings.dtype),
+            # transforms.ConvertImageDtype(Settings.tensor_dtype),
             cifar_norm,
         ]
     )

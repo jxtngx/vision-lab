@@ -23,12 +23,12 @@ from visionpod.components.train.work import TrainerWork
 
 
 class TrainerFlow(LightningFlow):
-    def __init__(self, sweep_payload: Dict[str, Any], trainer_payload: Dict[str, Any]):
+    def __init__(self, sweep_payload: Dict[str, Any], trainer_payload: Dict[str, Any]) -> None:
         super().__init__()
         self.sweep_work = SweepWork(**sweep_payload)
         self.trainer_work = TrainerWork(**trainer_payload)
 
-    def run(self):
+    def run(self) -> None:
         # start sweep; sweep is blocking
         self.sweep_work.run()
         # stop sweep when finished
@@ -42,7 +42,11 @@ class TrainerFlow(LightningFlow):
             # exit protocol if local
             if not config.System.is_cloud_run:
                 print("local exit")
-                sys.exit()
+                self.stop()
             # exit protocol if cloud run
             if config.System.is_cloud_run:
+                print("cloud exit")
                 self.stop()
+
+    def stop(self):
+        sys.exit()

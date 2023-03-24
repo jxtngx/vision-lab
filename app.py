@@ -21,6 +21,7 @@ from visionpod.components import TrainerFlow
 
 os.environ["WANDB_CONFIG_DIR"] = config.ExperimentManager.WANDB_CONFIG_DIR
 
+# TODO give a really verbose example of payload
 sweep_payload = dict(
     project_name="visionpod",  # the wandb project name
     trial_count=2,  # low trial count for proof of concept (POC)
@@ -32,6 +33,7 @@ sweep_payload = dict(
     model_kwargs=config.Module.model_kwargs,  # args required by ViT
 )
 
+# TODO give a really verbose example of payload
 trainer_payload = dict(
     tune=True,  # let trainer know to expect a tuned config payload
     machine="default",  # 1 cpu: 0.2 USD per hour

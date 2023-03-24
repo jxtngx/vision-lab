@@ -64,6 +64,10 @@ class PodDataModule(LightningDataModule):
         version_exists = any(v in os.listdir(self.data_splits) for v in vfiles)
 
         if not self.data_cache_exists:
+            self.dataset(self.data_cache, download=True)
+            self._persist_splits()
+
+        if not version_exists:
             self._persist_splits()
 
         if version_exists and not self.reversion:
