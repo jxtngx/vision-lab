@@ -34,7 +34,7 @@ class Settings:
     maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
     precision_dtype = "16-mixed"
     is_cloud_run = is_running_in_cloud()
-    machine = "gpu-rtx" if is_cloud_run else "default"
+    machine = "gpu" if is_cloud_run else "default"
     platform = sys.platform
 
 
