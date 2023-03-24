@@ -14,7 +14,6 @@
 
 import os
 
-import torchvision
 from lightning import LightningApp
 
 from visionpod import config
@@ -22,13 +21,11 @@ from visionpod.components import TrainerFlow
 
 os.environ["WANDB_CONFIG_DIR"] = config.ExperimentManager.WANDB_CONFIG_DIR
 
-torchvision.disable_beta_transforms_warning()
-
 # TODO give a really verbose example of payload
 sweep_payload = dict(
     project_name="visionpod",  # the wandb project name
     trial_count=2,  # low trial count for proof of concept (POC)
-    machine=config.Settings.machine,  # "gpu-rtx" if is_cloud_run else "default"
+    machine="default",  # "gpu-rtx" if is_cloud_run else "default"
     idle_timeout=60,  # time in seconds; wandb needs time to finish logging sweep
     interruptible=False,  # set to True for spot instances. False because not supported yet
     trainer_init_flags=config.Sweep.fast_trainer_flags,  # sets low max epochs for POC
@@ -39,7 +36,7 @@ sweep_payload = dict(
 # TODO give a really verbose example of payload
 trainer_payload = dict(
     tune=True,  # let trainer know to expect a tuned config payload
-    machine=config.Settings.machine,  # "gpu-rtx" if is_cloud_run else "default"
+    machine="default",  # "gpu-rtx" if is_cloud_run else "default"
     idle_timeout=30,  # time in seconds; give wandb time to finish
     interruptible=False,  # set to True for spot instances. False because not supported yet
     trainer_flags=config.Trainer.fast_flags,  # sets low max epochs for POC

@@ -32,7 +32,7 @@ class Settings:
     projectname = "visionpod"
     data_version = "0"
     maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
-    precision_dtype = "16-mixed"
+    precision_dtype = "16-mixed" if mps_available else "32-true"
     is_cloud_run = is_running_in_cloud()
     machine = "gpu" if is_cloud_run else "default"
     platform = sys.platform
