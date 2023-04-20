@@ -40,7 +40,7 @@ class Settings:
 
 class Paths:
     filepath = Path(__file__)
-    project = os.getcwd() if Settings.is_cloud_run else filepath.parents[1]
+    project = os.getcwd() if Settings.is_cloud_run else filepath.parents[2]
     package = filepath.parent
     # logs
     logs = os.path.join(project, "logs")
