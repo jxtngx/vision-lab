@@ -40,7 +40,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title={`Hello from ${siteConfig.title}`}
-      description="An end to end ML product template <head />">
+      description="An end to end CV project built with PyTorch and PyTorch Lightning <head />">
       <HomepageHeader />
       {/* <main>
         <HomepageFeatures />
