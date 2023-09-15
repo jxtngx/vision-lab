@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import dash
 import dash_bootstrap_components as dbc
 import lightning as L
 import torch
+from pages import Body, create_figure, DATASET, find_index, LABELNAMES, NavBar, PREDICTIONS
+
+import dash
 from dash import html
 from dash.dependencies import Input, Output
-from pages import Body, create_figure, DATASET, find_index, LABELNAMES, NavBar, PREDICTIONS
 
 
 class DashWorker(L.LightningWork):

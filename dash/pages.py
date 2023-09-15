@@ -15,9 +15,9 @@
 
 import dash_bootstrap_components as dbc
 import torch
-from dash import dcc, html
 from utilities import create_figure, find_index, make_metrics_summary, make_model_summary
 
+from dash import dcc, html
 from visionlab import config
 
 PREDICTIONS = torch.load(config.Paths.predictions)

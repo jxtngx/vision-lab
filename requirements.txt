@@ -1,2 +1,0 @@
-# this should only be used by CircleCI for installing base and testing requirements
-.

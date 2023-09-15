@@ -98,7 +98,7 @@ Using this template will require accounts for Lightning + Weights and Biases.
 
 After creating a W&B account and installing the development environment, a training run can be ran locally with any of the following command line examples.
 
-If you are on an M1 powered mac, be sure to set the following environment variable to train with MPS:
+If you are on an M series powered mac, be sure to set the following environment variable to train with MPS:
 
 ```sh
 export PYTORCH_ENABLE_MPS_FALLBACK=1
