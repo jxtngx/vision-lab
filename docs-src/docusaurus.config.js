@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Lightning Vision",
   //   tagline: 'Dinosaurs are cool',
-  //   favicon: 'img/favicon.ico',
+    favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
   url: "https://visionlab-docs.vercel.app/",
