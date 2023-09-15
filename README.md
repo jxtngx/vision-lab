@@ -21,11 +21,9 @@ Another purpose of this project is to create a visual interface with [ReactJS](h
 
 <!-- Core services and dependencies are: [Weights and Biases](http://wandb.ai/site), [Supabase](https://supabase.com), [Prisma](https://www.prisma.io), [FastAPI](https://fastapi.tiangolo.com), and [Zuplo](https://zuplo.com). -->
 
-This is a work in progress, especially the front end.
-
 The docs can be viewed at [visionpod-docs.vercel.app](https://visionpod-docs.vercel.app/)
 
-The NextJS app's progress can be viewed at [visionpod.vercel.app](https://visionpod.vercel.app/)
+The in-progress frontend app can be viewed at [visionpod.vercel.app](https://visionpod.vercel.app/)
 
 ## Tools and Topics
 
