@@ -1,42 +1,36 @@
-### PodTrainer
-
+### LabTrainer
 
 ```python
-visionpod.core.trainer.PodTrainer(
+visionlab.core.trainer.LabTrainer(
     logger=None, profiler=None, callbacks=[], plugins=[], set_seed=True, **trainer_init_kwargs
 )
 ```
 
-
 A custom Lightning.LightningTrainer
 
-__Arguments__
+**Arguments**
 
-- __logger__ `lightning.pytorch.loggers.logger.Logger | None`: None
-- __profiler__ `lightning.pytorch.profilers.profiler.Profiler | None`: None
-- __callbacks__ `List | None`: []
-- __plugins__ `List | None`: []
-- __set_seed__ `bool`: True
-- __trainer_init_kwargs__ `Dict[str, Any]`:
+- **logger** `lightning.pytorch.loggers.logger.Logger | None`: None
+- **profiler** `lightning.pytorch.profilers.profiler.Profiler | None`: None
+- **callbacks** `List | None`: []
+- **plugins** `List | None`: []
+- **set_seed** `bool`: True
+- **trainer_init_kwargs** `Dict[str, Any]`:
 
-
-----
+---
 
 ### persist_predictions
 
-
 ```python
-PodTrainer.persist_predictions(
-    predictions_dir="/Users/justin/Developer/lightning-pod-projects/lightning-pod-vision/data/predictions/predictions.pt",
+LabTrainer.persist_predictions(
+    predictions_dir="/Users/justin/Developer/lightning-vision-projects/lightning-vision-vision/data/predictions/predictions.pt",
 )
 ```
 
-
 helper method to persist predictions on completion of a training run
 
-__Arguments__
+**Arguments**
 
-- __predictions_dir__ `str | pathlib.Path | None`: the directory path where predictions should be saved to
+- **predictions_dir** `str | pathlib.Path | None`: the directory path where predictions should be saved to
 
-
-----
+---

@@ -12,5 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from visionpod.core.module import PodModule  # noqa: F401
-from visionpod.core.trainer import PodTrainer  # noqa: F401
+from visionlab.pipeline.datamodule import LabDataModule  # noqa: F401

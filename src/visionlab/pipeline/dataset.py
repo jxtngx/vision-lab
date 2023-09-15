@@ -17,7 +17,7 @@ from typing import Any
 from torchvision.datasets import CIFAR10 as Dataset
 
 
-class PodDataset(Dataset):
+class LabDataset(Dataset):
     """
     Note:
         see below for a basic example of a custom torch dataset
@@ -27,7 +27,7 @@ class PodDataset(Dataset):
     from torch.utils.data import Dataset
 
 
-    class PodDataset(Dataset):
+    class LabDataset(Dataset):
         def __init__(self, features_path, labels_path):
             self.features = pd.read_csv(features_path)
             self.labels = pd.read_csv(labels_path)

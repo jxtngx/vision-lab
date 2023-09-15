@@ -17,9 +17,9 @@ from typing import Any, Dict
 
 from lightning import LightningFlow
 
-from visionpod import config
-from visionpod.components.sweep.work import SweepWork
-from visionpod.components.train.work import TrainerWork
+from visionlab import config
+from visionlab.components.sweep.work import SweepWork
+from visionlab.components.train.work import TrainerWork
 
 
 class TrainerFlow(LightningFlow):

@@ -1,4 +1,5 @@
 # Lightning-Vision
+
 <!-- # Copyright Justin R. Goheen.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +22,9 @@ Another purpose of this project is to create a visual interface with [ReactJS](h
 
 <!-- Core services and dependencies are: [Weights and Biases](http://wandb.ai/site), [Supabase](https://supabase.com), [Prisma](https://www.prisma.io), [FastAPI](https://fastapi.tiangolo.com), and [Zuplo](https://zuplo.com). -->
 
-The docs can be viewed at [visionpod-docs.vercel.app](https://visionpod-docs.vercel.app/)
+The docs can be viewed at [visionlab-docs.vercel.app](https://visionlab-docs.vercel.app/)
 
-The in-progress frontend app can be viewed at [visionpod.vercel.app](https://visionpod.vercel.app/)
+The in-progress frontend app can be viewed at [visionlab.vercel.app](https://visionlab.vercel.app/)
 
 ## Tools and Topics
 
@@ -71,13 +72,13 @@ The structure of the project is:
 - `models` contains training checkpoints and pre-trained models
 - `requirements` + `requirements.txt` helps CI/CD jobs install Python requirements
 - `research` contains companion notebooks and a Plotly Dash UI
-- `tests` are tests for visionpod
+- `tests` are tests for visionlab
 - `ui` is the NextJS frontend deployed to Vercel
-- `visionpod` is the Python package, Lightning App, and VisionTransformer
+- `visionlab` is the Python package, Lightning App, and VisionTransformer
 
 ## Setup
 
-You must have [Python](https://www.python.org/downloads/) and [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) installed. See [Installing NVM, Node, and TypeScript](https://visionpod-docs.vercel.app/blog/Installing-NVM-Node-and-TypeScript) for help.
+You must have [Python](https://www.python.org/downloads/) and [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) installed. See [Installing NVM, Node, and TypeScript](https://visionlab-docs.vercel.app/blog/Installing-NVM-Node-and-TypeScript) for help.
 
 To setup a virtual development environment, in terminal, do:
 

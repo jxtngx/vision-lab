@@ -20,11 +20,11 @@ rootdir = Path(__file__).parent
 long_description = (rootdir / "README.md").read_text()
 
 setup(
-    name="visionpod",
+    name="visionlab",
     package_dir={"": "src"},
-    packages=["visionpod"],
+    packages=["visionlab"],
     version="0.0.1",
-    description="An End to End ML Product Example",
+    description="An End to End Vision Transformer Example",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Justin Goheen",

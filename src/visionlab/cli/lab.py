@@ -16,11 +16,11 @@ import os
 
 import click
 
-from visionpod import config, PodDataModule, PodModule, PodTrainer
-from visionpod.cli.utils import common_destructive_flow, make_bug_trainer, teardown
-from visionpod.components import SweepWork, TrainerWork
-from visionpod.utilities.bugreport import bugreport
-from visionpod.utilities.docs.autogen import PodDocsGenerator
+from visionlab import config, LabDataModule, LabModule, LabTrainer
+from visionlab.cli.utils import common_destructive_flow, make_bug_trainer, teardown
+from visionlab.components import SweepWork, TrainerWork
+from visionlab.utilities.bugreport import bugreport
+from visionlab.utilities.docs.autogen import PodDocsGenerator
 
 PACKAGE = config.Paths.package
 PROJECT = config.Paths.project
@@ -93,14 +93,14 @@ def trainer_run() -> None:
 @click.option("--image_size", default=config.Module.model_kwargs["image_size"])
 @click.option("--num_classes", default=config.Module.model_kwargs["num_classes"])
 def fast_dev(image_size, num_classes) -> None:
-    model = PodModule(image_size=image_size, num_classes=num_classes)
-    datamodule = PodDataModule()
-    trainer = PodTrainer(fast_dev_run=True, **config.Trainer.fast_flags)
+    model = LabModule(image_size=image_size, num_classes=num_classes)
+    datamodule = LabDataModule()
+    trainer = LabTrainer(fast_dev_run=True, **config.Trainer.fast_flags)
     trainer.fit(model=model, datamodule=datamodule)
 
 
 @trainer_run.command("fast-train")
-@click.option("--project-name", default="visionpod")
+@click.option("--project-name", default="visionlab")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=True)
 def fast_train(project_name, persist_model, persist_predictions) -> None:
@@ -115,7 +115,7 @@ def fast_train(project_name, persist_model, persist_predictions) -> None:
 
 
 @trainer_run.command("untuned")
-@click.option("--project-name", default="visionpod")
+@click.option("--project-name", default="visionlab")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=True)
 def untuned(project_name, persist_model, persist_predictions) -> None:
@@ -132,7 +132,7 @@ def untuned(project_name, persist_model, persist_predictions) -> None:
 
 
 @trainer_run.command("fast-sweep")
-@click.option("--project-name", default="visionpod")
+@click.option("--project-name", default="visionlab")
 @click.option("--persist_model", default=False)
 @click.option("--persist_predictions", default=False)
 def fast_sweep(project_name, persist_model, persist_predictions) -> None:
@@ -144,7 +144,7 @@ def fast_sweep(project_name, persist_model, persist_predictions) -> None:
 
 
 @trainer_run.command("tuned")
-@click.option("--project-name", default="visionpod")
+@click.option("--project-name", default="visionlab")
 @click.option("--trial-count", default=10)
 @click.option("--persist_model", is_flag=True)
 @click.option("--persist_predictions", is_flag=True)

@@ -14,25 +14,25 @@ class PodDocsGenerator:
     def build():
 
         pages = {
-            "core.PodModule.md": [
-                "visionpod.core.module.PodModule",
-                "visionpod.core.module.PodModule.forward",
-                "visionpod.core.module.PodModule.training_step",
-                "visionpod.core.module.PodModule.test_step",
-                "visionpod.core.module.PodModule.validation_step",
-                "visionpod.core.module.PodModule.predict_step",
-                "visionpod.core.module.PodModule.configure_optimizers",
-                "visionpod.core.module.PodModule.common_step",
+            "core.LabModule.md": [
+                "visionlab.core.module.LabModule",
+                "visionlab.core.module.LabModule.forward",
+                "visionlab.core.module.LabModule.training_step",
+                "visionlab.core.module.LabModule.test_step",
+                "visionlab.core.module.LabModule.validation_step",
+                "visionlab.core.module.LabModule.predict_step",
+                "visionlab.core.module.LabModule.configure_optimizers",
+                "visionlab.core.module.LabModule.common_step",
             ],
-            "core.PodTrainer.md": [
-                "visionpod.core.trainer.PodTrainer",
-                "visionpod.core.trainer.PodTrainer.persist_predictions",
+            "core.LabTrainer.md": [
+                "visionlab.core.trainer.LabTrainer",
+                "visionlab.core.trainer.LabTrainer.persist_predictions",
             ],
-            "app.AutoScaledFastAPI.md": ["visionpod.app.app.AutoScaledFastAPI"],
+            "app.AutoScaledFastAPI.md": ["visionlab.app.app.AutoScaledFastAPI"],
         }
 
         doc_generator = DocumentationGenerator(pages)
-        doc_generator.generate(f"{project}/docs-src/docs/VisionPod Source")
+        doc_generator.generate(f"{project}/docs-src/docs/visionlab Source")
 
         root_readme = os.path.join(project, "README.md")
         docs_intro = os.path.join(DOCSDIR, "intro.md")

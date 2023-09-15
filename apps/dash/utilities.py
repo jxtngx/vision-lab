@@ -21,7 +21,7 @@ import plotly.express as px
 from dash import dash_table
 from lightning.pytorch.utilities.model_summary import ModelSummary
 
-from visionpod import config, PodModule
+from visionlab import config, LabModule
 
 
 def make_metrics_summary():
@@ -93,7 +93,7 @@ def make_model_summary():
     available_checkpoints.remove("README.md")
     latest_checkpoint = available_checkpoints[0]
     chkpt_filename = os.path.join(config.Paths.checkpoints, latest_checkpoint)
-    model = PodModule.load_from_checkpoint(chkpt_filename)
+    model = LabModule.load_from_checkpoint(chkpt_filename)
     model_summary = ModelSummary(model)
     model_summary = model_summary.__str__().split("\n")
     model_layers = make_model_layer_table(model_summary)

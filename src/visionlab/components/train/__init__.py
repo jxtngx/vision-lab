@@ -12,4 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from visionpod.components.sweep.work import SweepWork  # noqa: F401
+from visionlab.components.train.flow import TrainerFlow  # noqa: F401
+from visionlab.components.train.work import TrainerWork  # noqa: F401

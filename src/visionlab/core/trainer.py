@@ -22,10 +22,10 @@ from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers import Logger, TensorBoardLogger
 from lightning.pytorch.profilers import Profiler, PyTorchProfiler
 
-from visionpod import config
+from visionlab import config
 
 
-class PodTrainer(L.Trainer):
+class LabTrainer(L.Trainer):
     """A custom Lightning.LightningTrainer
 
     # Arguments

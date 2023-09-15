@@ -24,7 +24,7 @@ from torchvision.models import ViT_B_32_Weights as Weights
 from torchvision.models.vision_transformer import ConvStemConfig
 
 
-class PodModule(L.LightningModule):
+class LabModule(L.LightningModule):
     """A custom PyTorch Lightning LightningModule for torchvision.VisionTransformer.
 
     # Arguments

@@ -21,7 +21,7 @@ from lightning import CloudCompute, LightningWork
 from lightning.app.utilities.enum import WorkStageStatus
 from lightning.pytorch.loggers import WandbLogger
 
-from visionpod import config, PodDataModule, PodModule, PodTrainer
+from visionlab import config, LabDataModule, LabModule, LabTrainer
 
 
 class SweepWork(LightningWork):
@@ -112,9 +112,9 @@ class SweepWork(LightningWork):
 
         module_payload = {**self._model_kwargs, **learnable_parameters}
 
-        model = PodModule(**module_payload)
+        model = LabModule(**module_payload)
 
-        self._trainer = PodTrainer(
+        self._trainer = LabTrainer(
             logger=logger,
             **self.trainer_init_flags,
         )
@@ -128,7 +128,7 @@ class SweepWork(LightningWork):
         return self._trainer.callback_metrics["val_acc"].item()
 
     def run(self) -> None:
-        self._datamodule = PodDataModule()
+        self._datamodule = LabDataModule()
         self._wandb_api = wandb.Api(api_key=config.ExperimentManager.WANDB_API_KEY)
         os.environ[wandb.env.DIR] = self.wandb_save_dir
         self.sweep_id = wandb.sweep(sweep=self.sweep_config, project=self.project_name)

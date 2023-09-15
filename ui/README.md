@@ -4,7 +4,7 @@ The intent is to learn NextJS and ReactJS well enough to recreate the Dash app s
 
 ![](readme-assets/dash_ui.png)
 
-The current state is deployed on Vercel at [visionpod.vercel.app](https://visionpod.vercel.app).
+The current state is deployed on Vercel at [visionlab.vercel.app](https://visionlab.vercel.app).
 
 ## Getting Started
 

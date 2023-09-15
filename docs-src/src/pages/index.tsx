@@ -16,7 +16,7 @@ function HomepageHeader() {
     <header className={clsx('hero', styles.heroBanner)}>
       <div className="container">
         <h1 className="hero__title">{siteConfig.title}</h1>
-        <p className="hero__subtitle">{siteConfig.tagline} An End to End ML Product </p>
+        <p className="hero__subtitle">{siteConfig.tagline} An end to end CV project built with PyTorch and PyTorch Lightning </p>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"

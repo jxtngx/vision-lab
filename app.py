@@ -16,14 +16,14 @@ import os
 
 from lightning import LightningApp
 
-from visionpod import config
-from visionpod.components import TrainerFlow
+from visionlab import config
+from visionlab.components import TrainerFlow
 
 os.environ["WANDB_CONFIG_DIR"] = config.ExperimentManager.WANDB_CONFIG_DIR
 
 # TODO give a really verbose example of payload
 sweep_payload = dict(
-    project_name="visionpod",  # the wandb project name
+    project_name="visionlab",  # the wandb project name
     trial_count=2,  # low trial count for proof of concept (POC)
     machine="default",  # "gpu-rtx" if is_cloud_run else "default"
     idle_timeout=60,  # time in seconds; wandb needs time to finish logging sweep

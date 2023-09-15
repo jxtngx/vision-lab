@@ -17,24 +17,24 @@ from pathlib import Path
 
 import torch
 
-from visionpod import PodDataModule
+from visionlab import LabDataModule
 
 
 def test_module_not_abstract():
-    _ = PodDataModule()
+    _ = LabDataModule()
 
 
 def test_prepare_data():
-    data_module = PodDataModule()
+    data_module = LabDataModule()
     data_module.prepare_data()
     networkpath = Path(__file__).parent
     projectpath = networkpath.parents[0]
     datapath = os.path.join(projectpath, "data", "cache")
-    assert "PodDataset" in os.listdir(datapath)
+    assert "LabDataset" in os.listdir(datapath)
 
 
 def test_setup():
-    data_module = PodDataModule()
+    data_module = LabDataModule()
     data_module.prepare_data()
     data_module.setup()
     data_keys = ["train_data", "test_data", "val_data"]
@@ -42,7 +42,7 @@ def test_setup():
 
 
 def test_trainloader():
-    data_module = PodDataModule()
+    data_module = LabDataModule()
     data_module.prepare_data()
     data_module.setup()
     loader = data_module.train_dataloader()
@@ -51,7 +51,7 @@ def test_trainloader():
 
 
 def test_testloader():
-    data_module = PodDataModule()
+    data_module = LabDataModule()
     data_module.prepare_data()
     data_module.setup()
     loader = data_module.test_dataloader()
@@ -60,7 +60,7 @@ def test_testloader():
 
 
 def test_valloader():
-    data_module = PodDataModule()
+    data_module = LabDataModule()
     data_module.prepare_data()
     data_module.setup()
     loader = data_module.val_dataloader()

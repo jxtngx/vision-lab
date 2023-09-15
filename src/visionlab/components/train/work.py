@@ -21,11 +21,11 @@ from lightning import CloudCompute, LightningWork
 from lightning.app.utilities.enum import WorkStageStatus
 from lightning.pytorch.loggers import WandbLogger
 
-from visionpod import config, PodDataModule, PodModule, PodTrainer
+from visionlab import config, LabDataModule, LabModule, LabTrainer
 
 
 class TrainerWork(LightningWork):
-    """trains PodModule with optional HPO Sweep"""
+    """trains LabModule with optional HPO Sweep"""
 
     def __init__(
         self,
@@ -181,7 +181,7 @@ class TrainerWork(LightningWork):
             self.tuned_config_path = os.path.join(config.Paths.tuned_configs, f"sweep-{sweep_id}.json")
             self.sweep_id = sweep_id
 
-        self._model = PodModule(
+        self._model = LabModule(
             lr=self.lr,
             optimizer=self.optimizer,
             attention_dropout=self.attention_dropout,
@@ -191,7 +191,7 @@ class TrainerWork(LightningWork):
             **self._model_kwargs,
         )
 
-        self._datamodule = PodDataModule()
+        self._datamodule = LabDataModule()
         self._datamodule.prepare_data()
 
         self._logger = WandbLogger(
@@ -202,7 +202,7 @@ class TrainerWork(LightningWork):
             id=self.run_id,
         )
 
-        self._trainer = PodTrainer(logger=self._logger, **self._trainer_flags)
+        self._trainer = LabTrainer(logger=self._logger, **self._trainer_flags)
         self._trainer.fit(model=self._model, datamodule=self._datamodule)
 
         self._trainer.logger.experiment.finish()

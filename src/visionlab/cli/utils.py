@@ -22,7 +22,7 @@ from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
 
-from visionpod import config
+from visionlab import config
 
 FILEPATH = Path(__file__)
 PROJECT = config.Paths.project

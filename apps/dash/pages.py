@@ -18,7 +18,7 @@ import torch
 from dash import dcc, html
 from utilities import create_figure, find_index, make_metrics_summary, make_model_summary
 
-from visionpod import config
+from visionlab import config
 
 PREDICTIONS = torch.load(config.Paths.predictions)
 DATASET = torch.load(config.Paths.test_split)

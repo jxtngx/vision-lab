@@ -29,7 +29,7 @@ class Settings:
     mps_available = MPSAccelerator.is_available()
     is_cloud_run = is_running_in_cloud()
     seed = 42
-    projectname = "visionpod"
+    projectname = "visionlab"
     data_version = "0"
     maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
     precision_dtype = "16-mixed" if mps_available else "32-true"
@@ -108,13 +108,13 @@ class Sweep:
     )
     init_kwargs = dict(
         wandb_save_dir=Paths.wandb_logs,
-        project_name="visionpod",
+        project_name="visionlab",
         trial_count=10,
         parallel=False,
     )
     fast_init_kwargs = dict(
         wandb_save_dir=Paths.wandb_logs,
-        project_name="visionpod",
+        project_name="visionlab",
         trial_count=2,
         parallel=False,
     )

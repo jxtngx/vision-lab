@@ -1,12 +1,9 @@
 ### AutoScaledFastAPI
 
-
 ```python
-visionpod.app.app.AutoScaledFastAPI()
+visionlab.app.app.AutoScaledFastAPI()
 ```
-
 
 Runs an AutoScaled FastAPI Lightning App
 
-
-----
+---

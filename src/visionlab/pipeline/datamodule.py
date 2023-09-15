@@ -22,16 +22,16 @@ from lightning.pytorch import LightningDataModule, seed_everything
 from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from torch.utils.data import DataLoader, random_split
 
-from visionpod import config
-from visionpod.pipeline.dataset import PodDataset
+from visionlab import config
+from visionlab.pipeline.dataset import LabDataset
 
 NUMWORKERS = int(multiprocessing.cpu_count() // 2)
 
 
-class PodDataModule(LightningDataModule):
+class LabDataModule(LightningDataModule):
     def __init__(
         self,
-        dataset: Any = PodDataset,
+        dataset: Any = LabDataset,
         data_cache: str = config.Paths.dataset,
         data_splits: str = config.Paths.splits,
         train_size: float = 0.8,
