@@ -19,7 +19,7 @@ The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) us
 
 Another purpose of this project is to create a visual interface with [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem.
 
-Core services and dependencies are: [Weights and Biases](http://wandb.ai/site), [Supabase](https://supabase.com), [Prisma](https://www.prisma.io), [FastAPI](https://fastapi.tiangolo.com), and [Zuplo](https://zuplo.com).
+<!-- Core services and dependencies are: [Weights and Biases](http://wandb.ai/site), [Supabase](https://supabase.com), [Prisma](https://www.prisma.io), [FastAPI](https://fastapi.tiangolo.com), and [Zuplo](https://zuplo.com). -->
 
 This is a work in progress, especially the front end.
 
