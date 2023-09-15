@@ -20,7 +20,7 @@ from visionlab import config, LabDataModule, LabModule, LabTrainer
 from visionlab.cli.utils import common_destructive_flow, make_bug_trainer, teardown
 from visionlab.components import SweepWork, TrainerWork
 from visionlab.utilities.bugreport import bugreport
-from visionlab.utilities.docs.autogen import PodDocsGenerator
+from visionlab.utilities.docs.autogen import LabDocsGenerator
 
 PACKAGE = config.Paths.package
 PROJECT = config.Paths.project
@@ -66,7 +66,7 @@ def docs() -> None:
 
 @docs.command("build")
 def build_docs() -> None:
-    PodDocsGenerator.build()
+    LabDocsGenerator.build()
 
 
 @docs.command("start")

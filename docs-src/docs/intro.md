@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# lightning-vision Vision
+# Lightning-Vision
 
 <!-- # Copyright Justin R. Goheen.
 #
@@ -20,17 +20,15 @@ sidebar_position: 1
 
 ## Overview
 
-The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning. The _product_ is a pre-trained VisionTransformer served from Lightning Platform.
+The core purpose of this repo is to help [Lightning.ai](https://lightning.ai) users familiarize with the Lightning ecosystem by providing an example image classification product built with Lightning.
 
 Another purpose of this project is to create a visual interface with [ReactJS](https://reactjs.org) + the [Vercel](https://vercel.com) ecosystem.
 
-Core services and dependencies are: [Weights and Biases](http://wandb.ai/site), [Supabase](https://supabase.com), [Prisma](https://www.prisma.io), [FastAPI](https://fastapi.tiangolo.com), and [Zuplo](https://zuplo.com).
-
-This is a work in progress, especially the front end.
+<!-- Core services and dependencies are: [Weights and Biases](http://wandb.ai/site), [Supabase](https://supabase.com), [Prisma](https://www.prisma.io), [FastAPI](https://fastapi.tiangolo.com), and [Zuplo](https://zuplo.com). -->
 
 The docs can be viewed at [visionlab-docs.vercel.app](https://visionlab-docs.vercel.app/)
 
-The NextJS app's progress can be viewed at [visionlab.vercel.app](https://visionlab.vercel.app/)
+The in-progress frontend app can be viewed at [visionlab.vercel.app](https://visionlab.vercel.app/)
 
 ## Tools and Topics
 
@@ -48,12 +46,10 @@ The NextJS app's progress can be viewed at [visionlab.vercel.app](https://vision
 
 - [Python](https://www.python.org): data engineering, and machine learning
 - [TypeScript](https://www.typescriptlang.org) and [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript): front-end design and visualization, and select back-end services
-- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build), [prisma-client-py](https://github.com/RobertCraigie/prisma-client-py)) may require troubleshooting errors
 
 **Data Engineering and Database Management**
 
 - [Supabase](https://supabase.com): Postgres database, and bucket storage
-- [Prisma](https://www.prisma.io): Next-generation Node.js and TypeScript ORM (with community Python client)
 
 **Model Development and Serving**
 
@@ -115,31 +111,5 @@ export PYTORCH_ENABLE_MPS_FALLBACK=1
 then, to train or run a Sweep, do any of the following:
 
 ```sh
-pod trainer run fast-train
+lab trainer run fast-train
 ```
-
-a Lightning App that will run a W&B Sweep then a tuned training run can be ran locally with:
-
-```sh
-bash do_local_run.sh
-```
-
-Running any of the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.
-
-Once the run is complete, a prototype UI can be ran locally with:
-
-```sh
-lightning run app apps/dash/app.py
-```
-
-## Roadmap
-
-The general outline for building this project is:
-
-- data acquistion and storage
-- do HPO trials and train from best trial config
-- persist model
-- build Model serving API with FastAPI
-- determine feedback criteria for front end users
-- design and build front end
-- improve on feedback

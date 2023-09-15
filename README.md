@@ -42,12 +42,10 @@ The in-progress frontend app can be viewed at [visionlab.vercel.app](https://vis
 
 - [Python](https://www.python.org): data engineering, and machine learning
 - [TypeScript](https://www.typescriptlang.org) and [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript): front-end design and visualization, and select back-end services
-- [Rust](https://www.rust-lang.org): exposure via project tooling ([ruff](https://beta.ruff.rs/docs/), [turbo](https://turbo.build), [prisma-client-py](https://github.com/RobertCraigie/prisma-client-py)) may require troubleshooting errors
 
 **Data Engineering and Database Management**
 
 - [Supabase](https://supabase.com): Postgres database, and bucket storage
-- [Prisma](https://www.prisma.io): Next-generation Node.js and TypeScript ORM (with community Python client)
 
 **Model Development and Serving**
 
@@ -109,31 +107,5 @@ export PYTORCH_ENABLE_MPS_FALLBACK=1
 then, to train or run a Sweep, do any of the following:
 
 ```sh
-pod trainer run fast-train
+lab trainer run fast-train
 ```
-
-a Lightning App that will run a W&B Sweep then a tuned training run can be ran locally with:
-
-```sh
-bash do_local_run.sh
-```
-
-Running any of the above will download the CIFAR10 dataset from torchvision, and cache it to `data/cache`.
-
-Once the run is complete, a prototype UI can be ran locally with:
-
-```sh
-lightning run app apps/dash/app.py
-```
-
-## Roadmap
-
-The general outline for building this project is:
-
-- data acquistion and storage
-- do HPO trials and train from best trial config
-- persist model
-- build Model serving API with FastAPI
-- determine feedback criteria for front end users
-- design and build front end
-- improve on feedback
