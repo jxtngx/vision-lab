@@ -23,7 +23,7 @@ A custom Lightning.LightningTrainer
 
 ```python
 LabTrainer.persist_predictions(
-    predictions_dir="/Users/justin/Developer/lightning-vision-projects/lightning-vision-vision/data/predictions/predictions.pt",
+    predictions_dir="/Users/justin/Developer/lightning-vision-projects/lightning-vision/data/predictions/predictions.pt",
 )
 ```
 

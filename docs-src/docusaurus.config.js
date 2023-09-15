@@ -19,7 +19,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: "JustinGoheen", // Usually your GitHub org/user name.
-  projectName: "lightning-vision-vision", // Usually your repo name.
+  projectName: "lightning-vision", // Usually your repo name.
 
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
@@ -79,7 +79,7 @@ const config = {
           },
           { to: "/blog", label: "Blog", position: "left" },
           {
-            href: "https://github.com/JustinGoheen/lightning-vision-vision",
+            href: "https://github.com/JustinGoheen/lightning-vision",
             label: "GitHub",
             position: "right",
           },
@@ -123,7 +123,7 @@ const config = {
         //       },
         //       {
         //         label: 'GitHub',
-        //         href: 'https://github.com/JustinGoheen/lightning-vision-vision',
+        //         href: 'https://github.com/JustinGoheen/lightning-vision',
         //       },
         //     ],
         //   },

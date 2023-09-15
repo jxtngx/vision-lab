@@ -10,7 +10,7 @@ tags: [W&B]
 _This post is in public draft_.
 
 This post follows a [contribution branch](https://github.com/Lightning-Universe/Training-Studio-app/pull/269)
-of lightning-training-studio and a lightning-vision-vision's visionlab.components [.hpo.work](https://github.com/JustinGoheen/lightning-vision-vision/blob/master/visionlab/components/hpo/work.py) and [.train.work](https://github.com/JustinGoheen/lightning-vision-vision/blob/master/visionlab/components/train/work.py).
+of lightning-training-studio and a lightning-vision's visionlab.components [.hpo.work](https://github.com/JustinGoheen/lightning-vision/blob/master/visionlab/components/hpo/work.py) and [.train.work](https://github.com/JustinGoheen/lightning-vision/blob/master/visionlab/components/train/work.py).
 
 The intent is to enable [grouped](https://docs.wandb.ai/guides/track/advanced/grouping) wandb runs for wandb [Sweeps](https://docs.wandb.ai/guides/sweeps) during hyperparameter optimization by creating a custom Lightning Logger to use with a lightning-training-studio [Sweep](https://github.com/Lightning-Universe/Training-Studio-app/blob/master/lightning_training_studio/components/sweep.py).
 
@@ -51,7 +51,7 @@ scikit-learn defines hyperparameters in [Tuning the hyper-parameters of an estim
 
 ### Lightning Module Hyperparameters
 
-In the example [visionlab.core.module](https://github.com/JustinGoheen/lightning-vision-vision/blob/master/visionlab/core/module.py) (a VisionTransform), the tuneable parameters are `lr`, `optimizer`, `dropout`, `attention_dropout`, `norm_layer` where:
+In the example [visionlab.core.module](https://github.com/JustinGoheen/lightning-vision/blob/master/visionlab/core/module.py) (a VisionTransform), the tuneable parameters are `lr`, `optimizer`, `dropout`, `attention_dropout`, `norm_layer` where:
 
 - `lr` is the learning rate applied to the optimizer
 - `dropout` and `attention_dropout` is the probability of an element to be zeroed
