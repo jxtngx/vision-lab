@@ -1,4 +1,4 @@
-# Lightning-Vision
+# Vision Lab
 
 <!-- # Copyright Justin R. Goheen.
 #
