@@ -19,7 +19,7 @@ from typing import Any, Callable, Dict, Optional
 import wandb
 from lightning import CloudCompute, LightningWork
 from lightning.app.utilities.enum import WorkStageStatus
-from lightning.pytorch.loggers import WandbLogger
+from pytorch_lightning.loggers import WandbLogger
 
 from visionlab import config, LabDataModule, LabModule, LabTrainer
 

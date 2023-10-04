@@ -16,8 +16,8 @@ import os
 from pathlib import Path
 
 import hydra
-import lightning as L
-from lightning.pytorch.demos.boring_classes import BoringModel
+import pytorch_lightning as pl
+from pytorch_lightning.demos.boring_classes import BoringModel
 from omegaconf.dictconfig import DictConfig
 
 # SET PATHS
@@ -32,7 +32,7 @@ project = os.getcwd()
 )
 def main(cfg: DictConfig) -> None:
     model = BoringModel()
-    trainer = L.Trainer(
+    trainer = pl.Trainer(
         max_epochs=cfg.trainer.max_epochs,
         limit_train_batches=cfg.trainer.limit_train_batches,
         limit_predict_batches=cfg.trainer.limit_predict_batches,

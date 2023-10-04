@@ -18,8 +18,8 @@ from typing import Any, Callable, Union
 
 import torch
 import torchvision
-from lightning.pytorch import LightningDataModule, seed_everything
-from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
+from pytorch_lightning import LightningDataModule, seed_everything
+from pytorch_lightning.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from torch.utils.data import DataLoader, random_split
 
 from visionlab import config

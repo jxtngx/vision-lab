@@ -15,7 +15,7 @@
 from functools import partial
 from typing import List, Optional
 
-import lightning as L
+import pytorch_lightning as pl
 import torch.nn.functional as F
 from torch import nn, optim
 from torchmetrics.functional import accuracy
@@ -24,7 +24,7 @@ from torchvision.models import ViT_B_32_Weights as Weights
 from torchvision.models.vision_transformer import ConvStemConfig
 
 
-class LabModule(L.LightningModule):
+class LabModule(pl.LightningModule):
     """A custom PyTorch Lightning LightningModule for torchvision.VisionTransformer.
 
     # Arguments

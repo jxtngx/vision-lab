@@ -18,7 +18,7 @@ import os
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from lightning.pytorch.utilities.model_summary import ModelSummary
+from pytorch_lightning.utilities.model_summary import ModelSummary
 
 from dash import dash_table
 from visionlab import config, LabModule

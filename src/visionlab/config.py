@@ -20,8 +20,8 @@ from pathlib import Path
 import torch
 from lightning.app import CloudCompute
 from lightning.app.utilities.cloud import is_running_in_cloud
-from lightning.pytorch.accelerators.mps import MPSAccelerator
-from lightning.pytorch.callbacks import EarlyStopping
+from pytorch_lightning.accelerators.mps import MPSAccelerator
+from pytorch_lightning.callbacks import EarlyStopping
 from torchvision import transforms
 
 

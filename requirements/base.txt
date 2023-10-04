@@ -2,4 +2,5 @@ pytorch-lightning
 torch
 torchvision
 wandb
+optuna
 torch-tb-profiler
