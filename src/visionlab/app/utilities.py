@@ -89,10 +89,10 @@ def make_model_param_text(model_summary: list):
 
 
 def make_model_summary():
-    available_checkpoints = os.listdir(config.Paths.checkpoints)
-    available_checkpoints.remove("README.md")
-    latest_checkpoint = available_checkpoints[0]
-    chkpt_filename = os.path.join(config.Paths.checkpoints, latest_checkpoint)
+    available_trials = os.listdir(config.Paths.trials)
+    available_trials.remove("README.md")
+    latest_checkpoint = available_trials[0]
+    chkpt_filename = os.path.join(config.Paths.trials, latest_checkpoint)
     model = LabModule.load_from_checkpoint(chkpt_filename)
     model_summary = ModelSummary(model)
     model_summary = model_summary.__str__().split("\n")

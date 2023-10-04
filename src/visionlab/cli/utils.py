@@ -64,7 +64,7 @@ def teardown() -> None:
     do_not_delete = "README.md"
 
     target_dirs = [
-        os.path.join(PROJECT, "models", "checkpoints"),
+        os.path.join(PROJECT, "models", "trials"),
         os.path.join(PROJECT, "models", "onnx"),
         os.path.join(PROJECT, "logs", "tensorboard"),
         os.path.join(PROJECT, "logs", "torch_profiler"),

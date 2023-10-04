@@ -185,7 +185,7 @@ next-env.d.ts
 # PROJECT
 # profiler, logger logs, model checkpoints, production models, data
 outputs/
-/models/checkpoints/model*
+/models/trials/model*
 /logs/tensorboard/version*
 /logs/torch_profiler/fit*
 /logs/torch_profiler/predict*

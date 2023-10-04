@@ -51,7 +51,7 @@ class Paths:
     wandb_logs = os.path.join(logs, "wandb")
     wandb_summary = os.path.join(logs, "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
     # models
-    checkpoints = os.path.join(project, "models", "checkpoints")
+    trials = os.path.join(project, "models", "trials")
     model = os.path.join(project, "models", "onnx", "model.onnx")
     # data
     predictions = os.path.join(project, "data", "predictions", "predictions.pt")

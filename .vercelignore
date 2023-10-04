@@ -182,10 +182,10 @@ next-env.d.ts
 .turbo
 
 # PROJECT
-# profiler, logger logs, model checkpoints, production models, data
+# profiler, logger logs, model trials, production models, data
 .ruff_cache/
 outputs/
-models/checkpoints/model*
+models/trials/model*
 /wandb/
 /docs/
 /logs/

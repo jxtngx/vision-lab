@@ -55,7 +55,7 @@ class LabTrainer(L.Trainer):
         super().__init__(
             logger=logger or TensorBoardLogger(config.Paths.tensorboard, name="logs"),
             profiler=profiler,
-            callbacks=callbacks + [ModelCheckpoint(dirpath=config.Paths.checkpoints, filename="model")],
+            callbacks=callbacks + [ModelCheckpoint(dirpath=config.Paths.trials, filename="model")],
             plugins=plugins,
             **trainer_init_kwargs
         )
