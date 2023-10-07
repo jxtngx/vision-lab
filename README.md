@@ -24,7 +24,7 @@ The recommended way for Vision lab users to create new repos is with the [use th
 
 `visionlab.pages` should contain code for data apps built with streamlit.
 
-`visionlab.conf` can assist with project, trainer, and sweep configurations.
+`visionlab.config` can assist with project, trainer, and sweep configurations.
 
 ### Project Root
 
