@@ -17,14 +17,12 @@ import os
 from typing import Any, Callable, Dict, Optional
 
 import wandb
-from lightning import CloudCompute, LightningWork
-from lightning.app.utilities.enum import WorkStageStatus
 from pytorch_lightning.loggers import WandbLogger
 
 from visionlab import config, LabDataModule, LabModule, LabTrainer
 
 
-class TrainerWork(LightningWork):
+class TrainerWork:
     """trains LabModule with optional HPO Sweep"""
 
     def __init__(
@@ -37,22 +35,11 @@ class TrainerWork(LightningWork):
         tuned_config_path: Optional[str] = None,
         tune: bool = False,
         fast_train_run: bool = False,
-        parallel: bool = False,
         persist_model: bool = False,
         persist_predictions: bool = False,
         predictions_dir: str = config.Paths.predictions,
-        machine: Optional[str] = None,
-        idle_timeout: int = 10,
-        interruptible: bool = False,
-        **work_kwargs,
     ) -> None:
-        super().__init__(
-            parallel=parallel,
-            cache_calls=True,
-            cloud_compute=CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible),
-            start_with_flow=False,
-            **work_kwargs,
-        )
+        super().__init__()
 
         if not tuned_config_path and not module_kwargs and not tune:
             raise ValueError("either module_kwargs must be set or tuned_configs_path be provided")
@@ -213,4 +200,3 @@ class TrainerWork(LightningWork):
             self._persist_predictions(self.predictions_dir)
 
         self.is_finished = True
-        self.status.stage = WorkStageStatus.SUCCEEDED

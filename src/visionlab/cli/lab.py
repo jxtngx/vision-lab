@@ -19,8 +19,6 @@ import click
 from visionlab import config, LabDataModule, LabModule, LabTrainer
 from visionlab.cli.utils import common_destructive_flow, make_bug_trainer, teardown
 from visionlab.components import SweepWork, TrainerWork
-from visionlab.utilities.bugreport import bugreport
-from visionlab.utilities.docs.autogen import LabDocsGenerator
 
 PACKAGE = config.Paths.package
 PROJECT = config.Paths.project
@@ -36,20 +34,27 @@ def _teardown() -> None:
     common_destructive_flow([teardown], command_name="teardown")
 
 
-@main.group("run")
-def run() -> None:
+@main.group("docs")
+def docs() -> None:
     pass
 
 
-@run.command("bug-report")
-def bug_report() -> None:
-    bugreport.main()
-    print("\n")
-    make_bug_trainer()
-    trainer = os.path.join(PACKAGE, "core", "bug_trainer.py")
-    run_command = " ".join(["python", trainer, " 2> boring_trainer_error.md"])
-    os.system(run_command)
-    os.remove(trainer)
+@docs.command("build")
+def build() -> None:
+    import shutil
+
+    os.system("mkdocs build")
+    shutil.copyfile(src="README.md", dst="docs/index.md")
+
+
+@docs.command("serve")
+def serve() -> None:
+    os.system("mkdocs serve")
+
+
+@main.group("run")
+def run() -> None:
+    pass
 
 
 @run.command("demo-ui")
@@ -57,16 +62,6 @@ def demo_ui() -> None:
     ui = os.path.join(PROJECT, "research", "demo", "app.py")
     run_command = f"lightning run app {ui}"
     os.system(run_command)
-
-
-@main.group("docs")
-def docs() -> None:
-    pass
-
-
-@docs.command("build")
-def build_docs() -> None:
-    LabDocsGenerator.build()
 
 
 @docs.command("start")

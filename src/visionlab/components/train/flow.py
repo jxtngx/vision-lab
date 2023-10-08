@@ -15,14 +15,13 @@
 import sys
 from typing import Any, Dict
 
-from lightning import LightningFlow
 
 from visionlab import config
 from visionlab.components.sweep.work import SweepWork
 from visionlab.components.train.work import TrainerWork
 
 
-class TrainerFlow(LightningFlow):
+class TrainerFlow:
     def __init__(self, sweep_payload: Dict[str, Any], trainer_payload: Dict[str, Any]) -> None:
         super().__init__()
         self.sweep_work = SweepWork(**sweep_payload)

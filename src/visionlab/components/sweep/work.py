@@ -17,14 +17,12 @@ import os
 from typing import Any, Dict, Optional
 
 import wandb
-from lightning import CloudCompute, LightningWork
-from lightning.app.utilities.enum import WorkStageStatus
 from pytorch_lightning.loggers import WandbLogger
 
 from visionlab import config, LabDataModule, LabModule, LabTrainer
 
 
-class SweepWork(LightningWork):
+class SweepWork:
     """manages hyperparameter tuning with W&B Sweeps"""
 
     def __init__(
@@ -35,19 +33,8 @@ class SweepWork(LightningWork):
         trainer_init_flags: Dict[str, Any] = config.Sweep.trainer_flags,
         model_kwargs: Optional[Dict[str, Any]] = None,
         trial_count: int = 10,
-        parallel: bool = False,
-        machine: str = "default",
-        idle_timeout: int = 60,
-        interruptible: bool = False,
-        **kwargs,
     ):
-        super().__init__(
-            parallel=parallel,
-            cache_calls=True,
-            cloud_compute=CloudCompute(name=machine, idle_timeout=idle_timeout, interruptible=interruptible),
-            start_with_flow=True,
-            **kwargs,
-        )
+        super().__init__()
 
         self.project_name = project_name
         self.wandb_save_dir = wandb_save_dir
@@ -139,4 +126,3 @@ class SweepWork(LightningWork):
         wandb.finish()
         self.is_finished = True  # hack to try and get log_results to wait
         self.log_results()
-        self.status.stage = WorkStageStatus.SUCCEEDED

@@ -18,8 +18,6 @@ from functools import partial
 from pathlib import Path
 
 import torch
-from lightning.app import CloudCompute
-from lightning.app.utilities.cloud import is_running_in_cloud
 from pytorch_lightning.accelerators.mps import MPSAccelerator
 from pytorch_lightning.callbacks import EarlyStopping
 from torchvision import transforms
@@ -27,20 +25,17 @@ from torchvision import transforms
 
 class Settings:
     mps_available = MPSAccelerator.is_available()
-    is_cloud_run = is_running_in_cloud()
     seed = 42
     projectname = "visionlab"
     data_version = "0"
     maybe_use_mps = dict(accelerator="mps", devices=1) if MPSAccelerator.is_available() else {}
     precision_dtype = "16-mixed" if mps_available else "32-true"
-    is_cloud_run = is_running_in_cloud()
-    machine = "gpu" if is_cloud_run else "default"
     platform = sys.platform
 
 
 class Paths:
     filepath = Path(__file__)
-    project = os.getcwd() if Settings.is_cloud_run else filepath.parents[2]
+    project = filepath.parents[2]
     package = filepath.parent
     # logs
     logs = os.path.join(project, "logs")
@@ -173,12 +168,6 @@ class DataModule:
 class Tune:
     sweep_payload = dict()
     trainer_payload = dict()
-
-
-class Compute:
-    train_compute = CloudCompute(name="gpu-rtx-multi", idle_timeout=10)
-    sweep_compute = CloudCompute(name="default", idle_timeout=10)
-    flow_compute = CloudCompute(name="default")
 
 
 class ExperimentManager:
