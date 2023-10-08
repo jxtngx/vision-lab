@@ -51,10 +51,6 @@ extra:
     - icon: fontawesome/brands/discord
       link: https://discord.gg/XncpTy7DSt
 
-  analytics:
-    provider: google
-    property: G-3JYEVW6724
-
 markdown_extensions:
   - abbr
   - admonition
