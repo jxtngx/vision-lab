@@ -29,6 +29,8 @@ NUMWORKERS = int(multiprocessing.cpu_count() // 2)
 
 
 class LabDataModule(LightningDataModule):
+    """A custom LightningDataModule"""
+
     def __init__(
         self,
         dataset: Any = LabDataset,
@@ -56,6 +58,7 @@ class LabDataModule(LightningDataModule):
         self.data_cache_exists = os.path.isdir(self.data_cache)
 
     def prepare_data(self) -> None:
+        """prepares data for the dataloaders"""
         vfiles = (
             f"v{self.data_version}-train.pt",
             f"v{self.data_version}-val.pt",
@@ -80,6 +83,7 @@ class LabDataModule(LightningDataModule):
             self._persist_splits()
 
     def setup(self, stage: Union[str, None] = None) -> None:
+        """used by trainer to setup the dataset for training and evaluation"""
         if stage == "fit" or stage is None:
             self.train_data = torch.load(os.path.join(self.data_splits, f"v{self.data_version}-train.pt"))
             self.val_data = torch.load(os.path.join(self.data_splits, f"v{self.data_version}-val.pt"))
@@ -102,10 +106,13 @@ class LabDataModule(LightningDataModule):
         torch.save(test_data, os.path.join(self.data_splits, f"v{self.data_version}-test.pt"))
 
     def train_dataloader(self) -> TRAIN_DATALOADERS:
+        """the dataloader used during training"""
         return DataLoader(self.train_data, shuffle=True, num_workers=self.num_workers, batch_size=self.batch_size)
 
     def test_dataloader(self) -> EVAL_DATALOADERS:
+        """the dataloader used during testing"""
         return DataLoader(self.test_data, shuffle=False, num_workers=self.num_workers, batch_size=self.batch_size)
 
     def val_dataloader(self) -> EVAL_DATALOADERS:
+        """the dataloader used during validation"""
         return DataLoader(self.val_data, shuffle=False, num_workers=self.num_workers, batch_size=self.batch_size)

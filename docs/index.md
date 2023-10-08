@@ -1,8 +1,11 @@
 ---
-sidebar_position: 1
+authors:
+  - justingoheen
+date: 2023-01-01
+categories:
 ---
 
-# Lightning-Vision
+# README
 
 <!-- # Copyright Justin R. Goheen.
 #
@@ -113,3 +116,9 @@ then, to train or run a Sweep, do any of the following:
 ```sh
 lab trainer run fast-train
 ```
+
+## Data
+
+The [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html) dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class. There are 50000 training images and 10000 test images.
+
+The dataset is divided into five training batches and one test batch, each with 10000 images. The test batch contains exactly 1000 randomly-selected images from each class. The training batches contain the remaining images in random order, but some training batches may contain more images from one class than another. Between them, the training batches contain exactly 5000 images from each class.

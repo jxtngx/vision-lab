@@ -28,7 +28,7 @@ from visionlab import config
 class LabTrainer(pl.Trainer):
     """A custom Lightning.LightningTrainer
 
-    # Arguments
+    Args:
         logger: None
         profiler: None
         callbacks: []
@@ -63,7 +63,7 @@ class LabTrainer(pl.Trainer):
     def persist_predictions(self, predictions_dir: Optional[Union[str, Path]] = config.Paths.predictions) -> None:
         """helper method to persist predictions on completion of a training run
 
-        # Arguments
+        Args:
             predictions_dir: the directory path where predictions should be saved to
         """
         self.test(ckpt_path="best", datamodule=self.datamodule)
