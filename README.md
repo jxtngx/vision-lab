@@ -49,3 +49,35 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[all]"
 ```
+
+## Using Vision Lab
+
+Vision Lab also enables use of a CLI named `lab` that is built with [Typer](https://typer.tiangolo.com). This CLI is available in the terminal after install. `lab`'s features can be view with:
+
+```sh
+lab --help
+```
+
+A [fast dev run](https://lightning.ai/docs/pytorch/latest/common/trainer.html#fast-dev-run) cab be ran with:
+
+```sh
+lab run dev
+```
+
+A longer demo run can be inititated with:
+
+```sh
+lab run demo
+```
+
+### Weights and Biases
+
+If you have a [Weights and Biases](https://wandb.ai/site) account, you can override the default CSV logger and use wanbd with:
+
+```sh
+lab run demo --logger wandb
+```
+
+### Streamlit
+
+Stay tuned for the Streamlit app!
