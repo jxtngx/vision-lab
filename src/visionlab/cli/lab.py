@@ -13,143 +13,92 @@
 # limitations under the License.
 
 import os
+from pathlib import Path
 
-import click
+import typer
+from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.loggers.csv_logs import CSVLogger
+from pytorch_lightning.loggers.wandb import WandbLogger
+from pytorch_lightning.profilers import PyTorchProfiler
+from typing_extensions import Annotated
 
-from visionlab import config, LabDataModule, LabModule, LabTrainer
-from visionlab.components import SweepWork, TrainerWork
+from visionlab import Config, LabDataModule, LabModule, LabTrainer
 
-PACKAGE = config.Paths.package
-PROJECT = config.Paths.project
+FILEPATH = Path(__file__)
+PROJECTPATH = FILEPATH.parents[2]
+PKGPATH = FILEPATH.parents[1]
+
+app = typer.Typer()
+docs_app = typer.Typer()
+run_app = typer.Typer()
+app.add_typer(docs_app, name="docs")
+app.add_typer(run_app, name="run")
 
 
-@click.group()
-def main() -> None:
+@app.callback()
+def callback() -> None:
     pass
 
 
-@main.group("docs")
-def docs() -> None:
-    pass
+# Docs
 
 
-@docs.command("build")
-def build() -> None:
+@docs_app.command("build")
+def build_docs() -> None:
     import shutil
 
     os.system("mkdocs build")
     shutil.copyfile(src="README.md", dst="docs/index.md")
 
 
-@docs.command("serve")
-def serve() -> None:
+@docs_app.command("serve")
+def serve_docs() -> None:
     os.system("mkdocs serve")
 
 
-@main.group("run")
-def run() -> None:
-    pass
+# Run
 
 
-@run.command("demo-ui")
-def demo_ui() -> None:
-    ui = os.path.join(PROJECT, "research", "demo", "app.py")
-    run_command = f"lightning run app {ui}"
-    os.system(run_command)
-
-
-@docs.command("start")
-def start_docs() -> None:
-    _cwd = os.getcwd()
-    try:
-        os.chdir(os.path.join(PROJECT, "docs-src"))
-        os.system("yarn start")
-    except KeyboardInterrupt:
-        os.chdir(_cwd)
-
-
-@main.group("trainer")
-def trainer() -> None:
-    pass
-
-
-@trainer.group("run")
-def trainer_run() -> None:
-    pass
-
-
-@trainer_run.command("fast-dev")
-@click.option("--image_size", default=config.Module.model_kwargs["image_size"])
-@click.option("--num_classes", default=config.Module.model_kwargs["num_classes"])
-def fast_dev(image_size, num_classes) -> None:
-    model = LabModule(image_size=image_size, num_classes=num_classes)
+@run_app.command("dev")
+def run_dev():
     datamodule = LabDataModule()
-    trainer = LabTrainer(fast_dev_run=True, **config.Trainer.fast_flags)
+    model = LabModule()
+    trainer = LabTrainer(fast_dev_run=True)
     trainer.fit(model=model, datamodule=datamodule)
 
 
-@trainer_run.command("fast-train")
-@click.option("--project-name", default="visionlab")
-@click.option("--persist_model", default=False)
-@click.option("--persist_predictions", default=True)
-def fast_train(project_name, persist_model, persist_predictions) -> None:
-    trainer = TrainerWork(
-        trainer_flags=config.Trainer.fast_flags,
-        project_name=project_name,
-        sweep=False,
-        trial_count=None,
-        fast_train_run=True,
+@run_app.command("demo")
+def run_demo(
+    logger: Annotated[str, typer.Option(help="logger to use. one of (`wandb`, `csv`)")] = "csv",
+):
+    if logger == "wandb":
+        logger = WandbLogger(name="textlab-demo", save_dir=Config.WANDBPATH, project=Config.PROJECTNAME)
+
+    else:
+        logger = CSVLogger(save_dir=Config.CSVLOGGERPATH)
+
+    datamodule = LabDataModule()
+    model = LabModule()
+    trainer = LabTrainer(
+        devices="auto",
+        accelerator="auto",
+        strategy="auto",
+        num_nodes=1,
+        precision="32-true",
+        enable_checkpointing=True,
+        max_epochs=2,
+        callbacks=EarlyStopping(monitor="val-loss", mode="min"),
+        logger=logger,
+        profiler=PyTorchProfiler(dirpath="logs/torch_profiler"),
     )
-    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions)
+    trainer.fit(model=model, datamodule=datamodule)
 
 
-@trainer_run.command("untuned")
-@click.option("--project-name", default="visionlab")
-@click.option("--persist_model", default=False)
-@click.option("--persist_predictions", default=True)
-def untuned(project_name, persist_model, persist_predictions) -> None:
-    flags = config.Trainer.train_flags
-    flags["callbacks"] = []
-    flags["max_epochs"] = 25
-    trainer = TrainerWork(
-        trainer_flags=flags,
-        project_name=project_name,
-        sweep=False,
-        trial_count=None,
-    )
-    trainer.run(persist_model=persist_model, persist_predictions=persist_predictions)
+@run_app.command("sweep")
+def run_sweep() -> None:
+    print("Not implemented")
 
 
-@trainer_run.command("fast-sweep")
-@click.option("--project-name", default="visionlab")
-@click.option("--persist_model", default=False)
-@click.option("--persist_predictions", default=False)
-def fast_sweep(project_name, persist_model, persist_predictions) -> None:
-    trainer = SweepWork(
-        project_name=project_name,
-        trainer_init_kwargs=config.Trainer.fast_flags,
-    )
-    trainer.run()
-
-
-@trainer_run.command("tuned")
-@click.option("--project-name", default="visionlab")
-@click.option("--trial-count", default=10)
-@click.option("--persist_model", is_flag=True)
-@click.option("--persist_predictions", is_flag=True)
-@click.option("--image_size", default=config.Module.model_kwargs["image_size"])
-@click.option("--num_classes", default=config.Module.model_kwargs["num_classes"])
-def tuned(
-    project_name,
-    trial_count,
-    persist_model,
-    persist_predictions,
-    image_size,
-    num_classes,
-) -> None:
-    trainer = TrainerWork(project_name=project_name, trial_count=trial_count)
-    trainer.run(
-        project_name,
-        persist_model=persist_model,
-        persist_predictions=persist_predictions,
-    )
+@run_app.command("from-cfg")
+def run_from_config() -> None:
+    print("Not implemented")
