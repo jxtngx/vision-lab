@@ -45,6 +45,7 @@ class Paths:
     tuned_configs = os.path.join(logs, "tuned_configs")
     wandb_logs = os.path.join(logs, "wandb")
     wandb_summary = os.path.join(logs, "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
+    csvlogger = os.path.join(logs, "csv")
     # models
     trials = os.path.join(project, "models", "trials")
     model = os.path.join(project, "models", "onnx", "model.onnx")

@@ -123,9 +123,9 @@ class LabModule(pl.LightningModule):
         loss = F.cross_entropy(y_hat, y)
 
         if stage == "training":
-            self.log(f"{stage}_loss", loss)
+            self.log(f"{stage}-loss", loss)
             return loss
         if stage in ["val", "test"]:
             acc = accuracy(y_hat.argmax(dim=-1), y, task=self.accuracy_task, num_classes=self.num_classes)
-            self.log(f"{stage}_acc", acc)
-            self.log(f"{stage}_loss", loss)
+            self.log(f"{stage}-acc", acc)
+            self.log(f"{stage}-loss", loss)

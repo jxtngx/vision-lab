@@ -22,7 +22,7 @@ from pytorch_lightning.loggers import WandbLogger
 from visionlab import config, LabDataModule, LabModule, LabTrainer
 
 
-class SweepWork:
+class Sweep:
     """manages hyperparameter tuning with W&B Sweeps"""
 
     def __init__(

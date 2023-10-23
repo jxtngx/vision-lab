@@ -12,6 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from visionlab.components.sweep.work import SweepWork  # noqa: F401
-from visionlab.components.train import TrainerFlow  # noqa: F401
-from visionlab.components.train import TrainerWork  # noqa: F401
+from visionlab.components.hpo.run import Run  # noqa: F401
+from visionlab.components.hpo.sweep import Sweep  # noqa: F401

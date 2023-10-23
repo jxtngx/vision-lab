@@ -16,13 +16,13 @@ import os
 from pathlib import Path
 
 import typer
-from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.loggers.csv_logs import CSVLogger
 from pytorch_lightning.loggers.wandb import WandbLogger
 from pytorch_lightning.profilers import PyTorchProfiler
 from typing_extensions import Annotated
 
-from visionlab import Config, LabDataModule, LabModule, LabTrainer
+from visionlab import config, LabDataModule, LabModule, LabTrainer
 
 FILEPATH = Path(__file__)
 PROJECTPATH = FILEPATH.parents[2]
@@ -72,10 +72,10 @@ def run_demo(
     logger: Annotated[str, typer.Option(help="logger to use. one of (`wandb`, `csv`)")] = "csv",
 ):
     if logger == "wandb":
-        logger = WandbLogger(name="textlab-demo", save_dir=Config.WANDBPATH, project=Config.PROJECTNAME)
+        logger = WandbLogger(name="textlab-demo", save_dir=config.Paths.wandb_logs, project=config.Settings.projectname)
 
     else:
-        logger = CSVLogger(save_dir=Config.CSVLOGGERPATH)
+        logger = CSVLogger(save_dir=config.Paths.csvlogger)
 
     datamodule = LabDataModule()
     model = LabModule()
@@ -87,7 +87,10 @@ def run_demo(
         precision="32-true",
         enable_checkpointing=True,
         max_epochs=2,
-        callbacks=EarlyStopping(monitor="val-loss", mode="min"),
+        callbacks=[
+            EarlyStopping(monitor="val-loss", mode="min"),
+            ModelCheckpoint(dirpath=config.Paths.trials, filename="model"),
+        ],
         logger=logger,
         profiler=PyTorchProfiler(dirpath="logs/torch_profiler"),
     )
