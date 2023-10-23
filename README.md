@@ -52,7 +52,7 @@ pip install -e ".[all]"
 
 ## Using Vision Lab
 
-Vision Lab also enables use of a CLI named `lab` that is built with [Typer](https://typer.tiangolo.com). This CLI is available in the terminal after install. `lab`'s features can be view with:
+Vision Lab also enables use of a CLI named `lab` that is built with [Typer](https://typer.tiangolo.com). This CLI is available in the terminal after install. `lab`'s features can be viewed with:
 
 ```sh
 lab --help
