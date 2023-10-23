@@ -16,9 +16,9 @@
 
 ## Overview
 
-Vision lab is a public template for computer vision deep learning research projects using Lightning AI's [PyTorch Lightning](https://lightning.ai/docs/pytorch/latest/).
+Vision lab is a public template for computer vision deep learning research projects using [TorchVision](https://pytorch.org/vision/stable/index.html) and Lightning AI's [PyTorch Lightning](https://lightning.ai/docs/pytorch/latest/).
 
-Use Vision Lab to train or finetune the default torchvision Vision Transformer clone it and or make it your own by implementing a new model and dataset.
+Use Vision Lab to train or finetune the default torchvision Vision Transformer or make it your own by implementing a new model and dataset after cloning the repo.
 
 The recommended way for Vision lab users to create new repos is with the [use this template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) button.
 
