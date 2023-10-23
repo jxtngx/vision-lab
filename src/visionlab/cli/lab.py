@@ -17,7 +17,6 @@ import os
 import click
 
 from visionlab import config, LabDataModule, LabModule, LabTrainer
-from visionlab.cli.utils import common_destructive_flow, make_bug_trainer, teardown
 from visionlab.components import SweepWork, TrainerWork
 
 PACKAGE = config.Paths.package
@@ -27,11 +26,6 @@ PROJECT = config.Paths.project
 @click.group()
 def main() -> None:
     pass
-
-
-@main.command("teardown")
-def _teardown() -> None:
-    common_destructive_flow([teardown], command_name="teardown")
 
 
 @main.group("docs")

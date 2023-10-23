@@ -14,17 +14,19 @@
 
 import json
 import os
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import streamlit as st
+from plotly.graph_objects import Figure
 from pytorch_lightning.utilities.model_summary import ModelSummary
 
-from dash import dash_table
 from visionlab import config, LabModule
 
 
-def make_metrics_summary():
+def make_metrics_summary() -> Dict[str, Any]:
     summary = json.load(open(config.Paths.wandb_summary))
     summary = dict(summary)
     collection = {
@@ -35,7 +37,7 @@ def make_metrics_summary():
     return collection
 
 
-def create_figure(image, title_text):
+def create_figure(image, title_text) -> Figure:
     image = np.transpose(image.numpy(), (1, 2, 0))
     fig = px.imshow(image)
     fig.update_layout(
@@ -52,7 +54,7 @@ def create_figure(image, title_text):
     return fig
 
 
-def make_model_layer_table(model_summary: list):
+def make_model_layer_table(model_summary: list) -> st.dataframe:
     model_layers = model_summary[:-4]
     model_layers = [i for i in model_layers if not all(j == "-" for j in i)]
     model_layers = [i.split("|") for i in model_layers]
@@ -61,23 +63,11 @@ def make_model_layer_table(model_summary: list):
     header = model_layers[0]
     body = model_layers[1:]
     table = pd.DataFrame(body, columns=header)
-    table = dash_table.DataTable(
-        data=table.to_dict("records"),
-        columns=[{"name": i, "id": i} for i in table.columns],
-        style_cell={
-            "textAlign": "left",
-            "font-family": "FreightSans, Helvetica Neue, Helvetica, Arial, sans-serif",
-        },
-        style_as_list_view=True,
-        style_table={
-            "overflow-x": "auto",
-        },
-        style_header={"border": "0px solid black"},
-    )
+    table = st.dataframe(data=table)
     return table
 
 
-def make_model_param_text(model_summary: list):
+def make_model_param_text(model_summary: list) -> List[str]:
     model_params = model_summary[-4:]
     model_params = [i.split("  ") for i in model_params]
     model_params = [[i[0]] + [i[-1]] for i in model_params]
@@ -88,7 +78,7 @@ def make_model_param_text(model_summary: list):
     return model_params
 
 
-def make_model_summary():
+def make_model_summary() -> Dict[str, Any]:
     available_trials = os.listdir(config.Paths.trials)
     available_trials.remove("README.md")
     latest_checkpoint = available_trials[0]

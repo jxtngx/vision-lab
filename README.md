@@ -1,10 +1,24 @@
 # Vision Lab
 
+<!-- # Copyright Justin R. Goheen.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License. -->
+
 ## Overview
 
 Vision lab is a public template for computer vision deep learning research projects using Lightning AI's [PyTorch Lightning](https://lightning.ai/docs/pytorch/latest/).
 
-Use Vision Lab to train or finetune the default torchvision Vision Transformer or make it your own by implementing a new model and dataset.
+Use Vision Lab to train or finetune the default torchvision Vision Transformer clone it and or make it your own by implementing a new model and dataset.
 
 The recommended way for Vision lab users to create new repos is with the [use this template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) button.
 

@@ -20,7 +20,6 @@ import torch.nn.functional as F
 from torch import nn, optim
 from torchmetrics.functional import accuracy
 from torchvision import models
-from torchvision.models import ViT_B_32_Weights as Weights
 from torchvision.models.vision_transformer import ConvStemConfig
 
 
@@ -65,6 +64,10 @@ class LabModule(pl.LightningModule):
         if not norm_layer:
             norm_layer = partial(nn.LayerNorm, eps=1e-6)
 
+        if weights:
+            weights_name = f"ViT_{vit_type.upper()}_Weights"
+            weights = getattr(models, weights_name)
+
         vit_kwargs = dict(
             image_size=image_size,
             num_classes=num_classes,
@@ -77,7 +80,7 @@ class LabModule(pl.LightningModule):
         vision_transformer = getattr(models, f"vit_{vit_type}")
 
         self.model = vision_transformer(
-            weights=Weights if weights else None,
+            weights=weights,
             progress=progress,
             **vit_kwargs,
         )
