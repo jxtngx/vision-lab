@@ -16,31 +16,31 @@
 
 ## Overview
 
-Vision lab is a public template for computer vision deep learning research projects using [TorchVision](https://pytorch.org/vision/stable/index.html) and Lightning AI's [PyTorch Lightning](https://lightning.ai/docs/pytorch/latest/).
+Vision Lab is a public template for computer vision deep learning research projects using [TorchVision](https://pytorch.org/vision/stable/index.html) and Lightning AI's [PyTorch Lightning](https://lightning.ai/docs/pytorch/latest/).
 
 Use Vision Lab to train or finetune the default torchvision Vision Transformer or make it your own by implementing a new model and dataset after cloning the repo.
 
-The recommended way for Vision lab users to create new repos is with the [use this template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) button.
+You can fork Vision Lab with the [use this template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) button.
 
 ## Source Module
 
-`visionlab.core` should contain code for the Lightning Module and Trainer.
+`visionlab.core` contains code for the Lightning Module and Trainer.
 
-`visionlab.components` should contain experiment utilities grouped by purpose for cohesion.
+`visionlab.components` contains experiment utilities grouped by purpose for cohesion.
 
-`visionlab.pipeline` should contain code for data acquistion and preprocessing, and building a TorchDataset and LightningDataModule.
+`visionlab.pipeline` contains code for data acquistion and preprocessing, and building a TorchDataset and LightningDataModule.
 
-`visionlab.serve` should contain code for model serving APIs built with [FastAPI](https://fastapi.tiangolo.com/project-generation/#machine-learning-models-with-spacy-and-fastapi).
+`visionlab.serve` contains code for model serving APIs built with [FastAPI](https://fastapi.tiangolo.com/project-generation/#machine-learning-models-with-spacy-and-fastapi).
 
-`visionlab.cli` should contain code for the command line interface built with [Typer](https://typer.tiangolo.com/)and [Rich](https://rich.readthedocs.io/en/stable/).
+`visionlab.cli` contains code for the command line interface built with [Typer](https://typer.tiangolo.com/) and [Rich](https://rich.readthedocs.io/en/stable/).
 
-`visionlab.pages` should contain code for data apps built with streamlit.
+`visionlab.pages` contains code for data apps built with [Streamlit](https://streamlit.io/).
 
-`visionlab.config` can assist with project, trainer, and sweep configurations.
+`visionlab.config` assists with project, trainer, and sweep configurations.
 
 ## Base Requirements and Extras
 
-Vision lab installs minimal requirements out of the box, and provides extras to make creating robust virtual environments easier. To view the requirements, in [setup.cfg](setup.cfg), see `install_requires` for the base requirements and `options.extras_require` for the available extras.
+Vision Lab installs minimal requirements out of the box, and provides extras to make creating robust virtual environments easier. To view the requirements, in [setup.cfg](setup.cfg), see `install_requires` for the base requirements and `options.extras_require` for the available extras.
 
 The recommended install is as follows:
 
@@ -72,7 +72,7 @@ lab run demo
 
 ### Weights and Biases
 
-If you have a [Weights and Biases](https://wandb.ai/site) account, you can override the default CSV logger and use wanbd with:
+If you have a [Weights and Biases](https://wandb.ai/site) account, you can override the default CSV logger and use wandb with:
 
 ```sh
 lab run demo --logger wandb
