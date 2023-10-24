@@ -20,7 +20,7 @@ Vision Lab is a public template for computer vision deep learning research proje
 
 Use Vision Lab to train or finetune the default torchvision Vision Transformer or make it your own by implementing a new model and dataset after cloning the repo.
 
-You can fork Vision Lab with the [use this template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) button.
+You can fork Vision Lab with the [use this template](https://github.com/new?template_name=vision-lab&template_owner=JustinGoheen) button.
 
 ## Source Module
 
