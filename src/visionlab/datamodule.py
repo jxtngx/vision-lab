@@ -14,26 +14,27 @@
 
 import multiprocessing
 import os
-from typing import Any, Callable, Union
+from typing import Callable, Union
 
 import torch
 import torchvision
-from pytorch_lightning import LightningDataModule, seed_everything
-from pytorch_lightning.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
+from torchvision.datasets import CIFAR100
+from torchvision.datasets import VisionDataset
+from lightning.pytorch import LightningDataModule, seed_everything
+from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from torch.utils.data import DataLoader, random_split
 
 from visionlab import config
-from visionlab.pipeline.dataset import LabDataset
 
 NUMWORKERS = int(multiprocessing.cpu_count() // 2)
 
 
-class LabDataModule(LightningDataModule):
+class CifarDataModule(LightningDataModule):
     """A custom LightningDataModule"""
 
     def __init__(
         self,
-        dataset: Any = LabDataset,
+        dataset: VisionDataset = CIFAR100,
         data_cache: str = config.Paths.dataset,
         data_splits: str = config.Paths.splits,
         train_size: float = 0.8,
@@ -94,12 +95,8 @@ class LabDataModule(LightningDataModule):
         """saves all splits for reproducibility"""
         seed_everything(config.Settings.seed)
         torchvision.disable_beta_transforms_warning()
-        train = self.dataset(self.data_cache, train=True, transform=self.train_transforms)
-        val = self.dataset(self.data_cache, train=True, transform=self.test_transforms)
-        train_size = int(len(train) * self.train_size)
-        val_size = len(train) - train_size
-        train_data, _ = random_split(train, lengths=[train_size, val_size])
-        _, val_data = random_split(val, lengths=[train_size, val_size])
+        dataset = self.dataset(self.data_cache, train=True, transform=self.train_transforms)
+        train_data, val_data = random_split(dataset, lengths=[self.train_size, 1 - self.train_size])
         test_data = self.dataset(self.data_cache, train=False, transform=self.test_transforms)
         torch.save(train_data, os.path.join(self.data_splits, f"v{self.data_version}-train.pt"))
         torch.save(val_data, os.path.join(self.data_splits, f"v{self.data_version}-val.pt"))

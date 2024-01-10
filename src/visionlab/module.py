@@ -15,7 +15,7 @@
 from functools import partial
 from typing import List, Optional
 
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import torch.nn.functional as F
 from torch import nn, optim
 from torchmetrics.functional import accuracy
@@ -23,7 +23,7 @@ from torchvision import models
 from torchvision.models.vision_transformer import ConvStemConfig
 
 
-class LabModule(pl.LightningModule):
+class ViTModule(pl.LightningModule):
     """A custom PyTorch Lightning LightningModule for torchvision.VisionTransformer.
 
     Args:

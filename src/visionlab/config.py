@@ -18,8 +18,8 @@ from functools import partial
 from pathlib import Path
 
 import torch
-from pytorch_lightning.accelerators.mps import MPSAccelerator
-from pytorch_lightning.callbacks import EarlyStopping
+from lightning.pytorch.accelerators.mps import MPSAccelerator
+from lightning.pytorch.callbacks import EarlyStopping
 from torchvision import transforms
 
 
@@ -91,41 +91,6 @@ class Trainer:
     )
 
 
-class Sweep:
-    config = dict(
-        method="random",
-        metric={"goal": "maximize", "name": "val_acc"},
-        parameters={
-            "lr": {"min": 0.0001, "max": 0.1},
-            "optimizer": {"distribution": "categorical", "values": ["Adam", "RMSprop", "SGD"]},
-            "dropout": {"min": 0.2, "max": 0.5},
-            "attention_dropout": {"min": 0.2, "max": 0.5},
-        },
-    )
-    init_kwargs = dict(
-        wandb_save_dir=Paths.wandb_logs,
-        project_name="visionlab",
-        trial_count=10,
-        parallel=False,
-    )
-    fast_init_kwargs = dict(
-        wandb_save_dir=Paths.wandb_logs,
-        project_name="visionlab",
-        trial_count=2,
-        parallel=False,
-    )
-    fast_trainer_flags = dict(
-        max_epochs=2,
-        precision=Settings.precision_dtype,
-        **Settings.maybe_use_mps,
-    )
-    trainer_flags = dict(
-        max_epochs=10,
-        precision=Settings.precision_dtype,
-        **Settings.maybe_use_mps,
-    )
-
-
 class DataModule:
     batch_size = 128
     mean = [0.49139968, 0.48215841, 0.44653091]
@@ -165,13 +130,3 @@ class DataModule:
         ]
     )
 
-
-class Tune:
-    sweep_payload = dict()
-    trainer_payload = dict()
-
-
-class ExperimentManager:
-    WANDB_API_KEY = os.getenv("WANDB_API_KEY")
-    WANDB_ENTITY = os.getenv("WANDB_ENTITY")
-    WANDB_CONFIG_DIR = Paths.wandb_logs

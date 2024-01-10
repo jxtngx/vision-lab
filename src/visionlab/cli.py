@@ -16,13 +16,12 @@ import os
 from pathlib import Path
 
 import typer
-from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
-from pytorch_lightning.loggers.csv_logs import CSVLogger
-from pytorch_lightning.loggers.wandb import WandbLogger
-from pytorch_lightning.profilers import PyTorchProfiler
+from lightning.pytorch import Trainer
+from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
+from lightning.pytorch.loggers import TensorBoardLogger
 from typing_extensions import Annotated
 
-from visionlab import config, LabDataModule, LabModule, LabTrainer
+from visionlab import config, CifarDataModule, ViTModule
 
 FILEPATH = Path(__file__)
 PROJECTPATH = FILEPATH.parents[2]
@@ -61,47 +60,30 @@ def serve_docs() -> None:
 
 @run_app.command("dev")
 def run_dev():
-    datamodule = LabDataModule()
-    model = LabModule()
-    trainer = LabTrainer(fast_dev_run=True)
+    datamodule = CifarDataModule()
+    model = ViTModule()
+    trainer = Trainer(fast_dev_run=True)
     trainer.fit(model=model, datamodule=datamodule)
 
 
-@run_app.command("demo")
+@run_app.command("trainer")
 def run_demo(
     logger: Annotated[str, typer.Option(help="logger to use. one of (`wandb`, `csv`)")] = "csv",
 ):
-    if logger == "wandb":
-        logger = WandbLogger(name="textlab-demo", save_dir=config.Paths.wandb_logs, project=config.Settings.projectname)
+    logger = TensorBoardLogger(save_dir=config.Paths.csvlogger, name="tensorboard")
 
-    else:
-        logger = CSVLogger(save_dir=config.Paths.csvlogger)
-
-    datamodule = LabDataModule()
-    model = LabModule()
-    trainer = LabTrainer(
+    datamodule = CifarDataModule()
+    model = ViTModule()
+    trainer = Trainer(
         devices="auto",
         accelerator="auto",
         strategy="auto",
-        num_nodes=1,
-        precision="32-true",
         enable_checkpointing=True,
-        max_epochs=2,
+        max_epochs=5,
         callbacks=[
             EarlyStopping(monitor="val-loss", mode="min"),
             ModelCheckpoint(dirpath=config.Paths.trials, filename="model"),
         ],
         logger=logger,
-        profiler=PyTorchProfiler(dirpath="logs/torch_profiler"),
     )
     trainer.fit(model=model, datamodule=datamodule)
-
-
-@run_app.command("sweep")
-def run_sweep() -> None:
-    print("Not implemented")
-
-
-@run_app.command("from-cfg")
-def run_from_config() -> None:
-    print("Not implemented")

@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from visionlab.core import LabModule, LabTrainer  # noqa: F401
-from visionlab.pipeline import LabDataModule  # noqa: F401
+from visionlab.module import ViTModule  # noqa: F401
+from visionlab.datamodule import CifarDataModule  # noqa: F401
