@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. -->
 
-<!-- push from Studio -->
-<!-- zed zed zed -->
 
 ## Overview
 
