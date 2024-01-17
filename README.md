@@ -70,4 +70,14 @@ A longer demo run can be inititated with:
 lab run demo
 ```
 
+### Weights and Biases
 
+If you have a [Weights and Biases](https://wandb.ai/site) account, you can override the default CSV logger and use wandb with:
+
+```sh
+lab run demo --logger wandb
+```
+
+### Streamlit
+
+Stay tuned for the Streamlit app!
