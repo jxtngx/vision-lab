@@ -189,3 +189,4 @@ models/onnx/
 logs/csv/
 data/cache/
 data/training_split/
+logs/csv/tensorboard
