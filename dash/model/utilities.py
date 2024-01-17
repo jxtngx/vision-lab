@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import os
 
 import numpy as np
@@ -21,16 +20,22 @@ import plotly.express as px
 from dash import dash_table
 from lightning.pytorch.utilities.model_summary import ModelSummary
 
-from visionlab import config, ViTModule
+from visionlab import config, VisionTransformer
 
 
 def make_metrics_summary():
-    summary = json.load(open(config.Paths.wandb_summary))
-    summary = dict(summary)
+    logsdir = os.path.join("logs", "csv")
+    logs = os.listdir(logsdir)
+    most_recent = os.path.join(logsdir, f"version_{len(logs)-1}", "metrics.csv")
+    summary = pd.read_csv(most_recent)
+    if not pd.isna(summary["val-loss"].iloc[-1]):
+        index = -1
+    elif pd.isna(summary["val-loss"].iloc[-1]):
+        index = -2
     collection = {
-        "Training Loss": summary["training_loss"],
-        "Val Loss": summary["val_loss"],
-        "Val Acc": summary["val_acc"],
+        "Training Loss": summary["training-loss"].iloc[index - 1],
+        "Val Loss": summary["val-loss"].iloc[index],
+        "Val Acc": summary["val-acc"].iloc[index],
     }
     return collection
 
@@ -89,11 +94,11 @@ def make_model_param_text(model_summary: list):
 
 
 def make_model_summary():
-    available_checkpoints = os.listdir(config.Paths.checkpoints)
+    available_checkpoints = os.listdir(config.Paths.ckpts)
     available_checkpoints.remove("README.md")
     latest_checkpoint = available_checkpoints[0]
-    chkpt_filename = os.path.join(config.Paths.checkpoints, latest_checkpoint)
-    model = ViTModule.load_from_checkpoint(chkpt_filename)
+    chkpt_filename = os.path.join(config.Paths.ckpts, latest_checkpoint)
+    model = VisionTransformer.load_from_checkpoint(chkpt_filename)
     model_summary = ModelSummary(model)
     model_summary = model_summary.__str__().split("\n")
     model_layers = make_model_layer_table(model_summary)
