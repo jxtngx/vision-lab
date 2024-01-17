@@ -188,3 +188,4 @@ models/checkpoints/
 models/onnx/
 logs/csv/
 data/cache/
+data/training_split/
