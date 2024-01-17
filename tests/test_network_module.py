@@ -14,29 +14,29 @@
 
 import torch
 
-from visionlab import ViTModule
+from visionlab import VisionTransformer
 
 
 def test_module_not_abstract():
-    _ = ViTModule()
+    _ = VisionTransformer()
 
 
 def test_module_forward():
     input_sample = torch.randn((1, 784))
-    model = ViTModule()
+    model = VisionTransformer()
     preds, label = model.forward(input_sample)
     assert preds.shape == input_sample.shape
 
 
 def test_module_training_step():
     input_sample = torch.randn((1, 784)), 1
-    model = ViTModule()
+    model = VisionTransformer()
     loss = model.training_step(input_sample)
     assert isinstance(loss, torch.Tensor)
 
 
 def test_optimizer():
-    model = ViTModule()
+    model = VisionTransformer()
     optimizer = model.configure_optimizers()
     optimizer_base_class = optimizer.__class__.__base__.__name__
     assert optimizer_base_class == "Optimizer"

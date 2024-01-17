@@ -41,16 +41,12 @@ class Paths:
     logs = os.path.join(project, "logs")
     torch_profiler = os.path.join(logs, "torch_profiler")
     simple_profiler = os.path.join(logs, "simple_profiler")
-    tensorboard = os.path.join(logs, "tensorboard")
     tuned_configs = os.path.join(logs, "tuned_configs")
-    wandb_logs = os.path.join(logs, "wandb")
-    wandb_summary = os.path.join(logs, "wandb", "wandb", "latest-run", "files", "wandb-summary.json")
-    csvlogger = os.path.join(logs, "csv")
     # models
-    trials = os.path.join(project, "models", "trials")
+    ckpts = os.path.join(project, "models", "checkpoints")
     model = os.path.join(project, "models", "onnx", "model.onnx")
-    # data
     predictions = os.path.join(project, "data", "predictions", "predictions.pt")
+    # data
     dataset = os.path.join(project, "data", "cache")
     splits = os.path.join(project, "data", "training_split")
     train_split = os.path.join(splits, f"v{Settings.data_version}-train.pt")

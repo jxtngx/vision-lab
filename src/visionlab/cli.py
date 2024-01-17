@@ -15,17 +15,18 @@
 import os
 from pathlib import Path
 
+import torch
 import typer
 from lightning.pytorch import Trainer
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
-from lightning.pytorch.loggers import TensorBoardLogger
-from typing_extensions import Annotated
+from lightning.pytorch.loggers import CSVLogger
 
-from visionlab import config, CifarDataModule, ViTModule
+from visionlab import config, CifarDataModule, VisionTransformer
 
-FILEPATH = Path(__file__)
-PROJECTPATH = FILEPATH.parents[2]
-PKGPATH = FILEPATH.parents[1]
+this_file = Path(__file__)
+this_studio_idx = [i for i, j in enumerate(this_file.parents) if j.name.endswith("this_studio")][0]
+this_studio = this_file.parents[this_studio_idx]
+csvlogs = os.path.join(this_studio, "vision-lab", "logs", "csv")
 
 app = typer.Typer()
 docs_app = typer.Typer()
@@ -40,8 +41,6 @@ def callback() -> None:
 
 
 # Docs
-
-
 @docs_app.command("build")
 def build_docs() -> None:
     import shutil
@@ -56,34 +55,40 @@ def serve_docs() -> None:
 
 
 # Run
-
-
 @run_app.command("dev")
 def run_dev():
     datamodule = CifarDataModule()
-    model = ViTModule()
+    model = VisionTransformer()
     trainer = Trainer(fast_dev_run=True)
     trainer.fit(model=model, datamodule=datamodule)
 
 
-@run_app.command("trainer")
-def run_demo(
-    logger: Annotated[str, typer.Option(help="logger to use. one of (`wandb`, `csv`)")] = "csv",
+@run_app.command("trainer", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def run_trainer(
+    devices: str = "auto",
+    accelerator: str = "auto",
+    strategy: str = "auto",
+    max_epochs: int = 10,
+    predict: bool = True,
 ):
-    logger = TensorBoardLogger(save_dir=config.Paths.csvlogger, name="tensorboard")
-
     datamodule = CifarDataModule()
-    model = ViTModule()
+    model = VisionTransformer()
     trainer = Trainer(
-        devices="auto",
-        accelerator="auto",
-        strategy="auto",
+        devices=devices,
+        accelerator=accelerator,
+        strategy=strategy,
+        max_epochs=max_epochs,
         enable_checkpointing=True,
-        max_epochs=5,
         callbacks=[
             EarlyStopping(monitor="val-loss", mode="min"),
-            ModelCheckpoint(dirpath=config.Paths.trials, filename="model"),
+            ModelCheckpoint(dirpath=config.Paths.ckpts, filename="model"),
         ],
-        logger=logger,
+        logger=CSVLogger(save_dir=config.Paths.logs, name="csv"),
+        log_every_n_steps=1,
     )
     trainer.fit(model=model, datamodule=datamodule)
+
+    if predict:
+        trainer.test(ckpt_path="best", datamodule=datamodule)
+        predictions = trainer.predict(model, datamodule.test_dataloader())
+        torch.save(predictions, config.Paths.predictions)

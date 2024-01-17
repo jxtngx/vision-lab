@@ -1,37 +1,24 @@
-# Copyright Justin R. Goheen.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 from functools import partial
 from typing import List, Optional
 
-import lightning.pytorch as pl
 import torch.nn.functional as F
 from torch import nn, optim
 from torchmetrics.functional import accuracy
 from torchvision import models
 from torchvision.models.vision_transformer import ConvStemConfig
 
+import lightning.pytorch as pl
 
-class ViTModule(pl.LightningModule):
-    """A custom PyTorch Lightning LightningModule for torchvision.VisionTransformer.
+
+class VisionTransformer(pl.LightningModule):
+    """A custom PyTorch Lightning LightningModule for torchvision VisionTransformers
 
     Args:
         optimizer: "Adam". A valid [torch.optim](https://pytorch.org/docs/stable/optim.html) name.
         lr: 1e-3
         accuracy_task: "multiclass". One of (binary, multiclass, multilabel).
         image_size: 32
-        num_classes: 10
+        num_classes: 100
         dropout: 0.0
         attention_dropout: 0.0
         norm_layer: None
@@ -47,7 +34,7 @@ class ViTModule(pl.LightningModule):
         lr: float = 1e-3,
         accuracy_task: str = "multiclass",
         image_size: int = 32,
-        num_classes: int = 10,
+        num_classes: int = 100,
         dropout: float = 0.0,
         attention_dropout: float = 0.0,
         norm_layer: Optional[nn.Module] = None,
@@ -95,18 +82,40 @@ class ViTModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch):
-        """runs a training step sequence in ``.common_step``"""
-        return self.common_step(batch, "training")
-
-    def test_step(self, batch, *args):
-        """runs a test step sequence in ``.common_step``"""
-        self.common_step(batch, "test")
+        """runs a training step sequence"""
+        x, y = batch
+        y_hat = self.model(x)
+        loss = F.cross_entropy(y_hat, y)
+        self.log("training-loss", loss)
+        return loss
 
     def validation_step(self, batch, *args):
-        """runs a validation step sequence in ``.common_step``"""
-        self.common_step(batch, "val")
+        """runs a validation step sequence"""
+        x, y = batch
+        y_hat = self.model(x)
+        loss = F.cross_entropy(y_hat, y)
+        self.log("val-loss", loss)
+        acc = accuracy(
+            y_hat.argmax(dim=-1),
+            y,
+            task=self.accuracy_task,
+            num_classes=self.num_classes,
+        )
+        self.log("val-acc", acc)
 
-    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+    def test_step(self, batch, *args):
+        """runs a test step sequence"""
+        x, y = batch
+        y_hat = self.model(x)
+        acc = accuracy(
+            y_hat.argmax(dim=-1),
+            y,
+            task=self.accuracy_task,
+            num_classes=self.num_classes,
+        )
+        self.log("test-acc", acc)
+
+    def predict_step(self, batch):
         """returns predicted logits from the trained model"""
         x, y = batch
         return self(x)
@@ -115,17 +124,3 @@ class ViTModule(pl.LightningModule):
         """configures the ``torch.optim`` used in training loop"""
         optimizer = self.optimizer(self.parameters(), lr=self.lr)
         return optimizer
-
-    def common_step(self, batch, stage):
-        """consolidates common code for train, test, and validation steps"""
-        x, y = batch
-        y_hat = self.model(x)
-        loss = F.cross_entropy(y_hat, y)
-
-        if stage == "training":
-            self.log(f"{stage}-loss", loss)
-            return loss
-        if stage in ["val", "test"]:
-            acc = accuracy(y_hat.argmax(dim=-1), y, task=self.accuracy_task, num_classes=self.num_classes)
-            self.log(f"{stage}-acc", acc)
-            self.log(f"{stage}-loss", loss)
