@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License. -->
 
+<!-- push from Studio -->
+
 ## Overview
 
 Vision Lab is a public template for computer vision deep learning research projects using [TorchVision](https://pytorch.org/vision/stable/index.html) and Lightning AI's [PyTorch Lightning](https://lightning.ai/docs/pytorch/latest/).
