@@ -22,6 +22,9 @@ Use Vision Lab to train or finetune the default torchvision Vision Transformer o
 
 You can fork Vision Lab with the [use this template](https://github.com/new?template_name=vision-lab&template_owner=JustinGoheen) button.
 
+> [!NOTE]
+> Vision Lab was featured by Weights and Biases in [this community spotlight](https://wandb.ai/wandb_fc/repo-spotlight/reports/Community-Spotlight-Lightning-Pod-Series--Vmlldzo0MDI2OTc0)
+
 ## Source Module
 
 `visionlab.core` contains code for the Lightning Module and Trainer.
