@@ -18,10 +18,10 @@ from typing import Callable, Union
 
 import torch
 import torchvision
+import pytorch_lightning as pl
 from torchvision.datasets import CIFAR100
 from torchvision.datasets import VisionDataset
-from lightning.pytorch import LightningDataModule, seed_everything
-from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
+from pytorch_lightning.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from torch.utils.data import DataLoader, random_split
 
 from visionlab import config
@@ -29,7 +29,7 @@ from visionlab import config
 NUMWORKERS = int(multiprocessing.cpu_count() // 2)
 
 
-class CifarDataModule(LightningDataModule):
+class CifarDataModule(pl.LightningDataModule):
     """A custom LightningDataModule"""
 
     def __init__(
@@ -93,7 +93,7 @@ class CifarDataModule(LightningDataModule):
 
     def _persist_splits(self):
         """saves all splits for reproducibility"""
-        seed_everything(config.Settings.seed)
+        pl.seed_everything(config.Settings.seed)
         torchvision.disable_beta_transforms_warning()
         dataset = self.dataset(self.data_cache, train=True, transform=self.train_transforms)
         train_data, val_data = random_split(dataset, lengths=[self.train_size, 1 - self.train_size])
