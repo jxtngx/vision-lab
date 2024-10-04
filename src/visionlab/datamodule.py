@@ -60,13 +60,13 @@ class CifarDataModule(pl.LightningDataModule):
 
     def prepare_data(self) -> None:
         """prepares data for the dataloaders"""
-        vfiles = (
+        versioned_files = (
             f"v{self.data_version}-train.pt",
             f"v{self.data_version}-val.pt",
             f"v{self.data_version}-test.pt",
         )
 
-        version_exists = any(v in os.listdir(self.data_splits) for v in vfiles)
+        version_exists = any(v in os.listdir(self.data_splits) for v in versioned_files)
 
         if not self.data_cache_exists:
             self.dataset(self.data_cache, download=True)
