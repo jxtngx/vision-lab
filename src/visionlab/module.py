@@ -7,7 +7,7 @@ from torchmetrics.functional import accuracy
 from torchvision import models
 from torchvision.models.vision_transformer import ConvStemConfig
 
-import lightning.pytorch as pl
+import pytorch_lightning as pl
 
 
 class VisionTransformer(pl.LightningModule):
