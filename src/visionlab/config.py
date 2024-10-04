@@ -18,8 +18,8 @@ from functools import partial
 from pathlib import Path
 
 import torch
-from lightning.pytorch.accelerators.mps import MPSAccelerator
-from lightning.pytorch.callbacks import EarlyStopping
+from pytorch_lightning.accelerators.mps import MPSAccelerator
+from pytorch_lightning.callbacks import EarlyStopping
 from torchvision import transforms
 
 
