@@ -43,8 +43,8 @@ class Paths:
     simple_profiler = os.path.join(logs, "simple_profiler")
     tuned_configs = os.path.join(logs, "tuned_configs")
     # models
-    ckpts = os.path.join(project, "models", "checkpoints")
-    model = os.path.join(project, "models", "onnx", "model.onnx")
+    ckpts = os.path.join(project, "checkpoints")
+    model = os.path.join(project, "checkpoints", "onnx", "model.onnx")
     predictions = os.path.join(project, "data", "predictions", "predictions.pt")
     # data
     dataset = os.path.join(project, "data", "cache")
